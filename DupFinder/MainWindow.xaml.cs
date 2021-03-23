@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using DupFinderCore;
+using System.Windows;
 
 namespace DupFinder
 {
@@ -7,15 +8,20 @@ namespace DupFinder
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        readonly IImageLoader _loader;
+
+        public MainWindow(IImageLoader loader)
         {
-            InitializeLogging();
+            _loader = loader;
 
             InitializeComponent();
+
+            testc();
         }
 
-        private void InitializeLogging()
+        private void testc()
         {
+            _loader.Test();
         }
     }
 }
