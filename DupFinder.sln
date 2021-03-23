@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DupFinderApp", "DupFinder\D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DupFinderCore", "DupFinderCore\DupFinderCore.csproj", "{D3053715-88AF-41B8-9EB9-9E4A6E7E93CC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DupFinderCore.Tests", "DupFinderCore.Tests\DupFinderCore.Tests.csproj", "{A14999DB-5A10-4CF4-8489-6362C738E975}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{D3053715-88AF-41B8-9EB9-9E4A6E7E93CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D3053715-88AF-41B8-9EB9-9E4A6E7E93CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D3053715-88AF-41B8-9EB9-9E4A6E7E93CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A14999DB-5A10-4CF4-8489-6362C738E975}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A14999DB-5A10-4CF4-8489-6362C738E975}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A14999DB-5A10-4CF4-8489-6362C738E975}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A14999DB-5A10-4CF4-8489-6362C738E975}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
