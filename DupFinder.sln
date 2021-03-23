@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31025.194
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DupFinder", "DupFinder\DupFinder.csproj", "{FC983116-8580-44C7-A374-BDC95C4AFA91}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DupFinderApp", "DupFinder\DupFinderApp.csproj", "{FC983116-8580-44C7-A374-BDC95C4AFA91}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DupFinderCore", "DupFinderCore\DupFinderCore.csproj", "{D3053715-88AF-41B8-9EB9-9E4A6E7E93CC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{FC983116-8580-44C7-A374-BDC95C4AFA91}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FC983116-8580-44C7-A374-BDC95C4AFA91}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FC983116-8580-44C7-A374-BDC95C4AFA91}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3053715-88AF-41B8-9EB9-9E4A6E7E93CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3053715-88AF-41B8-9EB9-9E4A6E7E93CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3053715-88AF-41B8-9EB9-9E4A6E7E93CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3053715-88AF-41B8-9EB9-9E4A6E7E93CC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
