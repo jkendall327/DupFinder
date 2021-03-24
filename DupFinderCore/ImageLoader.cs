@@ -11,14 +11,14 @@ namespace DupFinderCore
         public ImageLoader(ILogger logger)
         {
             _logger = logger;
-            _logger.Information("Starting image loader");
         }
 
-        public void Test()
-        {
-            _logger.Information("hello!");
-        }
-
+        /// <summary>
+        /// Loads an image from a path.
+        /// </summary>
+        /// <exception cref="FileNotFoundException">Thrown when file can't be found.</exception>
+        /// <param name="filepath">Image's path on the hard drive.</param>
+        /// <returns>The image loaded into memory.</returns>
         public Image Load(string filepath)
         {
             try
@@ -27,8 +27,7 @@ namespace DupFinderCore
             }
             catch (FileNotFoundException ex)
             {
-                _logger.Error($"File not found: {ex.FileName}. Error message: {ex.Message}. Error at {ex.TargetSite}. Stack: {ex.StackTrace}");
-
+                _logger.Error($"File {ex.FileName} skipped: file not found. Error message: {ex.Message}. Error at {ex.TargetSite}. Stack: {ex.StackTrace}");
                 throw;
             }
         }

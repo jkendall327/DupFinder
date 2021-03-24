@@ -8,20 +8,15 @@ namespace DupFinder
     /// </summary>
     public partial class MainWindow : Window
     {
-        readonly IImageLoader _loader;
+        readonly IProcessor _processor;
 
-        public MainWindow(IImageLoader loader)
+        public MainWindow(IProcessor processor)
         {
-            _loader = loader;
+            _processor = processor;
+
+            _processor.AddTargets();
 
             InitializeComponent();
-
-            testc();
-        }
-
-        private void testc()
-        {
-            _loader.Test();
         }
     }
 }

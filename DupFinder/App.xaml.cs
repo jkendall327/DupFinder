@@ -15,16 +15,20 @@ namespace DupFinder
         {
             ILogger log = new LoggerConfiguration()
             .Enrich.FromLogContext()
-            .WriteTo.File(path: "log.txt", restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information, rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true)
+            .WriteTo.File(path: "log.txt", restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Debug, rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true)
             .CreateLogger();
 
             var ioc = new WindsorContainer();
             ioc.Register(Castle.MicroKernel.Registration.Component.For<ILogger>().Instance(log));
+
+            ioc.Register(Castle.MicroKernel.Registration.Component.For<IProcessor>().ImplementedBy<Processor>());
+
             ioc.Register(Castle.MicroKernel.Registration.Component.For<IImageLoader>().ImplementedBy<ImageLoader>());
+            ioc.Register(Castle.MicroKernel.Registration.Component.For<IImageSetLoader>().ImplementedBy<ImageSetLoader>());
+
             ioc.Register(Castle.MicroKernel.Registration.Component.For<MainWindow>().ImplementedBy<MainWindow>());
 
             var window = ioc.Resolve<MainWindow>();
-            window.Title = "test";
             window.Show();
         }
     }
