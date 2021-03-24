@@ -1,9 +1,11 @@
-﻿namespace DupFinderCore
+﻿using System.Threading.Tasks;
+
+namespace DupFinderCore
 {
     public interface IProcessor
     {
         void AddTargets();
-        void Process();
-        void Prune();
+        Task Process();
+        Task Prune();
     }
 }
