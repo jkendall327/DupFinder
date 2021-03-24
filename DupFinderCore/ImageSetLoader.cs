@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using Microsoft.Extensions.Configuration;
+using Serilog;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -11,16 +12,19 @@ namespace DupFinderCore
     {
         readonly ILogger _logger;
         readonly IImageLoader _loader;
+        readonly IConfiguration _config;
 
-        public ImageSetLoader(ILogger logger, IImageLoader loader)
+        public ImageSetLoader(ILogger logger, IImageLoader loader, IConfiguration config)
         {
             _logger = logger;
             _loader = loader;
+            _config = config;
         }
 
         public IEnumerable<Image> GetImages()
         {
-            DirectoryInfo dirInfo = new("Dataset");
+            var directory = _config.GetSection("BaseFolder").Value;
+            DirectoryInfo dirInfo = new(directory);
 
             ParallelQuery<FileInfo> files;
 

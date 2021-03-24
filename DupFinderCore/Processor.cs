@@ -22,7 +22,7 @@ namespace DupFinderCore
 
         public void AddTargets()
         {
-            Targets = _loader.GetImages();
+            Targets = _loader.GetImages().ToList();
             _logger.Information("Images loaded.");
         }
 
