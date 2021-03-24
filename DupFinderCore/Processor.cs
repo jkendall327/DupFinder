@@ -38,6 +38,8 @@ namespace DupFinderCore
             {
                 Pairs.Add(item);
             }
+
+            // we now have a list of pairs -- images which are similar to each other
         }
 
         private async IAsyncEnumerable<(Image, Image)> FindPairs(IEnumerable<Image> images)
@@ -58,21 +60,15 @@ namespace DupFinderCore
              * if phash score is too low, do nothing, return nothing -- not a pair
              */
 
-            foreach ((Image left, Image right) pair in GetAllPairs<Image>(images.ToList()))
+            var pairs = images.ToList().GetAllPairs();
+            foreach ((Image left, Image right) pair in pairs)
             {
-                var similarity = Similarity(pair.left, pair.right);
+                if (Similarity(pair.left, pair.right) < 86) continue;
 
-                if (similarity < 86) continue;
+                // todo understand euclidian distance and implement
 
                 yield return pair;
             }
-        }
-
-        // https://stackoverflow.com/questions/17031771/comparing-each-element-with-each-other-element-in-a-list
-        public static IEnumerable<(T, T)> GetAllPairs<T>(IList<T> source)
-        {
-            return source.SelectMany((_, i) => source.Where((_, j) => i < j),
-                (x, y) => (x, y));
         }
 
         private float Similarity(Image original, Image compare)
