@@ -4,7 +4,6 @@ using Shipwreck.Phash.Bitmaps;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,16 +13,17 @@ namespace DupFinderCore
     {
         readonly IImageSetLoader _loader;
         readonly ILogger _logger;
+        readonly IImagerComparer _comparer;
 
         public IEnumerable<Image> Targets { get; set; } = Enumerable.Empty<Image>();
 
         public List<(Image Left, Image Right)> Pairs { get; set; } = new();
 
-        public Processor(IImageSetLoader loader, ILogger logger)
+        public Processor(IImageSetLoader loader, ILogger logger, IImagerComparer comparer)
         {
-            _loader = loader;
-            _logger = logger;
-
+            _loader = loader ?? throw new ArgumentNullException(nameof(loader));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
         }
 
         public void AddTargets()
@@ -92,49 +92,22 @@ namespace DupFinderCore
         {
             foreach (var pair in Pairs)
             {
-                JudgePairs(pair.Left, pair.Right);
+                _comparer.SetImages(pair.Left, pair.Right);
+                // maybe give the ienumerables to the comparer as well
+                var winner = _comparer.GetBetterImage();
+
+                if (winner is null)
+                {
+                    Unsure.Append(pair.Left); Unsure.Append(pair.Right);
+                    continue;
+                }
+
+                Keep.Append(winner);
+                // how to get trashed image? give enumerables to comparer...
+                // it should tell you what images to move and keep, not the processor
             }
 
             MovePairs();
-        }
-
-        private void JudgePairs(Image left, Image right)
-        {
-            int Pixels(Image image) => image.Width * image.Height;
-
-            if (Pixels(left) > Pixels(right))
-            {
-                Keep.Append(left); Trash.Append(right);
-                return;
-            }
-
-            if (GetSize(left) > GetSize(right))
-            {
-                Keep.Append(left); Trash.Append(right);
-            }
-
-            double Aspect(Image image) => (double)image.Width / image.Height;
-
-            var aspectRatioDifference = Math.Abs(Aspect(left) - Aspect(right));
-            var pixelDifference = Math.Abs(((double)Pixels(left) / Pixels(right)) - 1d);
-            var sizeDifference = Math.Abs(((double)GetSize(left) / GetSize(right)) - 1d);
-
-            if (Math.Abs(pixelDifference - sizeDifference) >= 1 || aspectRatioDifference > 0.05)
-            {
-                Unsure.Append(left); Unsure.Append(right);
-            }
-
-            // todo what if left is smaller than right etc.
-            // todo put this into own class with a list of rules
-            // that can be extended easily -- passing in funcs?
-        }
-
-        // https://stackoverflow.com/questions/221345/how-to-get-the-file-size-of-a-system-drawing-image
-        private long GetSize(Image image)
-        {
-            using var ms = new MemoryStream(); // estimatedLength can be original fileLength
-            image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg); // save image to stream in Jpeg format
-            return ms.Length;
         }
 
         private void MovePairs()
@@ -147,10 +120,8 @@ namespace DupFinderCore
 
             foreach (var image in Keep)
             {
-
+                // move to folder...
             }
-
-            throw new NotImplementedException();
         }
     }
 }
