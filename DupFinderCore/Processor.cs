@@ -1,4 +1,6 @@
 ﻿using Serilog;
+using Shipwreck.Phash;
+using Shipwreck.Phash.Bitmaps;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -48,18 +50,40 @@ namespace DupFinderCore
              * do this for every image in database
              */
 
-            foreach (var image in images)
-            {
-                foreach (var comparison in images)
-                {
-                    if (image == comparison) continue;
+            /*
+             * use shipwreck.phash to get image similarity score
+             * if image similarity score is high (above 86 in imgrefinery)
+             * compare euclidian distances
+             * 
+             * if phash score is too low, do nothing, return nothing -- not a pair
+             */
 
-                    if (new Random().Next() % 2 == 0)
-                    {
-                        yield return (image, comparison);
-                    }
-                }
+            foreach ((Image left, Image right) pair in GetAllPairs<Image>(images.ToList()))
+            {
+                var similarity = Similarity(pair.left, pair.right);
+
+                if (similarity < 86) continue;
+
+                yield return pair;
             }
+        }
+
+        // https://stackoverflow.com/questions/17031771/comparing-each-element-with-each-other-element-in-a-list
+        public static IEnumerable<(T, T)> GetAllPairs<T>(IList<T> source)
+        {
+            return source.SelectMany((_, i) => source.Where((_, j) => i < j),
+                (x, y) => (x, y));
+        }
+
+        private float Similarity(Image original, Image compare)
+        {
+            var bitmap = (Bitmap)original;
+            var hash1 = ImagePhash.ComputeDigest(bitmap.ToLuminanceImage());
+
+            var bitmap2 = (Bitmap)compare;
+            var hash2 = ImagePhash.ComputeDigest(bitmap2.ToLuminanceImage());
+
+            return ImagePhash.GetCrossCorrelation(hash1, hash2);
         }
 
         public async Task Prune()
