@@ -6,6 +6,6 @@ namespace DupFinderCore
     {
         void AddTargets();
         Task Process();
-        Task Prune();
+        void Prune();
     }
 }

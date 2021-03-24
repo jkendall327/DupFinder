@@ -4,6 +4,7 @@ using Shipwreck.Phash.Bitmaps;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -28,12 +29,13 @@ namespace DupFinderCore
         public void AddTargets()
         {
             // todo: can this be asynchronous too?
-            Targets = _loader.GetImages().ToList();
+            Targets = _loader.GetImages();
             _logger.Information("Images loaded.");
         }
 
         public async Task Process()
         {
+            // tood: this should probably all be parallel not async...
             await foreach (var item in FindPairs(Targets))
             {
                 Pairs.Add(item);
@@ -82,11 +84,57 @@ namespace DupFinderCore
             return ImagePhash.GetCrossCorrelation(hash1, hash2);
         }
 
-        public async Task Prune()
+        readonly IEnumerable<Image> Keep = Enumerable.Empty<Image>();
+        readonly IEnumerable<Image> Trash = Enumerable.Empty<Image>();
+        readonly IEnumerable<Image> Unsure = Enumerable.Empty<Image>();
+
+        public void Prune()
         {
-            await JudgePairs();
+            foreach (var pair in Pairs)
+            {
+                JudgePairs(pair.Left, pair.Right);
+            }
 
             MovePairs();
+        }
+
+        private void JudgePairs(Image left, Image right)
+        {
+            int Pixels(Image image) => image.Width * image.Height;
+
+            if (Pixels(left) > Pixels(right))
+            {
+                Keep.Append(left); Trash.Append(right);
+                return;
+            }
+
+            if (GetSize(left) > GetSize(right))
+            {
+                Keep.Append(left); Trash.Append(right);
+            }
+
+            double Aspect(Image image) => (double)image.Width / image.Height;
+
+            var aspectRatioDifference = Math.Abs(Aspect(left) - Aspect(right));
+            var pixelDifference = Math.Abs(((double)Pixels(left) / Pixels(right)) - 1d);
+            var sizeDifference = Math.Abs(((double)GetSize(left) / GetSize(right)) - 1d);
+
+            if (Math.Abs(pixelDifference - sizeDifference) >= 1 || aspectRatioDifference > 0.05)
+            {
+                Unsure.Append(left); Unsure.Append(right);
+            }
+
+            // todo what if left is smaller than right etc.
+            // todo put this into own class with a list of rules
+            // that can be extended easily -- passing in funcs?
+        }
+
+        // https://stackoverflow.com/questions/221345/how-to-get-the-file-size-of-a-system-drawing-image
+        private long GetSize(Image image)
+        {
+            using var ms = new MemoryStream(); // estimatedLength can be original fileLength
+            image.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg); // save image to stream in Jpeg format
+            return ms.Length;
         }
 
         private void MovePairs()
@@ -97,16 +145,10 @@ namespace DupFinderCore
              * Hide this behind an interface maybe.
              */
 
-            throw new NotImplementedException();
-        }
+            foreach (var image in Keep)
+            {
 
-        private Task JudgePairs()
-        {
-            /*
-             * Decide which of the two images to keep.
-             * Give each image some tag to decide whether to
-             * keep it, trash it, or do nothing with it (unsure).
-             */
+            }
 
             throw new NotImplementedException();
         }
