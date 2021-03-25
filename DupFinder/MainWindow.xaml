@@ -8,6 +8,7 @@
         Title="MainWindow" Height="450" Width="800">
     <Grid>
         <Label x:Name="label" Content="DupFinder!" HorizontalAlignment="Left" Margin="123,67,0,0" VerticalAlignment="Top" Height="141" Width="260"/>
+        <Button Click="Button_Click" Width="100" Height="40">Open folder</Button>
 
     </Grid>
 </Window>
