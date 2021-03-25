@@ -4,7 +4,7 @@ namespace DupFinderCore
 {
     public interface IProcessor
     {
-        void AddTargets();
+        Task<int> AddTargets();
         Task Process();
         void Prune();
     }

@@ -24,8 +24,13 @@ namespace DupFinder
             var folderDialog = new Ookii.Dialogs.Wpf.VistaFolderBrowserDialog();
             if (folderDialog.ShowDialog() == true)
             {
-                label.Content = folderDialog.SelectedPath;
+                chosenFolder.Content = folderDialog.SelectedPath;
             }
+        }
+
+        private async void button_Click_1(object sender, RoutedEventArgs e)
+        {
+            label1.Content = await _processor.AddTargets();
         }
     }
 }

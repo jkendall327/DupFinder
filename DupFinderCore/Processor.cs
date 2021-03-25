@@ -26,11 +26,13 @@ namespace DupFinderCore
             _comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
         }
 
-        public void AddTargets()
+        public async Task<int> AddTargets()
         {
             // todo: can this be asynchronous too?
-            Targets = _loader.GetImages();
+            Targets = await _loader.GetImages();
             _logger.Information("Images loaded.");
+
+            return Targets.Count();
         }
 
         public async Task Process()

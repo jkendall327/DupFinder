@@ -24,6 +24,7 @@ namespace DupFinderCore
             try
             {
                 return Image.FromFile(filepath);
+
             }
             catch (FileNotFoundException ex)
             {
