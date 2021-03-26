@@ -1,4 +1,5 @@
 ﻿using DupFinderCore;
+using System.IO;
 using System.Windows;
 
 namespace DupFinder
@@ -14,8 +15,6 @@ namespace DupFinder
         {
             _processor = processor;
 
-            _processor.AddTargets();
-
             InitializeComponent();
         }
 
@@ -30,7 +29,15 @@ namespace DupFinder
 
         private async void button_Click_1(object sender, RoutedEventArgs e)
         {
-            label1.Content = await _processor.AddTargets();
+            if (!Directory.Exists(chosenFolder.Content.ToString()))
+            {
+                MessageBox.Show("Please choose a valid folder.");
+                return;
+            }
+
+            var info = new DirectoryInfo(chosenFolder.Content?.ToString());
+
+            label1.Content = await _processor.AddTargets(info);
         }
     }
 }

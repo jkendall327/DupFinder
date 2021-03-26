@@ -20,11 +20,8 @@ namespace DupFinderCore
             _config = config;
         }
 
-        public async Task<List<Image>> GetImages()
+        public async Task<List<Image>> GetImages(DirectoryInfo dirInfo)
         {
-            var directory = _config.GetSection("BaseFolder").Value;
-            DirectoryInfo dirInfo = new(directory);
-
             var images = new List<Image>();
 
             ParallelQuery<FileInfo> files;
@@ -46,7 +43,6 @@ namespace DupFinderCore
             }
 
             _logger.Debug($"Loading files from {dirInfo.FullName}...");
-
 
             await Task.Run(() => Parallel.ForEach(files, file =>
             {

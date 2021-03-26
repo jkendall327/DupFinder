@@ -4,6 +4,7 @@ using Shipwreck.Phash.Bitmaps;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -26,9 +27,9 @@ namespace DupFinderCore
             _comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
         }
 
-        public async Task<int> AddTargets()
+        public async Task<int> AddTargets(DirectoryInfo baseFolder)
         {
-            Targets = await _loader.GetImages();
+            Targets = await _loader.GetImages(baseFolder);
             _logger.Information("Images loaded.");
 
             return Targets.Count();
