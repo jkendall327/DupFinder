@@ -7,11 +7,11 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <Label x:Name="label" Content="DupFinder" HorizontalAlignment="Left" Margin="16,10,0,0" VerticalAlignment="Top" Height="42" Width="208" FontSize="22"/>
-        <Button Click="Button_Click" Margin="20,93,660,284">Open folder</Button>
-        <Label x:Name="label1" Content="Chosen folder:" HorizontalAlignment="Left" Margin="145,100,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="label_Title" Content="DupFinder" HorizontalAlignment="Left" Margin="16,10,0,0" VerticalAlignment="Top" Height="42" Width="208" FontSize="22"/>
+        <Button x:Name="button_FolderPicker" Click="DirectoryPicker_Click" Margin="20,93,660,284">Open folder</Button>
+        <Label x:Name="label_ChosenFolder" Content="Chosen folder:" HorizontalAlignment="Left" Margin="145,100,0,0" VerticalAlignment="Top"/>
         <Label x:Name="chosenFolder" Content="" HorizontalAlignment="Left" Margin="252,100,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="button" Content="Button" HorizontalAlignment="Left" Margin="120,191,0,0" VerticalAlignment="Top" Height="66" Width="108" Click="button_Click_1"/>
+        <Button x:Name="button_LoadImages" Content="Load Images" HorizontalAlignment="Left" Margin="120,191,0,0" VerticalAlignment="Top" Height="66" Width="108" Click="TargetAdder_Click"/>
 
     </Grid>
 </Window>
