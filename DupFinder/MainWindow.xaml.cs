@@ -40,7 +40,7 @@ namespace DupFinder
             var info = new DirectoryInfo(directory);
             // 'Possible null reference for argument 'path' in 'DirectoryInfo.DirectoryInfo(string path)'
 
-            label_ChosenFolder = await _processor.AddTargets(info);
+            label_ChosenFolder.Content = await _processor.AddTargets(info);
         }
     }
 }
