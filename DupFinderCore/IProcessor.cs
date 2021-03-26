@@ -1,10 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System.IO;
+using System.Threading.Tasks;
 
 namespace DupFinderCore
 {
     public interface IProcessor
     {
-        void AddTargets();
+        Task<int> AddTargets(DirectoryInfo baseFolder);
         Task Process();
         void Prune();
     }

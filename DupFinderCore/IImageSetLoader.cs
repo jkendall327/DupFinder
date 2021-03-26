@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace DupFinderCore
 {
     public interface IImageSetLoader
     {
-        IEnumerable<Image> GetImages();
+        Task<List<Image>> GetImages(DirectoryInfo dir);
     }
 }

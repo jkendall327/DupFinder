@@ -4,6 +4,7 @@ using Shipwreck.Phash.Bitmaps;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -26,34 +27,23 @@ namespace DupFinderCore
             _comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
         }
 
-        public void AddTargets()
+        public async Task<int> AddTargets(DirectoryInfo baseFolder)
         {
-            // todo: can this be asynchronous too?
-            Targets = _loader.GetImages();
+            Targets = await _loader.GetImages(baseFolder);
             _logger.Information("Images loaded.");
+
+            return Targets.Count();
         }
 
         public async Task Process()
         {
-            // tood: this should probably all be parallel not async...
-            await foreach (var item in FindPairs(Targets))
-            {
-                Pairs.Add(item);
-            }
+            var pairs = await FindPairs(Targets);
 
             // we now have a list of pairs -- images which are similar to each other
         }
 
-        private async IAsyncEnumerable<(Image, Image)> FindPairs(IEnumerable<Image> images)
+        private async Task<IEnumerable<(Image, Image)>> FindPairs(IEnumerable<Image> images)
         {
-            /*
-             * take in two images
-             * compare hashes etc
-             * decide if they're pairs
-             * if so, add to pairs enumerable
-             * do this for every image in database
-             */
-
             /*
              * use shipwreck.phash to get image similarity score
              * if image similarity score is high (above 86 in imgrefinery)
@@ -63,14 +53,15 @@ namespace DupFinderCore
              */
 
             var pairs = images.ToList().GetAllPairs();
-            foreach ((Image left, Image right) pair in pairs)
+            var ret = new List<(Image, Image)>();
+
+            await Task.Run(() => Parallel.ForEach(pairs, pair =>
             {
-                if (Similarity(pair.left, pair.right) < 86) continue;
+                if (Similarity(pair.Item1, pair.Item2) < 86)
+                    ret.Add(pair);
+            }));
 
-                // todo understand euclidian distance and implement
-
-                yield return pair;
-            }
+            return ret;
         }
 
         private float Similarity(Image original, Image compare)
@@ -120,7 +111,7 @@ namespace DupFinderCore
 
             foreach (var image in Keep)
             {
-                // move to folder...
+
             }
         }
     }

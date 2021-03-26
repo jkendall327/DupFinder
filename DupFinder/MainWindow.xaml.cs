@@ -1,4 +1,5 @@
 ﻿using DupFinderCore;
+using System.IO;
 using System.Windows;
 
 namespace DupFinder
@@ -14,9 +15,32 @@ namespace DupFinder
         {
             _processor = processor;
 
-            _processor.AddTargets();
-
             InitializeComponent();
+        }
+
+        private void DirectoryPicker_Click(object sender, RoutedEventArgs e)
+        {
+            var folderDialog = new Ookii.Dialogs.Wpf.VistaFolderBrowserDialog();
+            if (folderDialog.ShowDialog() == true)
+            {
+                chosenFolder.Content = folderDialog.SelectedPath;
+            }
+        }
+
+        private async void TargetAdder_Click(object sender, RoutedEventArgs e)
+        {
+            var directory = chosenFolder.Content.ToString();
+
+            if (string.IsNullOrWhiteSpace(directory) || !Directory.Exists(directory))
+            {
+                MessageBox.Show("Please choose a valid folder.");
+                return;
+            }
+
+            var info = new DirectoryInfo(directory);
+            // 'Possible null reference for argument 'path' in 'DirectoryInfo.DirectoryInfo(string path)'
+
+            label_ChosenFolder.Content = await _processor.AddTargets(info);
         }
     }
 }
