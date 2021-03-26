@@ -29,13 +29,16 @@ namespace DupFinder
 
         private async void button_Click_1(object sender, RoutedEventArgs e)
         {
-            if (!Directory.Exists(chosenFolder.Content.ToString()))
+            var directory = chosenFolder.Content.ToString();
+
+            if (string.IsNullOrWhiteSpace(directory) || !Directory.Exists(directory))
             {
                 MessageBox.Show("Please choose a valid folder.");
                 return;
             }
 
-            var info = new DirectoryInfo(chosenFolder.Content?.ToString());
+            var info = new DirectoryInfo(directory);
+            // 'Possible null reference for argument 'path' in 'DirectoryInfo.DirectoryInfo(string path)'
 
             label1.Content = await _processor.AddTargets(info);
         }
