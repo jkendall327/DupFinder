@@ -8,7 +8,7 @@ using System.IO;
 
 namespace DupFinderCore
 {
-    enum Status
+    public enum Status
     {
         Undecided,
         Keep,
@@ -19,7 +19,7 @@ namespace DupFinderCore
     /// <summary>
     /// Wrapper around System.Drawing.Image that maintains file info, hash, colourmap, status, etc.
     /// </summary>
-    class Entry
+    public class Entry
     {
         public Image Image { get; }
 

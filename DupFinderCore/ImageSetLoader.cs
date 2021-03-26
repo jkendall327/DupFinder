@@ -1,7 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
-using Serilog;
+﻿using Serilog;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -12,17 +10,15 @@ namespace DupFinderCore
     public class ImageSetLoader : IImageSetLoader
     {
         readonly ILogger _logger;
-        readonly IConfiguration _config;
 
-        public ImageSetLoader(ILogger logger, IConfiguration config)
+        public ImageSetLoader(ILogger logger)
         {
             _logger = logger;
-            _config = config;
         }
 
-        public async Task<List<Image>> GetImages(DirectoryInfo dirInfo)
+        public async Task<List<Entry>> GetImages(DirectoryInfo dirInfo)
         {
-            var images = new List<Image>();
+            var images = new List<Entry>();
 
             ParallelQuery<FileInfo> files;
 
@@ -49,7 +45,7 @@ namespace DupFinderCore
                 if (IsNotImage(file)) return;
 
                 _logger.Debug($"Loaded file {file.Name}");
-                images.Add(Load(file.FullName));
+                images.Add(new Entry(file.FullName));
             }));
 
             return images;
@@ -58,19 +54,5 @@ namespace DupFinderCore
         // todo improve
         private bool IsNotImage(FileInfo file)
             => !Regex.IsMatch(file.FullName, @".jpg|.png|.jpeg$", RegexOptions.IgnoreCase) || file.FullName.Contains(".txt");
-
-        public Image Load(string filepath)
-        {
-            try
-            {
-                return Image.FromFile(filepath);
-
-            }
-            catch (FileNotFoundException ex)
-            {
-                _logger.Error($"File {ex.FileName} skipped: file not found. Error message: {ex.Message}. Error at {ex.TargetSite}. Stack: {ex.StackTrace}");
-                throw;
-            }
-        }
     }
 }

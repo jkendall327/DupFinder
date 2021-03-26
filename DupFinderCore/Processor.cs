@@ -1,9 +1,7 @@
 ﻿using Serilog;
 using Shipwreck.Phash;
-using Shipwreck.Phash.Bitmaps;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,9 +14,9 @@ namespace DupFinderCore
         readonly ILogger _logger;
         readonly IImagerComparer _comparer;
 
-        public IEnumerable<Image> Targets { get; set; } = Enumerable.Empty<Image>();
+        public IEnumerable<Entry> Targets { get; set; } = Enumerable.Empty<Entry>();
 
-        public List<(Image Left, Image Right)> Pairs { get; set; } = new();
+        public List<(Entry Left, Entry Right)> Pairs { get; set; } = new();
 
         public Processor(IImageSetLoader loader, ILogger logger, IImagerComparer comparer)
         {
@@ -42,7 +40,7 @@ namespace DupFinderCore
             // we now have a list of pairs -- images which are similar to each other
         }
 
-        private async Task<IEnumerable<(Image, Image)>> FindPairs(IEnumerable<Image> images)
+        private async Task<IEnumerable<(Entry, Entry)>> FindPairs(IEnumerable<Entry> images)
         {
             /*
              * use shipwreck.phash to get image similarity score
@@ -53,7 +51,7 @@ namespace DupFinderCore
              */
 
             var pairs = images.ToList().GetAllPairs();
-            var ret = new List<(Image, Image)>();
+            var ret = new List<(Entry, Entry)>();
 
             await Task.Run(() => Parallel.ForEach(pairs, pair =>
             {
@@ -64,20 +62,11 @@ namespace DupFinderCore
             return ret;
         }
 
-        private float Similarity(Image original, Image compare)
-        {
-            var bitmap = (Bitmap)original;
-            var hash1 = ImagePhash.ComputeDigest(bitmap.ToLuminanceImage());
+        private float Similarity(Entry original, Entry compare) => ImagePhash.GetCrossCorrelation(original.Hash, compare.Hash);
 
-            var bitmap2 = (Bitmap)compare;
-            var hash2 = ImagePhash.ComputeDigest(bitmap2.ToLuminanceImage());
-
-            return ImagePhash.GetCrossCorrelation(hash1, hash2);
-        }
-
-        readonly IEnumerable<Image> Keep = Enumerable.Empty<Image>();
-        readonly IEnumerable<Image> Trash = Enumerable.Empty<Image>();
-        readonly IEnumerable<Image> Unsure = Enumerable.Empty<Image>();
+        readonly IEnumerable<Entry> Keep = Enumerable.Empty<Entry>();
+        readonly IEnumerable<Entry> Trash = Enumerable.Empty<Entry>();
+        readonly IEnumerable<Entry> Unsure = Enumerable.Empty<Entry>();
 
         public void Prune()
         {
