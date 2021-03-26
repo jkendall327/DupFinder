@@ -19,7 +19,7 @@ namespace DupFinder
             InitializeComponent();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void DirectoryPicker_Click(object sender, RoutedEventArgs e)
         {
             var folderDialog = new Ookii.Dialogs.Wpf.VistaFolderBrowserDialog();
             if (folderDialog.ShowDialog() == true)
@@ -28,9 +28,9 @@ namespace DupFinder
             }
         }
 
-        private async void button_Click_1(object sender, RoutedEventArgs e)
+        private async void TargetAdder_Click(object sender, RoutedEventArgs e)
         {
-            label1.Content = await _processor.AddTargets();
+            label_ChosenFolder.Content = await _processor.AddTargets();
         }
     }
 }
