@@ -28,7 +28,6 @@ namespace DupFinderCore
 
         public async Task<int> AddTargets()
         {
-            // todo: can this be asynchronous too?
             Targets = await _loader.GetImages();
             _logger.Information("Images loaded.");
 
