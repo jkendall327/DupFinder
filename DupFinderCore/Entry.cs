@@ -66,6 +66,8 @@ namespace DupFinderCore
             Hash = ImagePhash.ComputeDigest(bitmap.ToLuminanceImage());
 
             GenerateColorMap();
+
+            Image.Dispose();
         }
 
         public void GenerateColorMap(bool Crop = false)
