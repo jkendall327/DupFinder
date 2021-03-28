@@ -1,6 +1,7 @@
 ﻿using Serilog;
 using Shipwreck.Phash;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -33,10 +34,10 @@ namespace DupFinderCore
             return Targets.Count();
         }
 
-        public async Task Process()
+        public async Task<int> Process()
         {
             var pairs = await FindPairs(Targets);
-
+            return pairs.Count();
             // we now have a list of pairs -- images which are similar to each other
         }
 
@@ -53,13 +54,17 @@ namespace DupFinderCore
             var pairs = images.ToList().GetAllPairs();
             var ret = new List<(Entry, Entry)>();
 
+            var test = new ConcurrentBag<(Entry, Entry)>();
+
             await Task.Run(() => Parallel.ForEach(pairs, pair =>
             {
                 if (Similarity(pair.Item1, pair.Item2) < 86)
-                    ret.Add(pair);
+                {
+                    test.Add(pair);
+                }
             }));
 
-            return ret;
+            return test;
         }
 
         private float Similarity(Entry original, Entry compare) => ImagePhash.GetCrossCorrelation(original.Hash, compare.Hash);

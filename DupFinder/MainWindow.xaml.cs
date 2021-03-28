@@ -42,5 +42,10 @@ namespace DupFinder
 
             label_ChosenFolder.Content = await _processor.AddTargets(info);
         }
+
+        private async void button_ProcessImages_Click(object sender, RoutedEventArgs e)
+        {
+            label_ProcessedImages.Content = await _processor.Process();
+        }
     }
 }
