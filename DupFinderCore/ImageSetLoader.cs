@@ -1,4 +1,5 @@
 ﻿using Serilog;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,14 +17,15 @@ namespace DupFinderCore
             _logger = logger;
         }
 
-        public async Task<List<Entry>> GetImages(DirectoryInfo dirInfo)
+        public async Task<IEnumerable<Entry>> GetImages(DirectoryInfo dirInfo)
         {
-            var images = new List<Entry>();
+            var images = new ConcurrentBag<Entry>();
 
             ParallelQuery<FileInfo> files;
 
             try
             {
+                // todo profile to see if this actually makes a difference -- overhead might make it slower
                 files = dirInfo.EnumerateFiles("*.*", SearchOption.AllDirectories).AsParallel();
             }
             catch (DirectoryNotFoundException)
