@@ -43,28 +43,22 @@ namespace DupFinderCore
 
         private async Task<IEnumerable<(Entry, Entry)>> FindPairs(IEnumerable<Entry> images)
         {
-            /*
-             * use shipwreck.phash to get image similarity score
-             * if image similarity score is high (above 86 in imgrefinery)
-             * compare euclidian distances
-             * 
-             * if phash score is too low, do nothing, return nothing -- not a pair
-             */
+            // todo compare euclidian distances if phash score is over 86%
 
-            var pairs = images.ToList().GetAllPairs();
-            var ret = new List<(Entry, Entry)>();
+            var uniquePairs = images.GetAllUniquePairs().ToList();
 
-            var test = new ConcurrentBag<(Entry, Entry)>();
+            var similarImages = new ConcurrentBag<(Entry, Entry)>();
 
-            await Task.Run(() => Parallel.ForEach(pairs, pair =>
+            await Task.Run(() => Parallel.ForEach(uniquePairs, pair =>
             {
-                if (Similarity(pair.Item1, pair.Item2) < 86)
+                var result = Similarity(pair.Item1, pair.Item2);
+                if (result > 0.86)
                 {
-                    test.Add(pair);
+                    similarImages.Add(pair);
                 }
             }));
 
-            return test;
+            return similarImages;
         }
 
         private float Similarity(Entry original, Entry compare) => ImagePhash.GetCrossCorrelation(original.Hash, compare.Hash);

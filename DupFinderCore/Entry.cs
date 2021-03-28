@@ -37,6 +37,11 @@ namespace DupFinderCore
 
         public Status Status { get; set; } = Status.Undecided;
 
+        public override string ToString()
+        {
+            return Path;
+        }
+
         /// <summary>
         /// Used for calculating similarity with PHash.
         /// </summary>
