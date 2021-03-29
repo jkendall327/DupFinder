@@ -23,7 +23,8 @@ namespace DupFinderCore
     {
         public Image Image { get; }
 
-        public string Path { get; }
+        public string FullPath { get; }
+        public string Filename => Path.GetFileName(FullPath);
         public int Pixels => Image.Width * Image.Height;
         public double AspectRatio => (double)Image.Width / Image.Height;
 
@@ -39,7 +40,7 @@ namespace DupFinderCore
 
         public override string ToString()
         {
-            return Path;
+            return FullPath;
         }
 
         /// <summary>
@@ -54,13 +55,13 @@ namespace DupFinderCore
                 throw new FileNotFoundException();
             }
 
-            Path = filepath;
-            Image = Image.FromFile(Path);
+            FullPath = filepath;
+            Image = Image.FromFile(FullPath);
 
-            FileInfo fileInfo = new(Path);
+            FileInfo fileInfo = new(FullPath);
 
             Size = fileInfo.Length;
-            Date = new FileInfo(Path).CreationTimeUtc;
+            Date = new FileInfo(FullPath).CreationTimeUtc;
 
             var bitmap = (Bitmap)Image;
             Hash = ImagePhash.ComputeDigest(bitmap.ToLuminanceImage());
