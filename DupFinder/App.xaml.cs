@@ -30,6 +30,7 @@ namespace DupFinder
             ioc.Register(Castle.MicroKernel.Registration.Component.For<IImageLoader>().ImplementedBy<ImageLoader>());
             ioc.Register(Castle.MicroKernel.Registration.Component.For<IImageSetLoader>().ImplementedBy<ImageSetLoader>());
             ioc.Register(Castle.MicroKernel.Registration.Component.For<IImagerComparer>().ImplementedBy<ImageComparer>());
+            ioc.Register(Castle.MicroKernel.Registration.Component.For<IImageComparisonRuleset>().ImplementedBy<ImageComparisonRuleset>());
 
             ioc.Register(Castle.MicroKernel.Registration.Component.For<MainWindow>().ImplementedBy<MainWindow>());
 

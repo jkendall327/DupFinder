@@ -6,8 +6,6 @@ namespace DupFinderCore
 {
     public interface IImagerComparer
     {
-        List<Func<Entry, Entry, Judgement>> Rules { get; set; }
-
         public List<Entry> Keep { get; }
         public List<Entry> Trash { get; }
         public List<Entry> Unsure { get; }
@@ -24,20 +22,17 @@ namespace DupFinderCore
 
     public class ImageComparer : IImagerComparer
     {
-        //a list of methods that take in two images as parameters and return an image
-        public List<Func<Entry, Entry, Judgement>> Rules { get; set; } = new List<Func<Entry, Entry, Judgement>>();
-
         private List<(Entry left, Entry right)> Pairs { get; set; } = new List<(Entry left, Entry right)>();
 
         public List<Entry> Keep => new List<Entry>();
-
         public List<Entry> Trash => new List<Entry>();
-
         public List<Entry> Unsure => new List<Entry>();
 
-        public ImageComparer()
+        readonly IImageComparisonRuleset _ruleset;
+
+        public ImageComparer(IImageComparisonRuleset ruleset)
         {
-            Rules.Add(ComparePixels);
+            _ruleset = ruleset ?? throw new ArgumentNullException(nameof(ruleset));
         }
 
         public void SetImages(IEnumerable<(Entry left, Entry right)> pairs)
@@ -64,7 +59,7 @@ namespace DupFinderCore
             int rightWins = 0;
             int unsure = 0;
 
-            foreach (var Rule in Rules)
+            foreach (var Rule in _ruleset.Rules)
             {
                 var judgement = Rule(pair.left, pair.right);
                 switch (judgement)
@@ -83,46 +78,34 @@ namespace DupFinderCore
                 }
             }
 
-            var list = new List<int>() { leftWins, rightWins, unsure };
+            // what if two or all values are equal somehow...?
 
-            if (list.Max() == leftWins)
+            var list = new List<int>() { leftWins, rightWins, unsure };
+            var highest = list.Max();
+
+            if (highest == leftWins)
             {
                 Keep.Add(pair.left);
                 Trash.Add(pair.right);
             }
-            if (list.Max() == rightWins)
+            if (highest == rightWins)
             {
                 Keep.Add(pair.right);
                 Trash.Add(pair.left);
             }
-            if (list.Max() == unsure)
+            if (highest == unsure)
             {
                 Unsure.Add(pair.left);
                 Unsure.Add(pair.right);
             }
         }
 
-        private Judgement ComparePixels(Entry left, Entry right)
-        {
-            if (left.Pixels > right.Pixels)
-            {
-                return Judgement.Left;
-            }
-            else if (left.Pixels < right.Pixels)
-            {
-                return Judgement.Right;
-            }
-
-            return Judgement.Unsure;
-        }
-
-
         public void Reset()
         {
             Keep.Clear();
             Trash.Clear();
             Unsure.Clear();
-            Rules.Clear();
+            _ruleset.Rules.Clear();
         }
     }
 }
