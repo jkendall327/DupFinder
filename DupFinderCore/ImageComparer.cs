@@ -80,8 +80,7 @@ namespace DupFinderCore
 
             // what if two or all values are equal somehow...?
 
-            var list = new List<int>() { leftWins, rightWins, unsure };
-            var highest = list.Max();
+            var highest = new List<int>() { leftWins, rightWins, unsure }.Max();
 
             if (highest == leftWins)
             {
