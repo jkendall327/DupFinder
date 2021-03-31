@@ -6,10 +6,19 @@
         xmlns:local="clr-namespace:DupFinder"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Padding" Value="10 10 10 10"/>
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Grid.Column" Value="0"/>
+            <Setter Property="Grid.ColumnSpan" Value="2"/>
+        </Style>
+    </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition x:Name="TitleColumn"></ColumnDefinition>
-            <ColumnDefinition x:Name="ButtonColumn"></ColumnDefinition>
+            <ColumnDefinition x:Name="TitleColumn" Width="auto"></ColumnDefinition>
+            <ColumnDefinition x:Name="ButtonColumn" Width="auto"></ColumnDefinition>
             <ColumnDefinition x:Name="LabelColumn"></ColumnDefinition>
             <ColumnDefinition x:Name="DynamicLabelColumn"></ColumnDefinition>
         </Grid.ColumnDefinitions>
@@ -24,17 +33,17 @@
 
         <Label Grid.Row="0" Grid.Column="0" FontSize="22" Margin="16,10,0,0">DupFinder!</Label>
 
-        <Button x:Name="button_FolderPicker" Grid.Column="1" Grid.Row="1">Choose directory</Button>
+        <Button x:Name="button_FolderPicker" Grid.Row="1">Choose Directory</Button>
         <Label x:Name="label_ChosenFolder" Grid.Column="2" Grid.Row="1" VerticalAlignment="Center">Chosen folder:</Label>
         <Label x:Name="chosenFolder" Grid.Column="3" Grid.Row="1" VerticalAlignment="Center">TEST</Label>
 
-        <Button x:Name="button_LoadImages" Grid.Column="1" Grid.Row="2" Click="TargetAdder_Click">Load Images</Button>
+        <Button x:Name="button_LoadImages" Grid.Row="2" Click="TargetAdder_Click">Load Images</Button>
         <Label x:Name="label_loadedImages" Grid.Column="2" Grid.Row="2" VerticalAlignment="Center">Loaded images:</Label>
 
-        <Button x:Name="button_ProcessImages" Grid.Column="1" Grid.Row="3" Content="Process Images" Click="button_ProcessImages_Click"/>
+        <Button x:Name="button_ProcessImages" Grid.Row="3" Content="Process Images" Click="button_ProcessImages_Click"/>
         <Label x:Name="label_processedImages" Grid.Column="2" Grid.Row="3" VerticalAlignment="Center">Processed images:</Label>
 
-        <Button x:Name="button_MoveImages" Grid.Column="1" Grid.Row="4" Content="Move Images" Click="button_MoveImages_Click"/>
+        <Button x:Name="button_MoveImages" Grid.Row="4" Content="Move Images" Click="button_MoveImages_Click"/>
         <Label x:Name="label_movedImages" Grid.Column="2" Grid.Row="4" VerticalAlignment="Center">X images moved</Label>
 
     </Grid>
