@@ -25,8 +25,8 @@ namespace DupFinderCore
 
         public string FullPath { get; }
         public string Filename => Path.GetFileName(FullPath);
-        public int Pixels => Image.Width * Image.Height;
-        public double AspectRatio => (double)Image.Width / Image.Height;
+        public int Pixels;
+        public double AspectRatio;
 
         public int FocusLevel { get; set; } = 64;
 
@@ -57,6 +57,9 @@ namespace DupFinderCore
 
             FullPath = filepath;
             Image = Image.FromFile(FullPath);
+
+            Pixels = Image.Width * Image.Height;
+            AspectRatio = (double)Image.Width / Image.Height;
 
             FileInfo fileInfo = new(FullPath);
 

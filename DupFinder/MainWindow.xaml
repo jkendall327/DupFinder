@@ -14,6 +14,7 @@
         <Button x:Name="button_LoadImages" Content="Load Images" HorizontalAlignment="Left" Margin="20,179,0,0" VerticalAlignment="Top" Height="66" Width="120" Click="TargetAdder_Click"/>
         <Button x:Name="button_ProcessImages" Content="Process Images" HorizontalAlignment="Left" Margin="20,276,0,0" VerticalAlignment="Top" Height="66" Width="120" Click="button_ProcessImages_Click"/>
         <Label x:Name="label_ProcessedImages" Content="PROCESSED IMAGES" HorizontalAlignment="Left" Margin="186,296,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="button_MoveImages" Content="Move Images" HorizontalAlignment="Left" Margin="20,366,0,0" VerticalAlignment="Top" Height="49" Width="120" Click="button_MoveImages_Click"/>
 
     </Grid>
 </Window>

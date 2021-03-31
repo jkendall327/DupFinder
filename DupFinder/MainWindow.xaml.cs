@@ -49,5 +49,10 @@ namespace DupFinder
         {
             label_ProcessedImages.Content = await _processor.Process();
         }
+
+        private void button_MoveImages_Click(object sender, RoutedEventArgs e)
+        {
+            _processor.Prune();
+        }
     }
 }

@@ -17,6 +17,8 @@ namespace DupFinderCore
         readonly IImagerComparer _comparer;
         readonly IConfiguration _config;
 
+        DirectoryInfo BaseFolder;
+
         public IEnumerable<Entry> Targets { get; set; } = Enumerable.Empty<Entry>();
 
         public List<(Entry Left, Entry Right)> Pairs { get; set; } = new();
@@ -31,7 +33,8 @@ namespace DupFinderCore
 
         public async Task<int> AddTargets(DirectoryInfo baseFolder)
         {
-            Targets = await _loader.GetImages(baseFolder);
+            BaseFolder = baseFolder;
+            Targets = await _loader.GetImages(BaseFolder);
             _logger.Information("Images loaded.");
 
             return Targets.Count();
@@ -39,8 +42,9 @@ namespace DupFinderCore
 
         public async Task<int> Process()
         {
-            var pairs = await FindPairs(Targets);
-            return pairs.Count();
+            var result = await FindPairs(Targets);
+            Pairs = result.ToList();
+            return Pairs.Count();
             // we now have a list of pairs -- images which are similar to each other
         }
 
@@ -69,13 +73,18 @@ namespace DupFinderCore
         public void Prune()
         {
             _comparer.Process(Pairs);
+            string path = BaseFolder.FullName + Path.DirectorySeparatorChar;
 
-            MovePairs(_comparer.Keep, new DirectoryInfo("Keep"));
-            MovePairs(_comparer.Trash, new DirectoryInfo("Trash"));
-            MovePairs(_comparer.Unsure, new DirectoryInfo("Unsure"));
+            Directory.CreateDirectory(path + "Keep");
+            Directory.CreateDirectory(path + "Trash");
+            Directory.CreateDirectory(path + "Unsure");
+
+            Move(_comparer.Keep, new DirectoryInfo(path + "Keep"));
+            Move(_comparer.Trash, new DirectoryInfo(path + "Trash"));
+            Move(_comparer.Unsure, new DirectoryInfo(path + "Unsure"));
         }
 
-        private void MovePairs(IEnumerable<Entry> images, DirectoryInfo destination)
+        private void Move(IEnumerable<Entry> images, DirectoryInfo destination)
         {
             foreach (var image in images)
             {
@@ -87,8 +96,8 @@ namespace DupFinderCore
 
                 // check config for whether or not to override files, if no config assume don't override
                 bool overrideFiles = bool.TryParse(_config.GetSection("Override").Value, out bool result);
-
-                File.Move(image.FullPath, destination.FullName + image.Filename, overrideFiles ? result : false);
+                // , overrideFiles ? result : false
+                File.Move(image.FullPath, destination.FullName + Path.DirectorySeparatorChar + image.Filename);
 
                 // todo: should it delete the original as well?
             }

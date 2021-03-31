@@ -6,9 +6,9 @@ namespace DupFinderCore
 {
     public interface IImagerComparer
     {
-        public List<Entry> Keep { get; }
-        public List<Entry> Trash { get; }
-        public List<Entry> Unsure { get; }
+        public List<Entry> Keep { get; set; }
+        public List<Entry> Trash { get; set; }
+        public List<Entry> Unsure { get; set; }
 
         void Process(IEnumerable<(Entry left, Entry right)> images);
     }
@@ -20,11 +20,9 @@ namespace DupFinderCore
 
     public class ImageComparer : IImagerComparer
     {
-        private List<(Entry left, Entry right)> Pairs { get; set; } = new List<(Entry left, Entry right)>();
-
-        public List<Entry> Keep => new List<Entry>();
-        public List<Entry> Trash => new List<Entry>();
-        public List<Entry> Unsure => new List<Entry>();
+        public List<Entry> Keep { get; set; } = new List<Entry>();
+        public List<Entry> Trash { get; set; } = new List<Entry>();
+        public List<Entry> Unsure { get; set; } = new List<Entry>();
 
         readonly IImageComparisonRuleset _ruleset;
 
@@ -40,7 +38,7 @@ namespace DupFinderCore
                 throw new ArgumentNullException(nameof(pairs));
             }
 
-            foreach ((Entry left, Entry right) pair in Pairs)
+            foreach (var pair in pairs)
             {
                 DetermineJudgement(pair);
             }
