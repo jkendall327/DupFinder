@@ -71,7 +71,7 @@ namespace DupFinderCore
                 }
             }
 
-            // what if two or all values are equal somehow...?
+            // todo what if two or all values are equal somehow...?
 
             var highest = new List<int>() { leftWins, rightWins, unsure }.Max();
 
