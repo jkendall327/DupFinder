@@ -1,4 +1,5 @@
-﻿using Castle.Windsor;
+﻿using BenchmarkDotNet.Running;
+using Castle.Windsor;
 using DupFinderCore;
 using Microsoft.Extensions.Configuration;
 using Serilog;
@@ -36,6 +37,8 @@ namespace DupFinder
 
             var window = ioc.Resolve<MainWindow>();
             window.Show();
+
+            var summary = BenchmarkRunner.Run<MainWindow>();
         }
     }
 }

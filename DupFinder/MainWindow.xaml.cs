@@ -1,4 +1,5 @@
-﻿using DupFinderCore;
+﻿using BenchmarkDotNet.Attributes;
+using DupFinderCore;
 using System.IO;
 using System.Windows;
 
@@ -27,6 +28,7 @@ namespace DupFinder
             }
         }
 
+        [Benchmark]
         private async void TargetAdder_Click(object sender, RoutedEventArgs e)
         {
             var directory = chosenFolder.Content.ToString();
