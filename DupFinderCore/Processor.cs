@@ -68,15 +68,11 @@ namespace DupFinderCore
 
         public void Prune()
         {
-            _comparer.SetImages(Pairs);
-
-            _comparer.Process();
+            _comparer.Process(Pairs);
 
             MovePairs(_comparer.Keep, new DirectoryInfo("Keep"));
             MovePairs(_comparer.Trash, new DirectoryInfo("Trash"));
             MovePairs(_comparer.Unsure, new DirectoryInfo("Unsure"));
-
-            _comparer.Reset();
         }
 
         private void MovePairs(IEnumerable<Entry> images, DirectoryInfo destination)

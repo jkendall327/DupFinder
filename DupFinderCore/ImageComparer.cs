@@ -10,9 +10,7 @@ namespace DupFinderCore
         public List<Entry> Trash { get; }
         public List<Entry> Unsure { get; }
 
-        void Process();
-        void Reset();
-        void SetImages(IEnumerable<(Entry left, Entry right)> images);
+        void Process(IEnumerable<(Entry left, Entry right)> images);
     }
 
     public enum Judgement
@@ -35,18 +33,13 @@ namespace DupFinderCore
             _ruleset = ruleset ?? throw new ArgumentNullException(nameof(ruleset));
         }
 
-        public void SetImages(IEnumerable<(Entry left, Entry right)> pairs)
+        public void Process(IEnumerable<(Entry left, Entry right)> pairs)
         {
             if (pairs is null)
             {
                 throw new ArgumentNullException(nameof(pairs));
             }
 
-            Pairs = pairs.ToList();
-        }
-
-        public void Process()
-        {
             foreach ((Entry left, Entry right) pair in Pairs)
             {
                 DetermineJudgement(pair);
@@ -97,14 +90,6 @@ namespace DupFinderCore
                 Unsure.Add(pair.left);
                 Unsure.Add(pair.right);
             }
-        }
-
-        public void Reset()
-        {
-            Keep.Clear();
-            Trash.Clear();
-            Unsure.Clear();
-            _ruleset.Rules.Clear();
         }
     }
 }
