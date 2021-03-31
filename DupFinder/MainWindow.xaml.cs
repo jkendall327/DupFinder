@@ -47,7 +47,7 @@ namespace DupFinder
 
         private async void button_ProcessImages_Click(object sender, RoutedEventArgs e)
         {
-            label_ProcessedImages.Content = await _processor.Process();
+            label_processedImages.Content = await _processor.Process();
         }
 
         private void button_MoveImages_Click(object sender, RoutedEventArgs e)

@@ -7,14 +7,35 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <Label x:Name="label_Title" Content="DupFinder" HorizontalAlignment="Left" Margin="16,10,0,0" VerticalAlignment="Top" Height="42" Width="208" FontSize="22"/>
-        <Button x:Name="button_FolderPicker" Click="DirectoryPicker_Click" Margin="20,93,660,284">Open folder</Button>
-        <Label x:Name="label_ChosenFolder" Content="Chosen folder:" HorizontalAlignment="Left" Margin="145,100,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="chosenFolder" Content="" HorizontalAlignment="Left" Margin="252,100,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="button_LoadImages" Content="Load Images" HorizontalAlignment="Left" Margin="20,179,0,0" VerticalAlignment="Top" Height="66" Width="120" Click="TargetAdder_Click"/>
-        <Button x:Name="button_ProcessImages" Content="Process Images" HorizontalAlignment="Left" Margin="20,276,0,0" VerticalAlignment="Top" Height="66" Width="120" Click="button_ProcessImages_Click"/>
-        <Label x:Name="label_ProcessedImages" Content="PROCESSED IMAGES" HorizontalAlignment="Left" Margin="186,296,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="button_MoveImages" Content="Move Images" HorizontalAlignment="Left" Margin="20,366,0,0" VerticalAlignment="Top" Height="49" Width="120" Click="button_MoveImages_Click"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition x:Name="TitleColumn"></ColumnDefinition>
+            <ColumnDefinition x:Name="ButtonColumn"></ColumnDefinition>
+            <ColumnDefinition x:Name="LabelColumn"></ColumnDefinition>
+            <ColumnDefinition x:Name="DynamicLabelColumn"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition x:Name="TitleRow"></RowDefinition>
+            <RowDefinition x:Name="ButtonRow1"></RowDefinition>
+            <RowDefinition x:Name="ButtonRow2"></RowDefinition>
+            <RowDefinition x:Name="ButtonRow3"></RowDefinition>
+            <RowDefinition x:Name="ButtonRow4"></RowDefinition>
+            <RowDefinition x:Name="BottomBuffer"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <Label Grid.Row="0" Grid.Column="0" FontSize="22" Margin="16,10,0,0">DupFinder!</Label>
+
+        <Button x:Name="button_FolderPicker" Grid.Column="1" Grid.Row="1">Choose directory</Button>
+        <Label x:Name="label_ChosenFolder" Grid.Column="2" Grid.Row="1" VerticalAlignment="Center">Chosen folder:</Label>
+        <Label x:Name="chosenFolder" Grid.Column="3" Grid.Row="1" VerticalAlignment="Center">TEST</Label>
+
+        <Button x:Name="button_LoadImages" Grid.Column="1" Grid.Row="2" Click="TargetAdder_Click">Load Images</Button>
+        <Label x:Name="label_loadedImages" Grid.Column="2" Grid.Row="2" VerticalAlignment="Center">Loaded images:</Label>
+
+        <Button x:Name="button_ProcessImages" Grid.Column="1" Grid.Row="3" Content="Process Images" Click="button_ProcessImages_Click"/>
+        <Label x:Name="label_processedImages" Grid.Column="2" Grid.Row="3" VerticalAlignment="Center">Processed images:</Label>
+
+        <Button x:Name="button_MoveImages" Grid.Column="1" Grid.Row="4" Content="Move Images" Click="button_MoveImages_Click"/>
+        <Label x:Name="label_movedImages" Grid.Column="2" Grid.Row="4" VerticalAlignment="Center">X images moved</Label>
 
     </Grid>
 </Window>
