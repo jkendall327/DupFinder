@@ -1,5 +1,5 @@
-﻿using BenchmarkDotNet.Running;
-using Castle.Windsor;
+﻿using Castle.Windsor;
+using DupFinderApp.ViewModels;
 using DupFinderCore;
 using Microsoft.Extensions.Configuration;
 using Serilog;
@@ -33,12 +33,11 @@ namespace DupFinder
             ioc.Register(Castle.MicroKernel.Registration.Component.For<IImagerComparer>().ImplementedBy<ImageComparer>());
             ioc.Register(Castle.MicroKernel.Registration.Component.For<IImageComparisonRuleset>().ImplementedBy<ImageComparisonRuleset>());
 
+            ioc.Register(Castle.MicroKernel.Registration.Component.For<MainWindowViewModel>().ImplementedBy<MainWindowViewModel>());
             ioc.Register(Castle.MicroKernel.Registration.Component.For<MainWindow>().ImplementedBy<MainWindow>());
 
             var window = ioc.Resolve<MainWindow>();
             window.Show();
-
-            var summary = BenchmarkRunner.Run<MainWindow>();
         }
     }
 }

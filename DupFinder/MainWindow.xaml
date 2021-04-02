@@ -33,17 +33,17 @@
 
         <Label Grid.Row="0" Grid.Column="0" FontSize="22" Margin="16,10,0,0">DupFinder!</Label>
 
-        <Button x:Name="button_FolderPicker" Grid.Row="1" Click="DirectoryPicker_Click">Choose Directory</Button>
+        <Button x:Name="button_FolderPicker" Grid.Row="1">Choose Directory</Button>
         <Label x:Name="label_ChosenFolder" Grid.Column="2" Grid.Row="1" VerticalAlignment="Center">Chosen folder:</Label>
         <Label x:Name="chosenFolder" Grid.Column="3" Grid.Row="1" VerticalAlignment="Center">TEST</Label>
 
-        <Button x:Name="button_LoadImages" Grid.Row="2" Click="TargetAdder_Click">Load Images</Button>
+        <Button x:Name="button_LoadImages" Grid.Row="2">Load Images</Button>
         <Label x:Name="label_loadedImages" Grid.Column="2" Grid.Row="2" VerticalAlignment="Center">Loaded images:</Label>
 
-        <Button x:Name="button_ProcessImages" Grid.Row="3" Content="Process Images" Click="button_ProcessImages_Click"/>
+        <Button x:Name="button_ProcessImages" Grid.Row="3" Content="Process Images"/>
         <Label x:Name="label_processedImages" Grid.Column="2" Grid.Row="3" VerticalAlignment="Center">Processed images:</Label>
 
-        <Button x:Name="button_MoveImages" Grid.Row="4" Content="Move Images" Click="button_MoveImages_Click"/>
+        <Button x:Name="button_MoveImages" Grid.Row="4" Content="Move Images"/>
         <Label x:Name="label_movedImages" Grid.Column="2" Grid.Row="4" VerticalAlignment="Center">X images moved</Label>
 
     </Grid>
