@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Serilog;
-using Shipwreck.Phash;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,19 +14,21 @@ namespace DupFinderCore
         readonly ILogger _logger;
         readonly IImagerComparer _comparer;
         readonly IConfiguration _config;
+        readonly IPairFinder _finder;
 
-        DirectoryInfo BaseFolder;
+        DirectoryInfo? BaseFolder;
 
         public IEnumerable<Entry> Targets { get; set; } = Enumerable.Empty<Entry>();
 
         public List<(Entry Left, Entry Right)> Pairs { get; set; } = new();
 
-        public Processor(IImageSetLoader loader, ILogger logger, IImagerComparer comparer, IConfiguration config)
+        public Processor(IImageSetLoader loader, ILogger logger, IImagerComparer comparer, IConfiguration config, IPairFinder finder)
         {
             _loader = loader ?? throw new ArgumentNullException(nameof(loader));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _comparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
             _config = config ?? throw new ArgumentNullException(nameof(config));
+            _finder = finder ?? throw new ArgumentNullException(nameof(finder));
         }
 
         public async Task<int> AddTargets(DirectoryInfo baseFolder)
@@ -42,38 +42,16 @@ namespace DupFinderCore
 
         public async Task<int> Process()
         {
-            var result = await FindPairs(Targets);
+            var result = await _finder.FindPairs(Targets);
             Pairs = result.ToList();
+
             return Pairs.Count();
-            // we now have a list of pairs -- images which are similar to each other
         }
-
-        private async Task<IEnumerable<(Entry, Entry)>> FindPairs(IEnumerable<Entry> images)
-        {
-            // todo compare euclidian distances if phash score is over 86%
-
-            var uniquePairs = images.GetAllUniquePairs().ToList();
-
-            var similarImages = new ConcurrentBag<(Entry, Entry)>();
-
-            await Task.Run(() => Parallel.ForEach(uniquePairs, pair =>
-            {
-                var result = Similarity(pair.Item1, pair.Item2);
-                if (result > 0.86)
-                {
-                    similarImages.Add(pair);
-                }
-            }));
-
-            return similarImages;
-        }
-
-        private float Similarity(Entry original, Entry compare) => ImagePhash.GetCrossCorrelation(original.Hash, compare.Hash);
 
         public void Prune()
         {
             _comparer.Process(Pairs);
-            string path = BaseFolder.FullName + Path.DirectorySeparatorChar;
+            string path = BaseFolder?.FullName + Path.DirectorySeparatorChar;
 
             Directory.CreateDirectory(path + "Keep");
             Directory.CreateDirectory(path + "Trash");
