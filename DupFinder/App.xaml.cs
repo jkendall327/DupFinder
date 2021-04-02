@@ -22,6 +22,13 @@ namespace DupFinder
             var builder = new ConfigurationBuilder().AddJsonFile("appsettings.json");
             IConfiguration Configuration = builder.Build();
 
+            WindsorContainer ioc = BuildDIContainer(log, Configuration);
+            var window = ioc.Resolve<MainWindow>();
+            window.Show();
+        }
+
+        private static WindsorContainer BuildDIContainer(ILogger log, IConfiguration Configuration)
+        {
             var ioc = new WindsorContainer();
             ioc.Register(Castle.MicroKernel.Registration.Component.For<ILogger>().Instance(log));
             ioc.Register(Castle.MicroKernel.Registration.Component.For<IConfiguration>().Instance(Configuration));
@@ -36,8 +43,7 @@ namespace DupFinder
             ioc.Register(Castle.MicroKernel.Registration.Component.For<MainWindowViewModel>().ImplementedBy<MainWindowViewModel>());
             ioc.Register(Castle.MicroKernel.Registration.Component.For<MainWindow>().ImplementedBy<MainWindow>());
 
-            var window = ioc.Resolve<MainWindow>();
-            window.Show();
+            return ioc;
         }
     }
 }
