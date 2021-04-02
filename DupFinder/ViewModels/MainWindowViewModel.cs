@@ -1,8 +1,10 @@
-﻿using DupFinderCore;
+﻿using DupFinderApp.Commands;
+using DupFinderCore;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Windows;
+using System.Windows.Input;
 
 namespace DupFinderApp.ViewModels
 {
@@ -62,6 +64,35 @@ namespace DupFinderApp.ViewModels
             }
         }
 
+        // todo: try to get this working
+        private T Update<T>(T original, T newValue, string propertyName)
+        {
+            if (!EqualityComparer<T>.Default.Equals(original, newValue))
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+                return newValue;
+            }
+
+            return original;
+        }
+
+        private ICommand? _chooseDirectoryCommand;
+        public ICommand ChooseDirectoryCommand =>
+            _chooseDirectoryCommand ??= new CommandHandler(() => ChooseDirectory(), () => true);
+
+        private ICommand? _loadImagesIntoMemoryCommand;
+        public ICommand LoadImagesIntoMemoryCommand =>
+            _loadImagesIntoMemoryCommand ??= new CommandHandler(() => LoadImagesIntoMemory(), () => !string.IsNullOrWhiteSpace(SelectedPath) || Directory.Exists(SelectedPath));
+
+        private ICommand? _findSimilarImagesCommand;
+        public ICommand FindSimilarImagesCommand =>
+            _findSimilarImagesCommand ??= new CommandHandler(() => FindSimilarImages(), () => loadedImages > 0);
+
+        private ICommand? _moveImagesCommand;
+        public ICommand MoveImagesCommand =>
+            _moveImagesCommand ??= new CommandHandler(() => SortImages(), () => SimilarImages > 0);
+
+
         public void ChooseDirectory()
         {
             var folderDialog = new Ookii.Dialogs.Wpf.VistaFolderBrowserDialog();
@@ -71,28 +102,13 @@ namespace DupFinderApp.ViewModels
             }
         }
 
-        public async void LoadTargets()
-        {
-            var directory = SelectedPath;
-
-            if (string.IsNullOrWhiteSpace(directory) || !Directory.Exists(directory))
-            {
-                MessageBox.Show("Please choose a valid folder."); return;
-            }
-
-            var info = new DirectoryInfo(directory);
-
-            LoadedImages = await _processor.AddTargets(info);
-        }
+        public async void LoadImagesIntoMemory()
+            => LoadedImages = await _processor.AddTargets(new DirectoryInfo(SelectedPath));
 
         public async void FindSimilarImages()
-        {
-            SimilarImages = await _processor.Process();
-        }
+            => SimilarImages = await _processor.Process();
 
-        public void SortImages(object sender, RoutedEventArgs e)
-        {
-            _processor.Prune();
-        }
+        public void SortImages()
+            => _processor.Prune();
     }
 }

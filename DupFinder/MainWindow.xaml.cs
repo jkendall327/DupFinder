@@ -8,10 +8,14 @@ namespace DupFinder
     /// </summary>
     public partial class MainWindow : Window
     {
+        readonly MainWindowViewModel _mainWindow;
         public MainWindow(MainWindowViewModel mainWindow)
         {
+            _mainWindow = mainWindow;
+
             InitializeComponent();
-            DataContext = mainWindow;
+
+            DataContext = _mainWindow;
         }
     }
 }
