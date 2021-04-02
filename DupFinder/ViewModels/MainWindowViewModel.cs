@@ -1,7 +1,6 @@
 ﻿using DupFinderApp.Commands;
 using DupFinderCore;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Windows.Input;
@@ -15,10 +14,9 @@ namespace DupFinderApp.ViewModels
         readonly IProcessor _processor;
 
         public MainWindowViewModel(IProcessor processor)
-        {
-            _processor = processor ?? throw new ArgumentNullException(nameof(processor));
-        }
+            => _processor = processor ?? throw new ArgumentNullException(nameof(processor));
 
+        #region Properties
         private string selectedPath = string.Empty;
 
         public string SelectedPath
@@ -26,11 +24,10 @@ namespace DupFinderApp.ViewModels
             get { return selectedPath; }
             set
             {
-                if (selectedPath != value)
-                {
-                    selectedPath = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SelectedPath)));
-                }
+                if (selectedPath == value) return;
+
+                selectedPath = value;
+                OnPropertyChanged(nameof(SelectedPath));
             }
         }
 
@@ -41,11 +38,10 @@ namespace DupFinderApp.ViewModels
             get { return loadedImages; }
             set
             {
-                if (loadedImages != value)
-                {
-                    loadedImages = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(LoadedImages)));
-                }
+                if (loadedImages == value) return;
+
+                loadedImages = value;
+                OnPropertyChanged(nameof(LoadedImages));
             }
         }
 
@@ -56,26 +52,17 @@ namespace DupFinderApp.ViewModels
             get { return similarImages; }
             set
             {
-                if (similarImages != value)
-                {
-                    similarImages = value;
-                    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SimilarImages)));
-                }
+                if (similarImages == value) return;
+
+                similarImages = value;
+                OnPropertyChanged(nameof(SimilarImages));
             }
         }
 
-        // todo: try to get this working
-        private T Update<T>(T original, T newValue, string propertyName)
-        {
-            if (!EqualityComparer<T>.Default.Equals(original, newValue))
-            {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-                return newValue;
-            }
+        protected void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        #endregion
 
-            return original;
-        }
-
+        #region Commands
         private ICommand? _chooseDirectoryCommand;
         public ICommand ChooseDirectoryCommand =>
             _chooseDirectoryCommand ??= new CommandHandler(() => ChooseDirectory(), () => true);
@@ -91,15 +78,15 @@ namespace DupFinderApp.ViewModels
         private ICommand? _moveImagesCommand;
         public ICommand MoveImagesCommand =>
             _moveImagesCommand ??= new CommandHandler(() => SortImages(), () => SimilarImages > 0);
-
+        #endregion
 
         public void ChooseDirectory()
         {
             var folderDialog = new Ookii.Dialogs.Wpf.VistaFolderBrowserDialog();
-            if (folderDialog.ShowDialog() == true)
-            {
-                SelectedPath = folderDialog.SelectedPath;
-            }
+            if (folderDialog.ShowDialog() != true) return;
+
+
+            SelectedPath = folderDialog.SelectedPath;
         }
 
         public async void LoadImagesIntoMemory()
