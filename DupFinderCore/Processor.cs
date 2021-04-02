@@ -31,7 +31,7 @@ namespace DupFinderCore
             _finder = finder ?? throw new ArgumentNullException(nameof(finder));
         }
 
-        public async Task<int> AddTargets(DirectoryInfo baseFolder)
+        public async Task<int> LoadImages(DirectoryInfo baseFolder)
         {
             BaseFolder = baseFolder;
             Targets = await _loader.GetImages(BaseFolder);
@@ -40,7 +40,7 @@ namespace DupFinderCore
             return Targets.Count();
         }
 
-        public async Task<int> Process()
+        public async Task<int> FindSimilarImages()
         {
             var result = await _finder.FindPairs(Targets);
             Pairs = result.ToList();
@@ -48,7 +48,7 @@ namespace DupFinderCore
             return Pairs.Count();
         }
 
-        public void Prune()
+        public void FindBetterImages()
         {
             _comparer.Process(Pairs);
             string path = BaseFolder?.FullName + Path.DirectorySeparatorChar;

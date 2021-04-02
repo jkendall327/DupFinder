@@ -90,12 +90,12 @@ namespace DupFinderApp.ViewModels
         }
 
         public async void LoadImagesIntoMemory()
-            => LoadedImages = await _processor.AddTargets(new DirectoryInfo(SelectedPath));
+            => LoadedImages = await _processor.LoadImages(new DirectoryInfo(SelectedPath));
 
         public async void FindSimilarImages()
-            => SimilarImages = await _processor.Process();
+            => SimilarImages = await _processor.FindSimilarImages();
 
         public void SortImages()
-            => _processor.Prune();
+            => _processor.FindBetterImages();
     }
 }
