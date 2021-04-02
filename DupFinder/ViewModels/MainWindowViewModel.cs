@@ -86,7 +86,7 @@ namespace DupFinderApp.ViewModels
 
         private ICommand? _findSimilarImagesCommand;
         public ICommand FindSimilarImagesCommand =>
-            _findSimilarImagesCommand ??= new CommandHandler(() => FindSimilarImages(), () => loadedImages > 0);
+            _findSimilarImagesCommand ??= new CommandHandler(() => FindSimilarImages(), () => LoadedImages > 0);
 
         private ICommand? _moveImagesCommand;
         public ICommand MoveImagesCommand =>
