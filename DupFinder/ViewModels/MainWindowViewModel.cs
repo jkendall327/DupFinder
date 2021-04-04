@@ -11,7 +11,7 @@ namespace DupFinderApp.ViewModels
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        readonly IProcessor _processor;
+        private readonly IProcessor _processor;
 
         public MainWindowViewModel(IProcessor processor)
             => _processor = processor ?? throw new ArgumentNullException(nameof(processor));
@@ -51,7 +51,7 @@ namespace DupFinderApp.ViewModels
         public ICommand MoveImagesCommand =>
             _moveImagesCommand ??= new CommandHandler(() => SortImages(), () => SimilarImages > 0);
 
-        public void ChooseDirectory()
+        private void ChooseDirectory()
         {
             var folderDialog = new Ookii.Dialogs.Wpf.VistaFolderBrowserDialog();
             if (folderDialog.ShowDialog() != true) return;
@@ -59,13 +59,13 @@ namespace DupFinderApp.ViewModels
             SelectedPath = folderDialog.SelectedPath;
         }
 
-        public async void LoadImagesIntoMemory()
+        private async void LoadImagesIntoMemory()
             => LoadedImages = await _processor.LoadImages(new DirectoryInfo(SelectedPath));
 
-        public async void FindSimilarImages()
+        private async void FindSimilarImages()
             => SimilarImages = await _processor.FindSimilarImages();
 
-        public void SortImages()
+        private void SortImages()
             => _processor.FindBetterImages();
     }
 }
