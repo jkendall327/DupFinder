@@ -44,7 +44,7 @@ namespace DupFinderApp.ViewModels
 
         protected void SetProperty<T>(ref T backingField, T value, string propertyName)
         {
-            if (Equals(backingField, value)) return;
+            if (System.Collections.Generic.EqualityComparer<T>.Default.Equals(backingField, value)) return;
 
             backingField = value;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
