@@ -17,18 +17,13 @@ namespace DupFinderApp.ViewModels
             => _processor = processor ?? throw new ArgumentNullException(nameof(processor));
 
         #region Properties
+
         private string selectedPath = string.Empty;
 
         public string SelectedPath
         {
             get { return selectedPath; }
-            set
-            {
-                if (selectedPath == value) return;
-
-                selectedPath = value;
-                OnPropertyChanged(nameof(SelectedPath));
-            }
+            set => SetProperty(ref selectedPath, value, nameof(SelectedPath));
         }
 
         private int loadedImages;
@@ -36,13 +31,7 @@ namespace DupFinderApp.ViewModels
         public int LoadedImages
         {
             get { return loadedImages; }
-            set
-            {
-                if (loadedImages == value) return;
-
-                loadedImages = value;
-                OnPropertyChanged(nameof(LoadedImages));
-            }
+            set => SetProperty(ref loadedImages, value, nameof(LoadedImages));
         }
 
         private int similarImages;
@@ -50,16 +39,17 @@ namespace DupFinderApp.ViewModels
         public int SimilarImages
         {
             get { return similarImages; }
-            set
-            {
-                if (similarImages == value) return;
-
-                similarImages = value;
-                OnPropertyChanged(nameof(SimilarImages));
-            }
+            set => SetProperty(ref similarImages, value, nameof(SimilarImages));
         }
 
-        protected void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        protected void SetProperty<T>(ref T backingField, T value, string propertyName)
+        {
+            if (Equals(backingField, value)) return;
+
+            backingField = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
         #endregion
 
         #region Commands
