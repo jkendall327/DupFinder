@@ -16,43 +16,25 @@ namespace DupFinderApp.ViewModels
         public MainWindowViewModel(IProcessor processor)
             => _processor = processor ?? throw new ArgumentNullException(nameof(processor));
 
-        #region Properties
-
         private string selectedPath = string.Empty;
-
-        public string SelectedPath
-        {
-            get { return selectedPath; }
-            set => SetProperty(ref selectedPath, value, nameof(SelectedPath));
-        }
+        public string SelectedPath { get => selectedPath; set => SetProperty(ref selectedPath, value); }
 
         private int loadedImages;
-
-        public int LoadedImages
-        {
-            get { return loadedImages; }
-            set => SetProperty(ref loadedImages, value, nameof(LoadedImages));
-        }
+        public int LoadedImages { get => loadedImages; set => SetProperty(ref loadedImages, value); }
 
         private int similarImages;
+        public int SimilarImages { get => similarImages; set => SetProperty(ref similarImages, value); }
 
-        public int SimilarImages
+        // automatically get the name of the calling method
+        private void SetProperty<T>(ref T backingField, T value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
         {
-            get { return similarImages; }
-            set => SetProperty(ref similarImages, value, nameof(SimilarImages));
-        }
-
-        protected void SetProperty<T>(ref T backingField, T value, string propertyName)
-        {
+            //only send out update if the value is different
             if (System.Collections.Generic.EqualityComparer<T>.Default.Equals(backingField, value)) return;
 
             backingField = value;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        #endregion
-
-        #region Commands
         private ICommand? _chooseDirectoryCommand;
         public ICommand ChooseDirectoryCommand =>
             _chooseDirectoryCommand ??= new CommandHandler(() => ChooseDirectory(), () => true);
@@ -68,13 +50,11 @@ namespace DupFinderApp.ViewModels
         private ICommand? _moveImagesCommand;
         public ICommand MoveImagesCommand =>
             _moveImagesCommand ??= new CommandHandler(() => SortImages(), () => SimilarImages > 0);
-        #endregion
 
         public void ChooseDirectory()
         {
             var folderDialog = new Ookii.Dialogs.Wpf.VistaFolderBrowserDialog();
             if (folderDialog.ShowDialog() != true) return;
-
 
             SelectedPath = folderDialog.SelectedPath;
         }
