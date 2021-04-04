@@ -22,26 +22,20 @@ namespace DupFinderCore
     public class Entry
     {
         public Image Image { get; }
+        public int Pixels { get; init; }
+        public double AspectRatio { get; init; }
+        public int FocusLevel { get; set; } = 64;
+        public long Size { get; }
 
         public string FullPath { get; }
         public string Filename => Path.GetFileName(FullPath);
-        public int Pixels;
-        public double AspectRatio;
-
-        public int FocusLevel { get; set; } = 64;
-
-        public long Size { get; }
-
         public DateTime Date { get; }
 
         public Image? ColorMap { get; set; }
 
         public Status Status { get; set; } = Status.Undecided;
 
-        public override string ToString()
-        {
-            return FullPath;
-        }
+        public override string ToString() => FullPath;
 
         /// <summary>
         /// Used for calculating similarity with PHash.
@@ -51,23 +45,20 @@ namespace DupFinderCore
         public Entry(string filepath)
         {
             if (!File.Exists(filepath))
-            {
-                throw new FileNotFoundException();
-            }
+                throw new FileNotFoundException("File not found", Path.GetFileName(filepath));
 
             FullPath = filepath;
+
             Image = Image.FromFile(FullPath);
 
             Pixels = Image.Width * Image.Height;
             AspectRatio = (double)Image.Width / Image.Height;
 
-            FileInfo fileInfo = new(FullPath);
+            FileInfo file = new(FullPath);
+            Size = file.Length;
+            Date = file.CreationTimeUtc;
 
-            Size = fileInfo.Length;
-            Date = new FileInfo(FullPath).CreationTimeUtc;
-
-            var bitmap = (Bitmap)Image;
-            Hash = ImagePhash.ComputeDigest(bitmap.ToLuminanceImage());
+            Hash = ImagePhash.ComputeDigest((Image as Bitmap).ToLuminanceImage());
 
             GenerateColorMap();
 
