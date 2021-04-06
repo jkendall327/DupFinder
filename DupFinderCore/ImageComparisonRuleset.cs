@@ -4,14 +4,20 @@ using System.Linq;
 
 namespace DupFinderCore
 {
+    /// <summary>
+    /// Represents a class that contains methods which compare two <see cref="Entry"/> items to determine which is superior.
+    /// </summary>
     public interface IImageComparisonRuleset
     {
-        List<Func<Entry, Entry, Judgement>> Rules { get; set; }
+        /// <summary>
+        /// Methods that will compare two <see cref="Entry"/> items and return a <see cref="Judgement"/> indicating which is superior.
+        /// </summary>
+        List<Func<Entry, Entry, Judgement>> Rules { get; }
     }
 
     public class ImageComparisonRuleset : IImageComparisonRuleset
     {
-        public List<Func<Entry, Entry, Judgement>> Rules { get; set; } = new List<Func<Entry, Entry, Judgement>>();
+        public List<Func<Entry, Entry, Judgement>> Rules { get; private set; } = new List<Func<Entry, Entry, Judgement>>();
 
         public ImageComparisonRuleset()
         {
@@ -42,6 +48,16 @@ namespace DupFinderCore
 
         private Judgement CompareByProperty<T>(Entry left, Entry right, Func<Entry, T> propertyToCompare, Order order)
         {
+            // evaluate the properties so we can compare for equality
+            T leftProperty = propertyToCompare(left);
+            T rightProperty = propertyToCompare(right);
+
+            // check if the two entries have the same value for the given property
+            if (EqualityComparer<T>.Default.Equals(leftProperty, rightProperty))
+            {
+                return Judgement.Unsure;
+            }
+
             IEnumerable<Entry> list = new List<Entry>() { left, right };
 
             // inject the property to compare

@@ -46,6 +46,13 @@ namespace DupFinderCore
 
         private void DetermineJudgement((Entry left, Entry right) pair)
         {
+            if (DetermineUnsure(pair.left, pair.right))
+            {
+                Unsure.Add(pair.left);
+                Unsure.Add(pair.right);
+                return;
+            }
+
             int leftWins = 0;
             int rightWins = 0;
             int unsure = 0;
@@ -88,6 +95,15 @@ namespace DupFinderCore
                 Unsure.Add(pair.left);
                 Unsure.Add(pair.right);
             }
+        }
+
+        private bool DetermineUnsure(Entry left, Entry right)
+        {
+            var aspectRatioDifference = Math.Abs(left.AspectRatio - right.AspectRatio);
+            var pixelDifference = Math.Abs(((double)left.Pixels / right.Pixels) - 1d);
+            var sizeDifference = Math.Abs(((double)left.Size / right.Size) - 1d);
+
+            return Math.Abs(pixelDifference - sizeDifference) >= 1 || aspectRatioDifference > 0.05;
         }
     }
 }
