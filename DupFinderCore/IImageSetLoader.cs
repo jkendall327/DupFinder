@@ -6,6 +6,6 @@ namespace DupFinderCore
 {
     public interface IImageSetLoader
     {
-        Task<IEnumerable<Entry>> GetImages(DirectoryInfo dir);
+        Task<IEnumerable<Entry>> LoadImages(DirectoryInfo dir);
     }
 }

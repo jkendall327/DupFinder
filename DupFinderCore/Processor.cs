@@ -34,7 +34,7 @@ namespace DupFinderCore
         public async Task<int> LoadImages(DirectoryInfo baseFolder)
         {
             BaseFolder = baseFolder;
-            Targets = await _loader.GetImages(BaseFolder);
+            Targets = await _loader.LoadImages(BaseFolder);
             _logger.Information("Images loaded.");
 
             return Targets.Count();

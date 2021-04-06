@@ -13,7 +13,12 @@ namespace DupFinderCore
         readonly ILogger _logger;
         public ImageSetLoader(ILogger logger) => _logger = logger;
 
-        public async Task<IEnumerable<Entry>> GetImages(DirectoryInfo directory)
+        /// <summary>
+        /// Loads image files from the harddrive into memory as Entry objects.
+        /// </summary>
+        /// <param name="directory">The directory to load images from.</param>
+        /// <returns>A task that represents a collection of images not yet loaded.</returns>
+        public async Task<IEnumerable<Entry>> LoadImages(DirectoryInfo directory)
         {
             var tasks = GetFiles(directory)
                 .Where(x => x.Exists)
