@@ -25,7 +25,6 @@ namespace DupFinderApp.ViewModels
         private int similarImages;
         public int SimilarImages { get => similarImages; set => SetProperty(ref similarImages, value); }
 
-        // automatically get the name of the calling method
         private void SetProperty<T>(ref T backingField, T value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
         {
             //only send out update if the value is different
@@ -37,19 +36,27 @@ namespace DupFinderApp.ViewModels
 
         private ICommand? _chooseDirectoryCommand;
         public ICommand ChooseDirectoryCommand =>
-            _chooseDirectoryCommand ??= new CommandHandler(() => ChooseDirectory(), () => true);
+            _chooseDirectoryCommand ??= new CommandHandler(
+                () => ChooseDirectory(),
+                () => true);
 
         private ICommand? _loadImagesIntoMemoryCommand;
         public ICommand LoadImagesIntoMemoryCommand =>
-            _loadImagesIntoMemoryCommand ??= new CommandHandler(() => LoadImagesIntoMemory(), () => !string.IsNullOrWhiteSpace(SelectedPath) || Directory.Exists(SelectedPath));
+            _loadImagesIntoMemoryCommand ??= new CommandHandler(
+                async () => LoadedImages = await _processor.LoadImages(new DirectoryInfo(SelectedPath)),
+                () => !string.IsNullOrWhiteSpace(SelectedPath) || Directory.Exists(SelectedPath));
 
         private ICommand? _findSimilarImagesCommand;
         public ICommand FindSimilarImagesCommand =>
-            _findSimilarImagesCommand ??= new CommandHandler(() => FindSimilarImages(), () => LoadedImages > 0);
+            _findSimilarImagesCommand ??= new CommandHandler(
+                async () => SimilarImages = await _processor.FindSimilarImages(),
+                () => LoadedImages > 0);
 
         private ICommand? _moveImagesCommand;
         public ICommand MoveImagesCommand =>
-            _moveImagesCommand ??= new CommandHandler(() => SortImages(), () => SimilarImages > 0);
+            _moveImagesCommand ??= new CommandHandler(
+                () => _processor.FindBetterImages(),
+                () => SimilarImages > 0);
 
         private void ChooseDirectory()
         {
@@ -58,14 +65,5 @@ namespace DupFinderApp.ViewModels
 
             SelectedPath = folderDialog.SelectedPath;
         }
-
-        private async void LoadImagesIntoMemory()
-            => LoadedImages = await _processor.LoadImages(new DirectoryInfo(SelectedPath));
-
-        private async void FindSimilarImages()
-            => SimilarImages = await _processor.FindSimilarImages();
-
-        private void SortImages()
-            => _processor.FindBetterImages();
     }
 }
