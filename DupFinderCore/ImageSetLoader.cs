@@ -1,8 +1,8 @@
 ﻿using Serilog;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -11,50 +11,67 @@ namespace DupFinderCore
     public class ImageSetLoader : IImageSetLoader
     {
         readonly ILogger _logger;
+        public ImageSetLoader(ILogger logger) => _logger = logger;
 
-        public ImageSetLoader(ILogger logger)
+        public async Task<IEnumerable<Entry>> GetImages(DirectoryInfo directory)
         {
-            _logger = logger;
+            var tasks = GetFiles(directory)
+                .Where(x => x.Exists)
+                .Where(x => IsImage(x))
+                .Select(x => MakeEntryAsync(x));
+
+            return await Task.WhenAll(tasks);
         }
 
-        public async Task<IEnumerable<Entry>> GetImages(DirectoryInfo dirInfo)
+        private IEnumerable<FileInfo> GetFiles(DirectoryInfo directory)
         {
-            var images = new ConcurrentBag<Entry>();
+            if (directory is null)
+            {
+                _logger.Warning($"{nameof(directory)} was null.");
+                return Enumerable.Empty<FileInfo>();
+            }
 
             ParallelQuery<FileInfo> files;
 
             try
             {
-                // todo profile to see if this actually makes a difference -- overhead might make it slower
-                files = dirInfo.EnumerateFiles("*.*", SearchOption.AllDirectories).AsParallel();
+                files = directory
+                    .EnumerateFiles("*.*", SearchOption.AllDirectories)
+                    .AsParallel();
             }
-            catch (DirectoryNotFoundException)
+            catch (DirectoryNotFoundException ex)
             {
-                _logger.Error($"Directory not found: {dirInfo.Name}");
-                return images;
+                _logger.Error($"Directory not found: {directory.Name}");
+                _logger.Error(ex.StackTrace);
+                return Enumerable.Empty<FileInfo>();
+            }
+            catch (SecurityException ex)
+            {
+                _logger.Error($"Security exception when processing {directory.Name}.");
+                _logger.Error(ex.StackTrace);
+                return Enumerable.Empty<FileInfo>();
             }
 
             if (!files.Any())
             {
-                _logger.Debug($"{dirInfo.Name} was empty.");
-                return images;
+                _logger.Debug($"{directory.Name} was empty.");
+                return Enumerable.Empty<FileInfo>();
             }
 
-            _logger.Debug($"Loading files from {dirInfo.FullName}...");
+            _logger.Debug($"Loading files from {directory.FullName}...");
 
-            await Task.Run(() => Parallel.ForEach(files, file =>
-            {
-                if (IsNotImage(file)) return;
+            return files;
+        }
 
-                _logger.Debug($"Loaded file {file.Name}");
-                images.Add(new Entry(file.FullName));
-            }));
-
-            return images;
+        private async Task<Entry> MakeEntryAsync(FileInfo file)
+        {
+            var entry = await Task.Run(() => new Entry(file.FullName));
+            _logger.Debug($"Loaded file {file.Name}");
+            return entry;
         }
 
         // todo improve
-        private bool IsNotImage(FileInfo file)
-            => !Regex.IsMatch(file.FullName, @".jpg|.png|.jpeg$", RegexOptions.IgnoreCase) || file.FullName.Contains(".txt");
+        private bool IsImage(FileInfo file)
+            => Regex.IsMatch(file.FullName, @".jpg|.png|.jpeg$", RegexOptions.IgnoreCase);
     }
 }
