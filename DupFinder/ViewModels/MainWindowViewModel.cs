@@ -1,16 +1,13 @@
 ﻿using DupFinderApp.Commands;
 using DupFinderCore;
 using System;
-using System.ComponentModel;
 using System.IO;
 using System.Windows.Input;
 
 namespace DupFinderApp.ViewModels
 {
-    public class MainWindowViewModel : INotifyPropertyChanged
+    public class MainWindowViewModel : VMBase
     {
-        public event PropertyChangedEventHandler? PropertyChanged;
-
         private readonly IProcessor _processor;
 
         public MainWindowViewModel(IProcessor processor)
@@ -24,15 +21,6 @@ namespace DupFinderApp.ViewModels
 
         private int similarImages;
         public int SimilarImages { get => similarImages; set => SetProperty(ref similarImages, value); }
-
-        private void SetProperty<T>(ref T backingField, T value, [System.Runtime.CompilerServices.CallerMemberName] string propertyName = "")
-        {
-            //only send out update if the value is different
-            if (System.Collections.Generic.EqualityComparer<T>.Default.Equals(backingField, value)) return;
-
-            backingField = value;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
 
         private ICommand? _chooseDirectoryCommand;
         public ICommand ChooseDirectoryCommand =>
@@ -57,6 +45,16 @@ namespace DupFinderApp.ViewModels
             _moveImagesCommand ??= new CommandHandler(
                 () => _processor.FindBetterImages(),
                 () => SimilarImages > 0);
+
+        private ICommand? showOptions;
+        public ICommand ShowOptionsCommand =>
+            showOptions ??= new CommandHandler(
+                () =>
+                {
+                    var options = new OptionsView();
+                    options.Show();
+                },
+                () => true);
 
         private void ChooseDirectory()
         {
