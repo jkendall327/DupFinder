@@ -48,9 +48,9 @@ namespace DupFinderCore
             return Pairs.Count();
         }
 
-        public void FindBetterImages()
+        public void FindBetterImages(UserSettings settings)
         {
-            _comparer.Process(Pairs);
+            _comparer.Process(Pairs, settings);
             string path = BaseFolder?.FullName + Path.DirectorySeparatorChar;
 
             Directory.CreateDirectory(path + "Keep");

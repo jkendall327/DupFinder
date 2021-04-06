@@ -1,6 +1,8 @@
-﻿namespace DupFinderApp.ViewModels
+﻿using DupFinderCore;
+
+namespace DupFinderApp.ViewModels
 {
-    class OptionsViewModel : VMBase
+    public class OptionsViewModel : VMBase
     {
         private bool checkDates = true;
 

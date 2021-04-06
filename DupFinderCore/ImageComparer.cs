@@ -10,7 +10,7 @@ namespace DupFinderCore
         public List<Entry> Trash { get; set; }
         public List<Entry> Unsure { get; set; }
 
-        void Process(IEnumerable<(Entry left, Entry right)> images);
+        void Process(IEnumerable<(Entry left, Entry right)> images, UserSettings settings);
     }
 
     public enum Judgement
@@ -31,12 +31,14 @@ namespace DupFinderCore
             _ruleset = ruleset ?? throw new ArgumentNullException(nameof(ruleset));
         }
 
-        public void Process(IEnumerable<(Entry left, Entry right)> pairs)
+        public void Process(IEnumerable<(Entry left, Entry right)> pairs, UserSettings settings)
         {
             if (pairs is null)
             {
                 throw new ArgumentNullException(nameof(pairs));
             }
+
+            _ruleset.Configure(settings);
 
             foreach (var pair in pairs)
             {

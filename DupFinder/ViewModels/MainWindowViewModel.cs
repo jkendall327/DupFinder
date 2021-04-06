@@ -43,18 +43,26 @@ namespace DupFinderApp.ViewModels
         private ICommand? _moveImagesCommand;
         public ICommand MoveImagesCommand =>
             _moveImagesCommand ??= new CommandHandler(
-                () => _processor.FindBetterImages(),
+                () => _processor.FindBetterImages(OptionsWindow.GetSettings()),
                 () => SimilarImages > 0);
+
 
         private ICommand? showOptions;
         public ICommand ShowOptionsCommand =>
-            showOptions ??= new CommandHandler(
-                () =>
-                {
-                    var options = new OptionsView();
-                    options.Show();
-                },
-                () => true);
+            showOptions ??= new CommandHandler(() => ShowOptionsWindow(), () => true);
+
+        private void ShowOptionsWindow()
+        {
+            var window = new OptionsView
+            {
+                DataContext = OptionsWindow
+            };
+
+            window.Show();
+        }
+
+        private OptionsViewModel optionsWindow = new OptionsViewModel();
+        public OptionsViewModel OptionsWindow { get => optionsWindow; set => SetProperty(ref optionsWindow, value); }
 
         private void ChooseDirectory()
         {

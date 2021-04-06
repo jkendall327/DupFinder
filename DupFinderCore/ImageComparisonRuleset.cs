@@ -13,6 +13,8 @@ namespace DupFinderCore
         /// Methods that will compare two <see cref="Entry"/> items and return a <see cref="Judgement"/> indicating which is superior.
         /// </summary>
         List<Func<Entry, Entry, Judgement>> Rules { get; }
+
+        void Configure(UserSettings settings);
     }
 
     public class ImageComparisonRuleset : IImageComparisonRuleset
@@ -21,9 +23,7 @@ namespace DupFinderCore
 
         public ImageComparisonRuleset()
         {
-            Rules.Add(ComparePixels);
-            Rules.Add(CompareDate);
-            Rules.Add(CompareSize);
+
         }
 
         private Judgement ComparePixels(Entry left, Entry right)
@@ -81,6 +81,22 @@ namespace DupFinderCore
             }
 
             return Judgement.Unsure;
+        }
+
+        public void Configure(UserSettings settings)
+        {
+            if (settings.CompareByDate)
+            {
+                Rules.Add(CompareDate);
+            }
+            if (settings.CompareByPixels)
+            {
+                Rules.Add(ComparePixels);
+            }
+            if (settings.CompareBySize)
+            {
+                Rules.Add(CompareSize);
+            }
         }
     }
 }

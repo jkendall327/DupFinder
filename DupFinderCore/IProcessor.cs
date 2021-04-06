@@ -7,6 +7,6 @@ namespace DupFinderCore
     {
         Task<int> LoadImages(DirectoryInfo baseFolder);
         Task<int> FindSimilarImages();
-        void FindBetterImages();
+        void FindBetterImages(UserSettings settings);
     }
 }
