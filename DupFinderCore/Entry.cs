@@ -16,10 +16,24 @@ namespace DupFinderCore
         Unsure
     }
 
+    public interface IEntry
+    {
+        int Pixels { get; init; }
+        double AspectRatio { get; init; }
+        int FocusLevel { get; set; }
+        long Size { get; }
+
+        string FullPath { get; }
+        string Filename => Path.GetFileName(FullPath);
+        DateTime Date { get; }
+
+        Digest Hash { get; }
+    }
+
     /// <summary>
     /// Wrapper around System.Drawing.Image that maintains file info, hash, colourmap, status, etc.
     /// </summary>
-    public class Entry
+    public class Entry : IEntry
     {
         public Image Image { get; }
         public int Pixels { get; init; }
@@ -29,11 +43,10 @@ namespace DupFinderCore
 
         public string FullPath { get; }
         public string Filename => Path.GetFileName(FullPath);
+
         public DateTime Date { get; }
 
         public Image? ColorMap { get; set; }
-
-        public Status Status { get; set; } = Status.Undecided;
 
         public override string ToString() => FullPath;
 
