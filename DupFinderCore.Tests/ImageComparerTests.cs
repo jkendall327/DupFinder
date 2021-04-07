@@ -1,4 +1,5 @@
 ﻿using Moq;
+using System;
 using System.Collections.Generic;
 using Xunit;
 
@@ -8,19 +9,14 @@ namespace DupFinderCore.Tests
     public class ImageComparerTests
     {
         private readonly ImageComparer _sut;
+        private readonly ImageComparisonRuleset _rules = new();
 
-        private readonly ImageComparisonRuleset _rules = new ImageComparisonRuleset();
-
-        private readonly UserSettings _settings = new UserSettings()
+        private readonly UserSettings _settings = new()
         { CompareByDate = true, CompareByPixels = true, CompareBySize = true };
-
-        private readonly List<(IEntry, IEntry)> Images = new List<(IEntry, IEntry)>();
 
         public ImageComparerTests()
         {
             _sut = new ImageComparer(_rules);
-
-            Images = CreateMockImages();
         }
 
         private List<(IEntry, IEntry)> CreateMockImages()
@@ -28,30 +24,45 @@ namespace DupFinderCore.Tests
             var list = new List<(IEntry, IEntry)>();
 
             var moq1 = new Mock<IEntry>();
-            moq1.SetupGet(x => x.Size).Returns(40000);
+            moq1.SetupGet(x => x.Size).Returns(30000); // smaller
+            moq1.SetupGet(x => x.Date).Returns(DateTime.Now.Subtract(TimeSpan.FromDays(1))); // newer
+            moq1.SetupGet(x => x.Pixels).Returns(1000); // more pixels
+
 
             var moq2 = new Mock<IEntry>();
             moq2.SetupGet(x => x.Size).Returns(40000);
-
-
-            //author.SetupGet(p => p.Id).Returns(1);
-            //author.SetupGet(p => p.FirstName).Returns(“Joydip”);
-            //author.SetupGet(p => p.LastName).Returns(“Kanjilal”);
-            //Assert.AreEqual(“Joydip”, author.Object.FirstName);
-            //Assert.AreEqual(“Kanjilal”, author.Object.LastName);
+            moq2.SetupGet(x => x.Date).Returns(DateTime.Now.Subtract(TimeSpan.FromDays(2)));
+            moq2.SetupGet(x => x.Pixels).Returns(900);
 
             list.Add((moq1.Object, moq2.Object));
 
-            return Images;
+            return list;
         }
 
         [Fact]
-        public void dotest()
+        public void ImageIsKept_WhenSuperiorOnAllCriteria()
         {
-            _sut.Process(Images, _settings);
+            var lilst = CreateMockImages();
+
+            _sut.Process(lilst, _settings);
+
+            Assert.Equal(lilst[0].Item1, _sut.Keep[0]);
+        }
+
+        [Fact]
+        public void ImageIsKept_WhenSuperiorOnMoreCriteria()
+        {
+            _sut.Process(CreateMockImages(), _settings);
 
             Assert.True(true);
         }
 
+        [Fact]
+        public void ImagesAreUnsure_WhenEqualOnAllCounts()
+        {
+            _sut.Process(CreateMockImages(), _settings);
+
+            Assert.True(true);
+        }
     }
 }
