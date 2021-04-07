@@ -4,12 +4,6 @@ using System.Linq;
 
 namespace DupFinderCore
 {
-
-    public enum Judgement
-    {
-        Left, Right, Unsure
-    }
-
     public class ImageComparer : IImagerComparer
     {
         public List<IEntry> Keep { get; set; } = new List<IEntry>();

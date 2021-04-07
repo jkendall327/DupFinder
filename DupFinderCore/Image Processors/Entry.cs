@@ -8,14 +8,6 @@ using System.IO;
 
 namespace DupFinderCore
 {
-    public enum Status
-    {
-        Undecided,
-        Keep,
-        Trash,
-        Unsure
-    }
-
     /// <summary>
     /// Wrapper around System.Drawing.Image that maintains file info, hash, colourmap, status, etc.
     /// </summary>
