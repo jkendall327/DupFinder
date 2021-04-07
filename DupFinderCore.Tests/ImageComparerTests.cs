@@ -10,108 +10,89 @@ namespace DupFinderCore.Tests
     {
         private readonly ImageComparer _sut;
         private readonly ImageComparisonRuleset _rules = new();
+        readonly List<(IEntry, IEntry)> list = new();
+
+        readonly Mock<IEntry> Left = new();
+        readonly Mock<IEntry> Right = new();
+
+        readonly Mock<IEntry> Good = new();
 
         private readonly UserSettings _settings = new()
         { CompareByDate = true, CompareByPixels = true, CompareBySize = true };
 
-        public ImageComparerTests() => _sut = new ImageComparer(_rules);
+        public ImageComparerTests()
+        {
+            _sut = new ImageComparer(_rules);
+
+            Good.SetupGet(x => x.Size).Returns(30000); // smaller
+            Good.SetupGet(x => x.Date).Returns(DaysAgo(1)); // newer
+            Good.SetupGet(x => x.Pixels).Returns(1000); // more pixels
+        }
 
         [Fact]
         public void ImageIsKept_WhenSuperiorOnAllCriteria()
         {
-            var list = new List<(IEntry, IEntry)>();
+            Right.SetupGet(x => x.Size).Returns(40000);
+            Right.SetupGet(x => x.Date).Returns(DaysAgo(2));
+            Right.SetupGet(x => x.Pixels).Returns(900);
 
-            var moq1 = new Mock<IEntry>();
-            moq1.SetupGet(x => x.Size).Returns(30000); // smaller
-            moq1.SetupGet(x => x.Date).Returns(DaysAgo(1)); // newer
-            moq1.SetupGet(x => x.Pixels).Returns(1000); // more pixels
-
-
-            var moq2 = new Mock<IEntry>();
-            moq2.SetupGet(x => x.Size).Returns(40000);
-            moq2.SetupGet(x => x.Date).Returns(DaysAgo(2));
-            moq2.SetupGet(x => x.Pixels).Returns(900);
-
-            list.Add((moq1.Object, moq2.Object));
+            list.Add((Good.Object, Right.Object));
 
             _sut.Process(list, _settings);
 
-            Assert.Contains(moq1.Object, _sut.Keep);
-            Assert.Contains(moq2.Object, _sut.Trash);
+            Assert.Contains(Good.Object, _sut.Keep);
+            Assert.Contains(Right.Object, _sut.Trash);
         }
 
         [Fact]
         public void ImageIsKept_WhenSuperiorOnMoreCriteria()
         {
-            var list = new List<(IEntry, IEntry)>();
+            Right.SetupGet(x => x.Size).Returns(40000);
+            Right.SetupGet(x => x.Date).Returns(DaysAgo(1));
+            Right.SetupGet(x => x.Pixels).Returns(900);
 
-            var moq1 = new Mock<IEntry>();
-            moq1.SetupGet(x => x.Size).Returns(30000); // smaller
-            moq1.SetupGet(x => x.Date).Returns(DaysAgo(1));
-            moq1.SetupGet(x => x.Pixels).Returns(1000); // more pixels
-
-
-            var moq2 = new Mock<IEntry>();
-            moq2.SetupGet(x => x.Size).Returns(40000);
-            moq2.SetupGet(x => x.Date).Returns(DaysAgo(1));
-            moq2.SetupGet(x => x.Pixels).Returns(900);
-
-            list.Add((moq1.Object, moq2.Object));
+            list.Add((Good.Object, Right.Object));
 
             _sut.Process(list, _settings);
 
-            Assert.Contains(moq1.Object, _sut.Keep);
-            Assert.Contains(moq2.Object, _sut.Trash);
+            Assert.Contains(Good.Object, _sut.Keep);
+            Assert.Contains(Right.Object, _sut.Trash);
         }
 
         [Fact]
         public void ImagesAreUnsure_WhenImagesAreEquallySuperiorOnDifferentCriteria()
         {
-            var list = new List<(IEntry, IEntry)>();
-
             // moq1 has better size, moq2 has better date
 
-            var moq1 = new Mock<IEntry>();
-            moq1.SetupGet(x => x.Size).Returns(20000);
-            moq1.SetupGet(x => x.Date).Returns(DaysAgo(2));
-            moq1.SetupGet(x => x.Pixels).Returns(1000);
+            Left.SetupGet(x => x.Size).Returns(20000);
+            Left.SetupGet(x => x.Date).Returns(DaysAgo(2));
+            Left.SetupGet(x => x.Pixels).Returns(1000);
 
+            Right.SetupGet(x => x.Size).Returns(30000);
+            Right.SetupGet(x => x.Date).Returns(DaysAgo(1));
+            Right.SetupGet(x => x.Pixels).Returns(1000);
 
-            var moq2 = new Mock<IEntry>();
-            moq2.SetupGet(x => x.Size).Returns(30000);
-            moq2.SetupGet(x => x.Date).Returns(DaysAgo(1));
-            moq2.SetupGet(x => x.Pixels).Returns(1000);
-
-            list.Add((moq1.Object, moq2.Object));
+            list.Add((Left.Object, Right.Object));
 
             _sut.Process(list, _settings);
 
-            Assert.Contains(moq1.Object, _sut.Unsure);
-            Assert.Contains(moq2.Object, _sut.Unsure);
+            Assert.Contains(Left.Object, _sut.Unsure);
+            Assert.Contains(Right.Object, _sut.Unsure);
         }
 
         [Fact]
         public void ImagesAreUnsure_WhenEqualOnAllCounts()
         {
-            var list = new List<(IEntry, IEntry)>();
+            Right.SetupGet(x => x.Size).Returns(30000);
+            Right.SetupGet(x => x.Date).Returns(DaysAgo(1));
+            Right.SetupGet(x => x.Pixels).Returns(1000);
 
-            var moq1 = new Mock<IEntry>();
-            moq1.SetupGet(x => x.Size).Returns(30000);
-            moq1.SetupGet(x => x.Date).Returns(DaysAgo(1));
-            moq1.SetupGet(x => x.Pixels).Returns(1000);
-
-
-            var moq2 = new Mock<IEntry>();
-            moq2.SetupGet(x => x.Size).Returns(30000);
-            moq2.SetupGet(x => x.Date).Returns(DaysAgo(1));
-            moq2.SetupGet(x => x.Pixels).Returns(1000);
-
-            list.Add((moq1.Object, moq2.Object));
+            list.Add((Good.Object, Right.Object));
 
             _sut.Process(list, _settings);
 
-            Assert.Contains(moq1.Object, _sut.Unsure);
-            Assert.Contains(moq2.Object, _sut.Unsure);
+            Assert.Contains(Good.Object, _sut.Unsure);
+            Assert.Contains(Right.Object, _sut.Unsure);
         }
 
         private static DateTime DaysAgo(int days)
