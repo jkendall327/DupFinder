@@ -4,6 +4,8 @@
              xmlns:local="clr-namespace:DupFinder"
              Startup="Application_Startup">
     <Application.Resources>
-         
+        <Style TargetType="Grid">
+            <Setter Property="Background" Value="#eee"></Setter>
+        </Style>
     </Application.Resources>
 </Application>
