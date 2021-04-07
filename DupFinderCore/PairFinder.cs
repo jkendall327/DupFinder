@@ -8,16 +8,16 @@ namespace DupFinderCore
 {
     public interface IPairFinder
     {
-        Task<IEnumerable<(Entry, Entry)>> FindPairs(IEnumerable<Entry> images);
+        Task<IEnumerable<(IEntry, IEntry)>> FindPairs(IEnumerable<IEntry> images);
     }
 
     public class PairFinder : IPairFinder
     {
-        public async Task<IEnumerable<(Entry, Entry)>> FindPairs(IEnumerable<Entry> images)
+        public async Task<IEnumerable<(IEntry, IEntry)>> FindPairs(IEnumerable<IEntry> images)
         {
             var uniquePairs = images.GetAllUniquePairs().ToList();
 
-            var similarImages = new ConcurrentBag<(Entry, Entry)>();
+            var similarImages = new ConcurrentBag<(IEntry, IEntry)>();
 
             await Task.Run(() => Parallel.ForEach(uniquePairs, pair =>
             {
@@ -28,7 +28,7 @@ namespace DupFinderCore
             return similarImages;
         }
 
-        private bool ImagesAreSimilar((Entry, Entry) pair)
+        private bool ImagesAreSimilar((IEntry, IEntry) pair)
         {
             var left = pair.Item1;
             var right = pair.Item2;
@@ -38,8 +38,9 @@ namespace DupFinderCore
             return phash > 0.86 && CompareEuclidianDistance(left, right);
         }
 
-        private bool CompareEuclidianDistance(Entry left, Entry right)
+        private bool CompareEuclidianDistance(IEntry left, IEntry right)
         {
+            // todo add implementation
             return true;
         }
 

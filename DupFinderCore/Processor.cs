@@ -18,9 +18,9 @@ namespace DupFinderCore
 
         DirectoryInfo? BaseFolder;
 
-        public IEnumerable<Entry> Targets { get; set; } = Enumerable.Empty<Entry>();
+        public IEnumerable<IEntry> Targets { get; set; } = Enumerable.Empty<Entry>();
 
-        public List<(Entry Left, Entry Right)> Pairs { get; set; } = new();
+        public List<(IEntry Left, IEntry Right)> Pairs { get; set; } = new();
 
         public Processor(IImageSetLoader loader, ILogger logger, IImagerComparer comparer, IConfiguration config, IPairFinder finder)
         {
@@ -62,7 +62,7 @@ namespace DupFinderCore
             Move(_comparer.Unsure, new DirectoryInfo(path + "Unsure"));
         }
 
-        private void Move(IEnumerable<Entry> images, DirectoryInfo destination)
+        private void Move(IEnumerable<IEntry> images, DirectoryInfo destination)
         {
             foreach (var image in images)
             {

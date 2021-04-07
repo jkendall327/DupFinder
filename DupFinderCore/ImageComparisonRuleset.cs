@@ -12,41 +12,41 @@ namespace DupFinderCore
         /// <summary>
         /// Methods that will compare two <see cref="Entry"/> items and return a <see cref="Judgement"/> indicating which is superior.
         /// </summary>
-        List<Func<Entry, Entry, Judgement>> Rules { get; }
+        List<Func<IEntry, IEntry, Judgement>> Rules { get; }
 
         void Configure(UserSettings settings);
     }
 
     public class ImageComparisonRuleset : IImageComparisonRuleset
     {
-        public List<Func<Entry, Entry, Judgement>> Rules { get; private set; } = new List<Func<Entry, Entry, Judgement>>();
+        public List<Func<IEntry, IEntry, Judgement>> Rules { get; private set; } = new List<Func<IEntry, IEntry, Judgement>>();
 
         public ImageComparisonRuleset()
         {
 
         }
 
-        private Judgement ComparePixels(Entry left, Entry right)
+        private Judgement ComparePixels(IEntry left, IEntry right)
         {
-            var pixels = new Func<Entry, int>(x => x.Pixels);
+            var pixels = new Func<IEntry, int>(x => x.Pixels);
             return CompareByProperty(left, right, pixels, Order.Biggest);
         }
 
-        private Judgement CompareDate(Entry left, Entry right)
+        private Judgement CompareDate(IEntry left, IEntry right)
         {
-            var date = new Func<Entry, DateTime>(x => x.Date);
+            var date = new Func<IEntry, DateTime>(x => x.Date);
             return CompareByProperty(left, right, date, Order.Biggest);
         }
 
-        private Judgement CompareSize(Entry left, Entry right)
+        private Judgement CompareSize(IEntry left, IEntry right)
         {
-            var size = new Func<Entry, long>(x => x.Size);
+            var size = new Func<IEntry, long>(x => x.Size);
             return CompareByProperty(left, right, size, Order.Smallest);
         }
 
         private enum Order { Biggest, Smallest }
 
-        private Judgement CompareByProperty<T>(Entry left, Entry right, Func<Entry, T> propertyToCompare, Order order)
+        private Judgement CompareByProperty<T>(IEntry left, IEntry right, Func<IEntry, T> propertyToCompare, Order order)
         {
             // evaluate the properties so we can compare for equality
             T leftProperty = propertyToCompare(left);
@@ -58,7 +58,7 @@ namespace DupFinderCore
                 return Judgement.Unsure;
             }
 
-            IEnumerable<Entry> list = new List<Entry>() { left, right };
+            IEnumerable<IEntry> list = new List<IEntry>() { left, right };
 
             // inject the property to compare
             // decide whether to find the smallest or biggest value by switching on order
