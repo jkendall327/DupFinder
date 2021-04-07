@@ -6,11 +6,6 @@ using System.Threading.Tasks;
 
 namespace DupFinderCore
 {
-    public interface IPairFinder
-    {
-        Task<IEnumerable<(IEntry, IEntry)>> FindPairs(IEnumerable<IEntry> images);
-    }
-
     public class PairFinder : IPairFinder
     {
         public async Task<IEnumerable<(IEntry, IEntry)>> FindPairs(IEnumerable<IEntry> images)
