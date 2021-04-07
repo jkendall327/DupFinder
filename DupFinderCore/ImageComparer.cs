@@ -6,11 +6,11 @@ namespace DupFinderCore
 {
     public interface IImagerComparer
     {
-        public List<Entry> Keep { get; set; }
-        public List<Entry> Trash { get; set; }
-        public List<Entry> Unsure { get; set; }
+        public List<IEntry> Keep { get; set; }
+        public List<IEntry> Trash { get; set; }
+        public List<IEntry> Unsure { get; set; }
 
-        void Process(IEnumerable<(Entry left, Entry right)> images, UserSettings settings);
+        void Process(IEnumerable<(IEntry left, IEntry right)> images, UserSettings settings);
     }
 
     public enum Judgement
@@ -20,9 +20,9 @@ namespace DupFinderCore
 
     public class ImageComparer : IImagerComparer
     {
-        public List<Entry> Keep { get; set; } = new List<Entry>();
-        public List<Entry> Trash { get; set; } = new List<Entry>();
-        public List<Entry> Unsure { get; set; } = new List<Entry>();
+        public List<IEntry> Keep { get; set; } = new List<IEntry>();
+        public List<IEntry> Trash { get; set; } = new List<IEntry>();
+        public List<IEntry> Unsure { get; set; } = new List<IEntry>();
 
         readonly IImageComparisonRuleset _ruleset;
 
@@ -31,7 +31,7 @@ namespace DupFinderCore
             _ruleset = ruleset ?? throw new ArgumentNullException(nameof(ruleset));
         }
 
-        public void Process(IEnumerable<(Entry left, Entry right)> pairs, UserSettings settings)
+        public void Process(IEnumerable<(IEntry left, IEntry right)> pairs, UserSettings settings)
         {
             if (pairs is null)
             {
@@ -46,7 +46,7 @@ namespace DupFinderCore
             }
         }
 
-        private void DetermineJudgement((Entry left, Entry right) pair)
+        private void DetermineJudgement((IEntry left, IEntry right) pair)
         {
             if (DetermineUnsure(pair.left, pair.right))
             {
@@ -99,7 +99,7 @@ namespace DupFinderCore
             }
         }
 
-        private bool DetermineUnsure(Entry left, Entry right)
+        private bool DetermineUnsure(IEntry left, IEntry right)
         {
             var aspectRatioDifference = Math.Abs(left.AspectRatio - right.AspectRatio);
             var pixelDifference = Math.Abs(((double)left.Pixels / right.Pixels) - 1d);
