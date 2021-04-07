@@ -5,26 +5,22 @@ using System.Linq;
 namespace DupFinderCore
 {
     /// <summary>
-    /// Represents a class that contains methods which compare two <see cref="Entry"/> items to determine which is superior.
+    /// Compares two <see cref="Entry"/> items to determine which is superior.
     /// </summary>
     public interface IImageComparisonRuleset
     {
         /// <summary>
-        /// Methods that will compare two <see cref="Entry"/> items and return a <see cref="Judgement"/> indicating which is superior.
+        /// List of methods that will compare two <see cref="Entry"/> items and return a <see cref="Judgement"/> indicating which is superior.
         /// </summary>
         List<Func<IEntry, IEntry, Judgement>> Rules { get; }
 
         void Configure(UserSettings settings);
     }
 
+    /// <inheritdoc cref="IImageComparisonRuleset"/>
     public class ImageComparisonRuleset : IImageComparisonRuleset
     {
         public List<Func<IEntry, IEntry, Judgement>> Rules { get; private set; } = new List<Func<IEntry, IEntry, Judgement>>();
-
-        public ImageComparisonRuleset()
-        {
-
-        }
 
         private Judgement ComparePixels(IEntry left, IEntry right)
         {
@@ -83,6 +79,10 @@ namespace DupFinderCore
             return Judgement.Unsure;
         }
 
+        /// <summary>
+        /// Read a <see cref="UserSettings"/> object to dynamically add rules for image comparison.
+        /// </summary>
+        /// <param name="settings"></param>
         public void Configure(UserSettings settings)
         {
             if (settings.CompareByDate)

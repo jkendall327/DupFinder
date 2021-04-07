@@ -8,16 +8,12 @@ using System.Threading.Tasks;
 
 namespace DupFinderCore
 {
+    /// <inheritdoc cref="IImageSetLoader"/> 
     public class ImageSetLoader : IImageSetLoader
     {
         readonly ILogger _logger;
         public ImageSetLoader(ILogger logger) => _logger = logger;
 
-        /// <summary>
-        /// Loads image files from the harddrive into memory as Entry objects.
-        /// </summary>
-        /// <param name="directory">The directory to load images from.</param>
-        /// <returns>A task that represents a collection of images not yet loaded.</returns>
         public async Task<IEnumerable<Entry>> LoadImages(DirectoryInfo directory)
         {
             var tasks = GetFiles(directory)

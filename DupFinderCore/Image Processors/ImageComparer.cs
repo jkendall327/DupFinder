@@ -4,7 +4,8 @@ using System.Linq;
 
 namespace DupFinderCore
 {
-    public class ImageComparer : IImagerComparer
+    /// <inheritdoc cref="IImageComparer"/>
+    public class ImageComparer : IImageComparer
     {
         public List<IEntry> Keep { get; set; } = new List<IEntry>();
         public List<IEntry> Trash { get; set; } = new List<IEntry>();
@@ -17,7 +18,7 @@ namespace DupFinderCore
             _ruleset = ruleset ?? throw new ArgumentNullException(nameof(ruleset));
         }
 
-        public void Process(IEnumerable<(IEntry left, IEntry right)> pairs, UserSettings settings)
+        public void Compare(IEnumerable<(IEntry left, IEntry right)> pairs, UserSettings settings)
         {
             if (pairs is null)
             {

@@ -12,7 +12,7 @@ namespace DupFinderCore
     {
         readonly IImageSetLoader _loader;
         readonly ILogger _logger;
-        readonly IImagerComparer _comparer;
+        readonly IImageComparer _comparer;
         readonly IConfiguration _config;
         readonly IPairFinder _finder;
 
@@ -22,7 +22,7 @@ namespace DupFinderCore
 
         public List<(IEntry Left, IEntry Right)> Pairs { get; set; } = new();
 
-        public Processor(IImageSetLoader loader, ILogger logger, IImagerComparer comparer, IConfiguration config, IPairFinder finder)
+        public Processor(IImageSetLoader loader, ILogger logger, IImageComparer comparer, IConfiguration config, IPairFinder finder)
         {
             _loader = loader ?? throw new ArgumentNullException(nameof(loader));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -50,7 +50,7 @@ namespace DupFinderCore
 
         public void FindBetterImages(UserSettings settings)
         {
-            _comparer.Process(Pairs, settings);
+            _comparer.Compare(Pairs, settings);
             string path = BaseFolder?.FullName + Path.DirectorySeparatorChar;
 
             Directory.CreateDirectory(path + "Keep");

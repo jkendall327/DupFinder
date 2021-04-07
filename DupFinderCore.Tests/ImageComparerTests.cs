@@ -38,7 +38,7 @@ namespace DupFinderCore.Tests
 
             list.Add((Good.Object, Right.Object));
 
-            _sut.Process(list, _settings);
+            _sut.Compare(list, _settings);
 
             Assert.Contains(Good.Object, _sut.Keep);
             Assert.Contains(Right.Object, _sut.Trash);
@@ -53,7 +53,7 @@ namespace DupFinderCore.Tests
 
             list.Add((Good.Object, Right.Object));
 
-            _sut.Process(list, _settings);
+            _sut.Compare(list, _settings);
 
             Assert.Contains(Good.Object, _sut.Keep);
             Assert.Contains(Right.Object, _sut.Trash);
@@ -74,7 +74,7 @@ namespace DupFinderCore.Tests
 
             list.Add((Left.Object, Right.Object));
 
-            _sut.Process(list, _settings);
+            _sut.Compare(list, _settings);
 
             Assert.Contains(Left.Object, _sut.Unsure);
             Assert.Contains(Right.Object, _sut.Unsure);
@@ -89,7 +89,7 @@ namespace DupFinderCore.Tests
 
             list.Add((Good.Object, Right.Object));
 
-            _sut.Process(list, _settings);
+            _sut.Compare(list, _settings);
 
             Assert.Contains(Good.Object, _sut.Unsure);
             Assert.Contains(Right.Object, _sut.Unsure);

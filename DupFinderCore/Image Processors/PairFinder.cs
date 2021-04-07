@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace DupFinderCore
 {
+    /// <inheritdoc cref="IPairFinder"/>
     public class PairFinder : IPairFinder
     {
         public async Task<IEnumerable<(IEntry, IEntry)>> FindPairs(IEnumerable<IEntry> images)
         {
-            var uniquePairs = images.GetAllUniquePairs().ToList();
+            var uniquePairs = images.UniquePairs().ToList();
 
             var similarImages = new ConcurrentBag<(IEntry, IEntry)>();
 

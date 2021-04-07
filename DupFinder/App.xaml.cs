@@ -40,7 +40,7 @@ namespace DupFinder
 
             ioc.Register(Component.For<IImageLoader>().ImplementedBy<ImageLoader>());
             ioc.Register(Component.For<IImageSetLoader>().ImplementedBy<ImageSetLoader>());
-            ioc.Register(Component.For<IImagerComparer>().ImplementedBy<ImageComparer>());
+            ioc.Register(Component.For<IImageComparer>().ImplementedBy<ImageComparer>());
             ioc.Register(Component.For<IImageComparisonRuleset>().ImplementedBy<ImageComparisonRuleset>());
             ioc.Register(Component.For<IPairFinder>().ImplementedBy<PairFinder>());
 

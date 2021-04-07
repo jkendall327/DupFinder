@@ -8,9 +8,7 @@ using System.IO;
 
 namespace DupFinderCore
 {
-    /// <summary>
-    /// Wrapper around System.Drawing.Image that maintains file info, hash, colourmap, status, etc.
-    /// </summary>
+    /// <inheritdoc cref="IEntry"/>
     public class Entry : IEntry
     {
         public Image Image { get; }
