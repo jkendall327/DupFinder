@@ -45,18 +45,18 @@ namespace DupFinderCore
             ColorMap = GetColorMap();
         }
 
-        public Image GetColorMap(bool crop = false)
+        public Image GetColorMap(Image baseImage, int focusLevel, bool crop = false)
         {
-            using var shrunken = new Bitmap(FocusLevel, FocusLevel, PixelFormat.Format16bppRgb555);
+            using var shrunken = new Bitmap(focusLevel, focusLevel, PixelFormat.Format16bppRgb555);
 
             using var canvas = Graphics.FromImage(shrunken);
             canvas.CompositingQuality = CompositingQuality.HighQuality;
             canvas.InterpolationMode = InterpolationMode.HighQualityBilinear;
             canvas.SmoothingMode = SmoothingMode.HighQuality;
 
-            var offset = crop ? (int)(FocusLevel * 0.166) : 0;
+            var offset = crop ? (int)(focusLevel * 0.166) : 0;
 
-            canvas.DrawImage(Image, 0 - offset, 0 - offset, FocusLevel + offset, FocusLevel + offset);
+            canvas.DrawImage(baseImage, 0 - offset, 0 - offset, focusLevel + offset, focusLevel + offset);
 
             return shrunken;
         }

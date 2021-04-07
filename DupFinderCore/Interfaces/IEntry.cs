@@ -53,5 +53,7 @@ namespace DupFinderCore
         /// The entry's color map. Used for comparing Euclidian distances.
         /// </summary>
         Image ColorMap { get; }
+
+        Image GetColorMap(Image baseImage, int focusLevel, bool crop = false);
     }
 }

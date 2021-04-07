@@ -47,6 +47,7 @@ namespace DupFinderCore
             {
                 // eScore not high enough to be sure it's a pair, but high enough to be unsure
                 // do something with this or ignore?
+                return false;
             }
 
             if (euclidianDistance < TruncatedPercentage(regularLimit))
@@ -64,18 +65,10 @@ namespace DupFinderCore
 
         private bool WeightedComparison(IEntry left, IEntry right, double euclidianDistance)
         {
-            var copy1 = left;
-            var copy2 = right;
+            // get the colormap of both entries when their focuslevel is * 1.33d
+            // get the euclidian distance of those focused colormaps
 
-            copy1.FocusLevel = (int)(copy1.FocusLevel * 1.33d);
-            copy2.FocusLevel = (int)(copy2.FocusLevel * 1.33d);
-
-            copy1.GetColorMap(true);
-            copy2.GetColorMap(true);
-
-            var focusedEuclidianDistance = GetEuclidianDistance(copy1, copy2);
-
-            euclidianDistance = (euclidianDistance + focusedEuclidianDistance) / 2d;
+            // euclidianDistance = (euclidianDistance + focusedDistance) / 2d;
 
             return euclidianDistance > regularLimit;
         }
@@ -88,8 +81,8 @@ namespace DupFinderCore
             var rawScore = 0d;
             var maxScore = Math.Pow(left.FocusLevel, 2) * 38054255625;
 
-            var leftMap = (Bitmap)left.ColorMap;
-            var rightMap = (Bitmap)right.ColorMap;
+            using var leftMap = (Bitmap)left.ColorMap;
+            using var rightMap = (Bitmap)right.ColorMap;
 
             for (var y = 0; y < left.FocusLevel; y++)
                 for (var x = 0; x < left.FocusLevel; x++)
@@ -99,9 +92,6 @@ namespace DupFinderCore
 
                     rawScore += 38054255625 - Math.Abs(EuclideanDistance(Color1, Color2));
                 }
-
-            leftMap.Dispose();
-            rightMap.Dispose();
 
             return (rawScore / maxScore) * 100;
         }
@@ -114,6 +104,5 @@ namespace DupFinderCore
 
             return Math.Pow(red + green + blue, 2);
         }
-
     }
 }
