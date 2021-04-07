@@ -24,7 +24,7 @@ namespace DupFinderCore
         long Size { get; }
 
         string FullPath { get; }
-        string Filename => Path.GetFileName(FullPath);
+        string Filename { get; }
         DateTime Date { get; }
 
         Digest Hash { get; }
@@ -78,7 +78,7 @@ namespace DupFinderCore
             Image.Dispose();
         }
 
-        public void GenerateColorMap(bool Crop = false)
+        private void GenerateColorMap(bool crop = false)
         {
             var Shrunken = new Bitmap(FocusLevel, FocusLevel, PixelFormat.Format16bppRgb555);
             var Canvas = Graphics.FromImage(Shrunken);
@@ -86,7 +86,7 @@ namespace DupFinderCore
             Canvas.InterpolationMode = InterpolationMode.HighQualityBilinear;
             Canvas.SmoothingMode = SmoothingMode.HighQuality;
 
-            var offset = Crop ? (int)(FocusLevel * 0.166) : 0;
+            var offset = crop ? (int)(FocusLevel * 0.166) : 0;
             Canvas.DrawImage(Image, 0 - offset, 0 - offset, FocusLevel + offset, FocusLevel + offset);
 
             ColorMap = Shrunken;
