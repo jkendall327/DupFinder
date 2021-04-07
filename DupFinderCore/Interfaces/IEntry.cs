@@ -1,5 +1,6 @@
 ﻿using Shipwreck.Phash;
 using System;
+using System.Drawing;
 
 namespace DupFinderCore
 {
@@ -47,5 +48,10 @@ namespace DupFinderCore
         /// The <see cref="ImagePhash"/> digest of the image. Used to calculate similarity to other <see cref="IEntry"/> items.
         /// </summary>
         Digest Hash { get; }
+
+        /// <summary>
+        /// The entry's color map. Used for comparing Euclidian distances.
+        /// </summary>
+        Image ColorMap { get; }
     }
 }

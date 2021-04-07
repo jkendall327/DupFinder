@@ -9,65 +9,64 @@ using System.IO;
 namespace DupFinderCore
 {
     /// <inheritdoc cref="IEntry"/>
-    public class Entry : IEntry
+    public class Entry : IEntry, IDisposable
     {
-        public Image Image { get; }
+        // image data
+        public Image Image { get; private set; }
         public int Pixels { get; init; }
         public double AspectRatio { get; init; }
         public int FocusLevel { get; set; } = 64;
-        public long Size { get; }
-
-        public string FullPath { get; }
-        public string Filename => Path.GetFileName(FullPath);
-
-        public DateTime Date { get; }
-
-        public Image? ColorMap { get; set; }
-
-        public override string ToString() => FullPath;
-
-        /// <summary>
-        /// Used for calculating similarity with PHash.
-        /// </summary>
+        public Image ColorMap { get; set; }
         public Digest Hash { get; }
+
+        // file data
+        public FileInfo OriginalFile { get; set; }
+        public string FullPath => OriginalFile.FullName;
+        public string Filename => Path.GetFileName(FullPath);
+        public long Size => OriginalFile.Length;
+        public DateTime Date => OriginalFile.CreationTimeUtc;
 
         public Entry(string filepath)
         {
             if (!File.Exists(filepath))
                 throw new FileNotFoundException("File not found", Path.GetFileName(filepath));
 
-            FullPath = filepath;
+            OriginalFile = new(filepath);
 
             Image = Image.FromFile(FullPath);
 
+            // find a way to store the image in memory
+            // so you can dispose the original handle
+            // and not lock the file? or is it ok to?
+
             Pixels = Image.Width * Image.Height;
             AspectRatio = (double)Image.Width / Image.Height;
-
-            FileInfo file = new(FullPath);
-            Size = file.Length;
-            Date = file.CreationTimeUtc;
-
-            Hash = ImagePhash.ComputeDigest((Image as Bitmap).ToLuminanceImage());
-
-            GenerateColorMap();
-
-            Image.Dispose();
+            Hash = ImagePhash.ComputeDigest(Image.ToBitmap().ToLuminanceImage());
+            ColorMap = GetColorMap();
         }
 
-        private void GenerateColorMap(bool crop = false)
+        public Image GetColorMap(bool crop = false)
         {
-            var Shrunken = new Bitmap(FocusLevel, FocusLevel, PixelFormat.Format16bppRgb555);
-            var Canvas = Graphics.FromImage(Shrunken);
-            Canvas.CompositingQuality = CompositingQuality.HighQuality;
-            Canvas.InterpolationMode = InterpolationMode.HighQualityBilinear;
-            Canvas.SmoothingMode = SmoothingMode.HighQuality;
+            using var shrunken = new Bitmap(FocusLevel, FocusLevel, PixelFormat.Format16bppRgb555);
+
+            using var canvas = Graphics.FromImage(shrunken);
+            canvas.CompositingQuality = CompositingQuality.HighQuality;
+            canvas.InterpolationMode = InterpolationMode.HighQualityBilinear;
+            canvas.SmoothingMode = SmoothingMode.HighQuality;
 
             var offset = crop ? (int)(FocusLevel * 0.166) : 0;
-            Canvas.DrawImage(Image, 0 - offset, 0 - offset, FocusLevel + offset, FocusLevel + offset);
 
-            ColorMap = Shrunken;
+            canvas.DrawImage(Image, 0 - offset, 0 - offset, FocusLevel + offset, FocusLevel + offset);
 
-            Canvas.Dispose();
+            return shrunken;
+        }
+        public override string ToString() => FullPath;
+
+        public void Dispose()
+        {
+            // todo call this somewhere!
+            ((IDisposable)Image).Dispose();
+            ((IDisposable)ColorMap).Dispose();
         }
     }
 }
