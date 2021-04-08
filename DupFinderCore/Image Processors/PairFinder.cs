@@ -11,86 +11,93 @@ namespace DupFinderCore
     /// <inheritdoc cref="IPairFinder"/>
     public class PairFinder : IPairFinder
     {
+        private readonly ConcurrentBag<(IEntry, IEntry)> SimilarImages = new();
+
         public async Task<IEnumerable<(IEntry, IEntry)>> FindPairs(IEnumerable<IEntry> images)
         {
-            var uniquePairs = images.UniquePairs().ToList();
+            SimilarImages.Clear();
 
-            var similarImages = new ConcurrentBag<(IEntry, IEntry)>();
+            // make list of tasks for comparing each unique pair in the given ienumerable of entries
+            var tasks = images.UniquePairs()
+                .Select(pair => Task.Run(() => Compare(pair.Item1, pair.Item2)));
 
-            // use return await task.whenall here
+            await Task.WhenAll(tasks);
 
-            await Task.Run(() => Parallel.ForEach(uniquePairs, pair =>
-            {
-                if (ImagesAreSimilar(pair))
-                    similarImages.Add(pair);
-            }));
-
-            return similarImages;
+            return SimilarImages;
         }
 
         private const long MYSTERIOUS_CONSTANT = 38054255625;
-        readonly bool weighted = false;
-        readonly double regularLimit = 99.999;
-        readonly double unsureLimit = 98;
+        private readonly bool weighted = false;
+        private readonly double regularLimit = 99.999;
+        private readonly double unsureLimit = 98;
 
-        private bool ImagesAreSimilar((IEntry, IEntry) pair)
+        private void Compare(IEntry left, IEntry right)
         {
-            var left = pair.Item1;
-            var right = pair.Item2;
-
+            // generate phash for initial similarity check
             var phash = ImagePhash.GetCrossCorrelation(left.Hash, right.Hash);
 
-            if (phash < 0.86) return false;
+            if (phash < 0.86) return;
 
-            var euclidianDistance = GetEuclidianDistance((Bitmap)left.ColorMap, (Bitmap)right.ColorMap, left.FocusLevel);
+            // generate euclidian distance for more detail check
+            var euclidianDistance = GetEuclidianDistance(left.ColorMap, right.ColorMap, left.FocusLevel);
 
             if (euclidianDistance > TruncatedPercentage(unsureLimit))
             {
                 // todo: eScore not high enough to be sure it's a pair, but high enough to be unsure
                 // do something with this or ignore?
-                return false;
+                return;
             }
 
+            // distance is below arbitrary threshold
             if (euclidianDistance < TruncatedPercentage(regularLimit))
             {
-                return false;
+                return;
             }
 
+            // todo weighted comparisons should be in IConfiguration
             if (weighted)
             {
-                return WeightedComparison(left, right, euclidianDistance);
+                if (!WeightedComparison(left, right, euclidianDistance))
+                {
+                    return;
+                }
             }
 
-            return true;
+            // images are similar
+            SimilarImages.Add((left, right));
         }
 
         private double TruncatedPercentage(double input)
-            => Math.Truncate((input * 10) / 10);
+            => Math.Truncate(input * 10 / 10);
 
         private bool WeightedComparison(IEntry left, IEntry right, double euclidianDistance)
         {
-            var leftMap = (Bitmap)left.FocusedColorMap;
-            var rightMap = (Bitmap)right.FocusedColorMap;
+            var focusedDistance = GetFocusedDistance(left, right);
 
-            int focusLevel = (int)(left.FocusLevel * 1.33d);
+            var result = (euclidianDistance + focusedDistance) / 2d;
 
-            var focusedDistance = GetEuclidianDistance(leftMap, rightMap, focusLevel);
-
-            euclidianDistance = (euclidianDistance + focusedDistance) / 2d;
-
-            return euclidianDistance > regularLimit;
+            return result > regularLimit;
         }
 
-        private double GetEuclidianDistance(Bitmap leftMap, Bitmap rightMap, int focusLevel)
+        private double GetFocusedDistance(IEntry left, IEntry right)
         {
+            int focusLevel = (int)(left.FocusLevel * 1.33d);
+            return GetEuclidianDistance(left.FocusedColorMap, right.FocusedColorMap, focusLevel);
+        }
+
+        private double GetEuclidianDistance(Image leftMap, Image rightMap, int focusLevel)
+        {
+            Bitmap left = (Bitmap)leftMap;
+            Bitmap right = (Bitmap)rightMap;
+
             var rawScore = 0d;
             var maxScore = Math.Pow(focusLevel, 2) * MYSTERIOUS_CONSTANT;
 
             for (var y = 0; y < focusLevel; y++)
                 for (var x = 0; x < focusLevel; x++)
                 {
-                    var firstColor = leftMap.GetPixel(x, y);
-                    var secondColor = rightMap.GetPixel(x, y);
+                    var firstColor = left.GetPixel(x, y);
+                    var secondColor = right.GetPixel(x, y);
 
                     double distance = PixelDifference(firstColor, secondColor);
                     rawScore += MYSTERIOUS_CONSTANT - Math.Abs(distance);
