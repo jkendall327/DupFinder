@@ -14,7 +14,7 @@ namespace DupFinderApp.ViewModels
         {
             _processor = processor ?? throw new ArgumentNullException(nameof(processor));
 
-            ChooseDirectory = new CommandHandler(() => OpenDirectoryDialogue(), () => true);
+            ChooseDirectory = new CommandHandler(OpenDirectoryDialogue, () => true);
 
             LoadImages = new CommandHandler(
                 async () => LoadedImages = await _processor.LoadImages(new DirectoryInfo(SelectedPath)),
@@ -28,7 +28,7 @@ namespace DupFinderApp.ViewModels
                 () => _processor.FindBetterImages(OptionsWindow.GetSettings()),
                 () => SimilarImages > 0);
 
-            ShowOptions = new CommandHandler(() => ShowOptionsWindow(), () => true);
+            ShowOptions = new CommandHandler(ShowOptionsWindow, () => true);
         }
 
         private string selectedPath = string.Empty;

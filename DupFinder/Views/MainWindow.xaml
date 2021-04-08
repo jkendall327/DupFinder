@@ -33,22 +33,22 @@
 
         <Label Grid.Row="0" Grid.Column="0" FontSize="40">DupFinder!</Label>
 
-        <Button x:Name="button_FolderPicker" Grid.Row="1" Command="{Binding Path=ChooseDirectoryCommand}">Choose Directory</Button>
+        <Button x:Name="button_FolderPicker" Grid.Row="1" Command="{Binding Path=ChooseDirectory}">Choose Directory</Button>
         <Label x:Name="label_ChosenFolder" Grid.Column="2" Grid.Row="1" VerticalAlignment="Center">Chosen folder:</Label>
         <Label x:Name="chosenFolder" Grid.Column="3" Grid.Row="1" VerticalAlignment="Center" Content="{Binding Path=SelectedPath}"></Label>
 
-        <Button x:Name="button_LoadImages" Grid.Row="2" Command="{Binding Path=LoadImagesIntoMemoryCommand}">Load Images</Button>
+        <Button x:Name="button_LoadImages" Grid.Row="2" Command="{Binding Path=LoadImages}">Load Images</Button>
         <Label x:Name="label_loadedImages" Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" Content="Loaded Images:"></Label>
         <Label x:Name="loadedImages" Grid.Column="3" Grid.Row="2" VerticalAlignment="Center" Content="{Binding Path=LoadedImages}"></Label>
 
-        <Button x:Name="button_ProcessImages" Grid.Row="3" Content="Process Images" Command="{Binding Path=FindSimilarImagesCommand, UpdateSourceTrigger=PropertyChanged}"/>
+        <Button x:Name="button_ProcessImages" Grid.Row="3" Content="Process Images" Command="{Binding Path=FindSimilarImages, UpdateSourceTrigger=PropertyChanged}"/>
         <Label x:Name="label_processedImages" Grid.Column="2" Grid.Row="3" VerticalAlignment="Center">Processed images:</Label>
         <Label x:Name="processesdImages" Grid.Column="3" Grid.Row="3" VerticalAlignment="Center" Content="{Binding Path=SimilarImages}"></Label>
 
 
-        <Button x:Name="button_MoveImages" Grid.Row="4" Content="Move Images" Command="{Binding Path=MoveImagesCommand}"/>
+        <Button x:Name="button_MoveImages" Grid.Row="4" Content="Move Images" Command="{Binding Path=MoveImages}"/>
         <Label x:Name="label_movedImages" Grid.Column="2" Grid.Row="4" VerticalAlignment="Center">X images moved (not implemented)</Label>
 
-        <Button Content="Options" Grid.Row="5" Command="{Binding Path=ShowOptionsCommand}"></Button>
+        <Button Content="Options" Grid.Row="5" Command="{Binding Path=ShowOptions}"></Button>
     </Grid>
 </Window>
