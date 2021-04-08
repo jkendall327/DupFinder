@@ -10,16 +10,6 @@ namespace DupFinderCore
     public interface IEntry
     {
         /// <summary>
-        /// The base image that the <see cref="IEntry"/> wraps.
-        /// </summary>
-        public Color[,] Image { get; set; }
-
-        /// <summary>
-        /// Gets an entry's focused color map. Used for Euclidian distance comparisons.
-        /// </summary>
-        public Image FocusedColorMap { get; }
-
-        /// <summary>
         /// The image's number of pixels.
         /// </summary>
         int Pixels { get; init; }
@@ -62,8 +52,11 @@ namespace DupFinderCore
         /// <summary>
         /// The entry's color map. Used for comparing Euclidian distances.
         /// </summary>
-        Image ColorMap { get; }
+        Color[,] ColorMap { get; }
 
-        Image GetColorMap(Image baseImage, int focusLevel, bool crop = false);
+        /// <summary>
+        /// Gets an entry's focused color map. Used for Euclidian distance comparisons.
+        /// </summary>
+        Color[,] FocusedColorMap { get; }
     }
 }

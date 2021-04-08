@@ -3,7 +3,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace DupFinderCore
@@ -18,10 +17,15 @@ namespace DupFinderCore
             SimilarImages.Clear();
 
             // make list of tasks for comparing each unique pair in the given ienumerable of entries
-            var tasks = images.UniquePairs()
-                .Select(pair => Task.Run(() => Compare(pair.Item1, pair.Item2)));
+            //var tasks = images.UniquePairs()
+            //    .Select(pair => Task.Run(() => Compare(pair.Item1, pair.Item2)));
 
-            await Task.WhenAll(tasks);
+            //await Task.WhenAll(tasks);
+
+            foreach (var pair in images.UniquePairs())
+            {
+                Compare(pair.Item1, pair.Item2);
+            }
 
             return SimilarImages;
         }
@@ -72,54 +76,33 @@ namespace DupFinderCore
 
         private bool WeightedComparison(IEntry left, IEntry right, double euclidianDistance)
         {
-            var focusedDistance = GetFocusedDistance(left, right);
+            int focusLevel = (int)(left.FocusLevel * 1.33d);
+
+            var focusedDistance = GetEuclidianDistance(left.FocusedColorMap, right.FocusedColorMap, focusLevel);
 
             var result = (euclidianDistance + focusedDistance) / 2d;
 
             return result > regularLimit;
         }
 
-        private double GetFocusedDistance(IEntry left, IEntry right)
+        private double GetEuclidianDistance(Color[,] leftMap, Color[,] rightMap, int focusLevel)
         {
-            int focusLevel = (int)(left.FocusLevel * 1.33d);
-            return GetEuclidianDistance(left.FocusedColorMap, right.FocusedColorMap, focusLevel);
-        }
-
-        private double GetEuclidianDistance(IEntry left, IEntry right, int focusLevel)
-        {
-            var rawScore = 0d;
-            var maxScore = Math.Pow(focusLevel, 2) * MYSTERIOUS_CONSTANT;
-
-            for (var y = 0; y < focusLevel; y++)
-                for (var x = 0; x < focusLevel; x++)
-                {
-                    var firstColor = left.Image[x, y];
-                    var secondColor = right.Image[x, y];
-
-                    double distance = PixelDifference(firstColor, secondColor);
-                    rawScore += MYSTERIOUS_CONSTANT - Math.Abs(distance);
-                }
-
-            return (rawScore / maxScore) * 100;
-        }
-
-        private double GetEuclidianDistance(Image leftMap, Image rightMap, int focusLevel)
-        {
-            Bitmap left = (Bitmap)leftMap;
-            Bitmap right = (Bitmap)rightMap;
+            // todo what if they're not the same size? out of bounds exception
 
             var rawScore = 0d;
             var maxScore = Math.Pow(focusLevel, 2) * MYSTERIOUS_CONSTANT;
 
             for (var y = 0; y < focusLevel; y++)
+            {
                 for (var x = 0; x < focusLevel; x++)
                 {
-                    var firstColor = left.GetPixel(x, y);
-                    var secondColor = right.GetPixel(x, y);
+                    var firstColor = leftMap[x, y];
+                    var secondColor = rightMap[x, y];
 
                     double distance = PixelDifference(firstColor, secondColor);
                     rawScore += MYSTERIOUS_CONSTANT - Math.Abs(distance);
                 }
+            }
 
             return (rawScore / maxScore) * 100;
         }

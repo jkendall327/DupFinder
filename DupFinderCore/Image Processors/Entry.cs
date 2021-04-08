@@ -9,15 +9,14 @@ using System.IO;
 namespace DupFinderCore
 {
     /// <inheritdoc cref="IEntry"/>
-    public class Entry : IEntry, IDisposable
+    public class Entry : IEntry
     {
         // image data
-        Color[,] OriginalImage { get; set; };
         public int Pixels { get; init; }
         public double AspectRatio { get; init; }
         public int FocusLevel { get; set; } = 64;
-        public Image ColorMap { get; set; }
-        public Image FocusedColorMap => GetColorMap(Image, (int)(FocusLevel * 1.33d), true);
+        public Color[,] ColorMap { get; }
+        public Color[,] FocusedColorMap { get; }
         public Digest Hash { get; }
 
         // file data
@@ -35,30 +34,52 @@ namespace DupFinderCore
 
             OriginalFile = new(filepath);
 
-            var img = Image.FromFile(FullPath);
+            using var img = Image.FromFile(filepath);
 
-            OriginalImage = img.ToColorArray();
             Pixels = img.Width * img.Height;
             AspectRatio = img.Width / img.Height;
+
             Hash = ImagePhash.ComputeDigest(img.ToBitmap().ToLuminanceImage());
-            ColorMap = GetColorMap(img, FocusLevel);
+
+            ColorMap = GetColorMap(img);
+            FocusedColorMap = GetFocusedMap(img);
         }
 
-        public Image GetColorMap(Image baseImage, int focusLevel, bool crop = false)
+        private Color[,] GetColorMap(Image baseImage)
         {
-            var shrunken = new Bitmap(focusLevel, focusLevel, PixelFormat.Format16bppRgb555);
+            var shrunken = new Bitmap(FocusLevel, FocusLevel, PixelFormat.Format16bppRgb555);
+            using Graphics canvas = GetCanvas(shrunken);
 
-            using var canvas = Graphics.FromImage(shrunken);
-            canvas.CompositingQuality = CompositingQuality.HighQuality;
-            canvas.InterpolationMode = InterpolationMode.HighQualityBilinear;
-            canvas.SmoothingMode = SmoothingMode.HighQuality;
+            var offset = 0;
 
-            var offset = crop ? (int)(focusLevel * 0.166) : 0;
+            canvas.DrawImage(baseImage, 0 - offset, 0 - offset, FocusLevel + offset, FocusLevel + offset);
+
+            return shrunken.ToColorArray();
+        }
+
+        private Color[,] GetFocusedMap(Image baseImage)
+        {
+            var focusLevel = (int)(FocusLevel * 1.33d);
+
+            using var shrunken = new Bitmap(focusLevel, focusLevel, PixelFormat.Format16bppRgb555);
+            using Graphics canvas = GetCanvas(shrunken);
+
+            var offset = (int)(focusLevel * 0.166);
 
             canvas.DrawImage(baseImage, 0 - offset, 0 - offset, focusLevel + offset, focusLevel + offset);
 
-            return shrunken;
+            return shrunken.ToColorArray();
         }
+
+        private static Graphics GetCanvas(Bitmap shrunken)
+        {
+            var canvas = Graphics.FromImage(shrunken);
+            canvas.CompositingQuality = CompositingQuality.HighQuality;
+            canvas.InterpolationMode = InterpolationMode.HighQualityBilinear;
+            canvas.SmoothingMode = SmoothingMode.HighQuality;
+            return canvas;
+        }
+
         public override string ToString() => Filename;
     }
 }
