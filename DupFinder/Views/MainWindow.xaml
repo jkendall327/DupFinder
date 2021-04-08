@@ -37,7 +37,7 @@
         <Label x:Name="label_ChosenFolder" Grid.Column="2" Grid.Row="1" VerticalAlignment="Center">Chosen folder:</Label>
         <Label x:Name="chosenFolder" Grid.Column="3" Grid.Row="1" VerticalAlignment="Center" Content="{Binding Path=SelectedPath}"></Label>
 
-        <Button x:Name="button_LoadImages" Grid.Row="2" Command="{Binding Path=LoadImages}">Load Images</Button>
+        <Button x:Name="button_LoadImages" Grid.Row="2" Command="{Binding Path=LoadImages, UpdateSourceTrigger=PropertyChanged}">Load Images</Button>
         <Label x:Name="label_loadedImages" Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" Content="Loaded Images:"></Label>
         <Label x:Name="loadedImages" Grid.Column="3" Grid.Row="2" VerticalAlignment="Center" Content="{Binding Path=LoadedImages}"></Label>
 
