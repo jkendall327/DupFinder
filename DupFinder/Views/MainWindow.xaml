@@ -23,28 +23,28 @@
         <Label FontSize="40">Duplicate image finder</Label>
 
         <StackPanel Orientation="Horizontal">
-            <Button x:Name="button_FolderPicker" Command="{Binding Path=ChooseDirectoryCommand}">Choose Directory</Button>
-            <Label x:Name="label_ChosenFolder">Chosen folder:</Label>
-            <Label x:Name="chosenFolder" Content="{Binding Path=SelectedPath}"></Label>
+            <Button Command="{Binding Path=ChooseDirectoryCommand}">Choose Directory</Button>
+            <Label>Chosen folder:</Label>
+            <Label Content="{Binding Path=SelectedPath}"/>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal">
-            <Button x:Name="button_LoadImages" Command="{Binding Path=LoadImagesIntoMemoryCommand}">Load Images</Button>
-            <Label x:Name="label_loadedImages" Content="Loaded Images:"></Label>
-            <Label x:Name="loadedImages" Content="{Binding Path=LoadedImages}"></Label>
+            <Button Command="{Binding Path=LoadImagesIntoMemoryCommand}">Load Images</Button>
+            <Label Content="Loaded Images:"/>
+            <Label Content="{Binding Path=LoadedImages}"/>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal">
-            <Button x:Name="button_ProcessImages" Content="Process Images" Command="{Binding Path=FindSimilarImagesCommand}"/>
-            <Label x:Name="label_processedImages">Processed images:</Label>
-            <Label x:Name="processesdImages" Content="{Binding Path=SimilarImages}"></Label>
+            <Button Content="Process Images" Command="{Binding Path=FindSimilarImagesCommand}"/>
+            <Label>Processed images:</Label>
+            <Label Content="{Binding Path=SimilarImages}"/>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal">
-            <Button x:Name="button_MoveImages" Content="Move Images" Command="{Binding Path=MoveImagesCommand}"/>
-            <Label x:Name="label_movedImages">X images moved (not implemented)</Label>
+            <Button Content="Move Images" Command="{Binding Path=MoveImagesCommand}"/>
+            <Label>X images moved (not implemented)</Label>
         </StackPanel>
 
-        <Button Content="Options" Command="{Binding Path=ShowOptionsCommand}"></Button>
+        <Button Content="Options" Command="{Binding Path=ShowOptionsCommand}"/>
     </StackPanel>
 </Window>
