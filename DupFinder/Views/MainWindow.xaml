@@ -28,19 +28,19 @@
         <StackPanel>
             <Button Command="{Binding Path=ChooseDirectory}">Choose Directory</Button>
             <Label>Chosen folder:</Label>
-            <Label Content="{Binding Path=SelectedPath}"/>
+            <Label Content="{Binding SelectedPath}"/>
         </StackPanel>
 
         <StackPanel>
             <Button Command="{Binding Path=LoadImages}">Load Images</Button>
             <Label Content="Loaded Images:"/>
-            <Label Content="{Binding Path=LoadedImages}"/>
+            <Label Content="{Binding LoadedImages}"/>
         </StackPanel>
 
         <StackPanel>
             <Button Content="Process Images" Command="{Binding Path=FindSimilarImages}"/>
             <Label>Processed images:</Label>
-            <Label Content="{Binding Path=SimilarImages}"/>
+            <Label Content="{Binding SimilarImages}"/>
         </StackPanel>
 
         <StackPanel>
