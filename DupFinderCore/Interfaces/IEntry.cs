@@ -10,6 +10,16 @@ namespace DupFinderCore
     public interface IEntry
     {
         /// <summary>
+        /// The base image that the <see cref="IEntry"/> wraps.
+        /// </summary>
+        public Image Image { get; set; }
+
+        /// <summary>
+        /// Gets an entry's focused color map. Used for Euclidian distance comparisons.
+        /// </summary>
+        public Image FocusedColorMap { get; }
+
+        /// <summary>
         /// The image's number of pixels.
         /// </summary>
         int Pixels { get; init; }

@@ -12,11 +12,12 @@ namespace DupFinderCore
     public class Entry : IEntry, IDisposable
     {
         // image data
-        public Image Image { get; private set; }
+        public Image Image { get; set; }
         public int Pixels { get; init; }
         public double AspectRatio { get; init; }
         public int FocusLevel { get; set; } = 64;
         public Image ColorMap { get; set; }
+        public Image FocusedColorMap => GetColorMap(Image, (int)(FocusLevel * 1.33d), true);
         public Digest Hash { get; }
 
         // file data
@@ -42,7 +43,7 @@ namespace DupFinderCore
             Pixels = Image.Width * Image.Height;
             AspectRatio = (double)Image.Width / Image.Height;
             Hash = ImagePhash.ComputeDigest(Image.ToBitmap().ToLuminanceImage());
-            ColorMap = GetColorMap();
+            ColorMap = GetColorMap(Image, FocusLevel);
         }
 
         public Image GetColorMap(Image baseImage, int focusLevel, bool crop = false)

@@ -28,6 +28,7 @@ namespace DupFinderCore
             return similarImages;
         }
 
+        private const long MYSTERIOUS_CONSTANT = 38054255625;
         readonly bool weighted = false;
         readonly double regularLimit = 99.999;
         readonly double unsureLimit = 98;
@@ -41,11 +42,11 @@ namespace DupFinderCore
 
             if (phash < 0.86) return false;
 
-            var euclidianDistance = GetEuclidianDistance(left, right);
+            var euclidianDistance = GetEuclidianDistance((Bitmap)left.ColorMap, (Bitmap)right.ColorMap, left.FocusLevel);
 
             if (euclidianDistance > TruncatedPercentage(unsureLimit))
             {
-                // eScore not high enough to be sure it's a pair, but high enough to be unsure
+                // todo: eScore not high enough to be sure it's a pair, but high enough to be unsure
                 // do something with this or ignore?
                 return false;
             }
@@ -63,44 +64,52 @@ namespace DupFinderCore
             return true;
         }
 
+        private double TruncatedPercentage(double input)
+            => Math.Truncate((input * 10) / 10);
+
         private bool WeightedComparison(IEntry left, IEntry right, double euclidianDistance)
         {
-            // get the colormap of both entries when their focuslevel is * 1.33d
-            // get the euclidian distance of those focused colormaps
+            var leftMap = (Bitmap)left.FocusedColorMap;
+            var rightMap = (Bitmap)right.FocusedColorMap;
 
-            // euclidianDistance = (euclidianDistance + focusedDistance) / 2d;
+            int focusLevel = (int)(left.FocusLevel * 1.33d);
+
+            var focusedDistance = GetEuclidianDistance(leftMap, rightMap, focusLevel);
+
+            euclidianDistance = (euclidianDistance + focusedDistance) / 2d;
 
             return euclidianDistance > regularLimit;
         }
 
-        private double TruncatedPercentage(double input)
-            => Math.Truncate((input * 10) / 10);
-
-        private double GetEuclidianDistance(IEntry left, IEntry right)
+        private double GetEuclidianDistance(Bitmap leftMap, Bitmap rightMap, int focusLevel)
         {
             var rawScore = 0d;
-            var maxScore = Math.Pow(left.FocusLevel, 2) * 38054255625;
+            var maxScore = Math.Pow(focusLevel, 2) * MYSTERIOUS_CONSTANT;
 
-            using var leftMap = (Bitmap)left.ColorMap;
-            using var rightMap = (Bitmap)right.ColorMap;
-
-            for (var y = 0; y < left.FocusLevel; y++)
-                for (var x = 0; x < left.FocusLevel; x++)
+            for (var y = 0; y < focusLevel; y++)
+                for (var x = 0; x < focusLevel; x++)
                 {
-                    var Color1 = leftMap.GetPixel(x, y);
-                    var Color2 = rightMap.GetPixel(x, y);
+                    var firstColor = leftMap.GetPixel(x, y);
+                    var secondColor = rightMap.GetPixel(x, y);
 
-                    rawScore += 38054255625 - Math.Abs(EuclideanDistance(Color1, Color2));
+                    double distance = PixelDifference(firstColor, secondColor);
+                    rawScore += MYSTERIOUS_CONSTANT - Math.Abs(distance);
                 }
+
+            leftMap.Dispose();
+            rightMap.Dispose();
 
             return (rawScore / maxScore) * 100;
         }
 
-        public double EuclideanDistance(Color Color1, Color Color2)
+        public double PixelDifference(Color first, Color second)
         {
-            double red = Math.Pow(Color1.R - Color2.R, 2.0);
-            double green = Math.Pow(Color1.G - Color2.G, 2.0);
-            double blue = Math.Pow(Color1.B - Color2.B, 2.0);
+            double squaredDistance(byte first, byte second)
+                => Math.Pow(first - second, 2.0);
+
+            double red = squaredDistance(first.R, second.R);
+            double green = squaredDistance(first.G, second.G);
+            double blue = squaredDistance(first.B, second.B);
 
             return Math.Pow(red + green + blue, 2);
         }
