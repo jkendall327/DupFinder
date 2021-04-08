@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 
 namespace DupFinderCore
@@ -12,5 +13,22 @@ namespace DupFinderCore
         /// </summary>
         public static IEnumerable<(T, T)> UniquePairs<T>(this IEnumerable<T> source)
             => source.SelectMany((_, i) => source.Where((_, j) => i < j), (x, y) => (x, y));
+
+        public static Color[,] ToColorArray(this Image image) => ToColorArray((Bitmap)image);
+
+        public static Color[,] ToColorArray(this Bitmap image)
+        {
+            Color[,] array = new Color[image.Width, image.Height];
+
+            for (int i = 0; i < image.Width; i++)
+            {
+                for (int x = 0; x < image.Height; x++)
+                {
+                    array[i, x] = image.GetPixel(i, x);
+                }
+            }
+
+            return array;
+        }
     }
 }

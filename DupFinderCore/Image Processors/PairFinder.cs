@@ -85,6 +85,24 @@ namespace DupFinderCore
             return GetEuclidianDistance(left.FocusedColorMap, right.FocusedColorMap, focusLevel);
         }
 
+        private double GetEuclidianDistance(IEntry left, IEntry right, int focusLevel)
+        {
+            var rawScore = 0d;
+            var maxScore = Math.Pow(focusLevel, 2) * MYSTERIOUS_CONSTANT;
+
+            for (var y = 0; y < focusLevel; y++)
+                for (var x = 0; x < focusLevel; x++)
+                {
+                    var firstColor = left.Image[x, y];
+                    var secondColor = right.Image[x, y];
+
+                    double distance = PixelDifference(firstColor, secondColor);
+                    rawScore += MYSTERIOUS_CONSTANT - Math.Abs(distance);
+                }
+
+            return (rawScore / maxScore) * 100;
+        }
+
         private double GetEuclidianDistance(Image leftMap, Image rightMap, int focusLevel)
         {
             Bitmap left = (Bitmap)leftMap;
@@ -102,9 +120,6 @@ namespace DupFinderCore
                     double distance = PixelDifference(firstColor, secondColor);
                     rawScore += MYSTERIOUS_CONSTANT - Math.Abs(distance);
                 }
-
-            leftMap.Dispose();
-            rightMap.Dispose();
 
             return (rawScore / maxScore) * 100;
         }

@@ -12,7 +12,7 @@ namespace DupFinderCore
         /// <summary>
         /// The base image that the <see cref="IEntry"/> wraps.
         /// </summary>
-        public Image Image { get; set; }
+        public Color[,] Image { get; set; }
 
         /// <summary>
         /// Gets an entry's focused color map. Used for Euclidian distance comparisons.

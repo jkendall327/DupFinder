@@ -12,7 +12,7 @@ namespace DupFinderCore
     public class Entry : IEntry, IDisposable
     {
         // image data
-        public Image Image { get; set; }
+        Color[,] OriginalImage { get; set; };
         public int Pixels { get; init; }
         public double AspectRatio { get; init; }
         public int FocusLevel { get; set; } = 64;
@@ -27,6 +27,7 @@ namespace DupFinderCore
         public long Size => OriginalFile.Length;
         public DateTime Date => OriginalFile.CreationTimeUtc;
 
+
         public Entry(string filepath)
         {
             if (!File.Exists(filepath))
@@ -34,21 +35,18 @@ namespace DupFinderCore
 
             OriginalFile = new(filepath);
 
-            Image = Image.FromFile(FullPath);
+            var img = Image.FromFile(FullPath);
 
-            // find a way to store the image in memory
-            // so you can dispose the original handle
-            // and not lock the file? or is it ok to?
-
-            Pixels = Image.Width * Image.Height;
-            AspectRatio = (double)Image.Width / Image.Height;
-            Hash = ImagePhash.ComputeDigest(Image.ToBitmap().ToLuminanceImage());
-            ColorMap = GetColorMap(Image, FocusLevel);
+            OriginalImage = img.ToColorArray();
+            Pixels = img.Width * img.Height;
+            AspectRatio = img.Width / img.Height;
+            Hash = ImagePhash.ComputeDigest(img.ToBitmap().ToLuminanceImage());
+            ColorMap = GetColorMap(img, FocusLevel);
         }
 
         public Image GetColorMap(Image baseImage, int focusLevel, bool crop = false)
         {
-            using var shrunken = new Bitmap(focusLevel, focusLevel, PixelFormat.Format16bppRgb555);
+            var shrunken = new Bitmap(focusLevel, focusLevel, PixelFormat.Format16bppRgb555);
 
             using var canvas = Graphics.FromImage(shrunken);
             canvas.CompositingQuality = CompositingQuality.HighQuality;
@@ -61,13 +59,6 @@ namespace DupFinderCore
 
             return shrunken;
         }
-        public override string ToString() => FullPath;
-
-        public void Dispose()
-        {
-            // todo call this somewhere!
-            ((IDisposable)Image).Dispose();
-            ((IDisposable)ColorMap).Dispose();
-        }
+        public override string ToString() => Filename;
     }
 }
