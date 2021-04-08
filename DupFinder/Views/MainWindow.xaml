@@ -14,32 +14,35 @@
             <Setter Property="HorizontalAlignment" Value="Left" />
             <Setter Property="MinWidth" Value="150" />
         </Style>
+        <Style TargetType="Label">
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
     </Window.Resources>
     <StackPanel>
         
-        <Label FontSize="40">DupFinder!</Label>
+        <Label FontSize="40">Duplicate image finder</Label>
 
         <StackPanel Orientation="Horizontal">
             <Button x:Name="button_FolderPicker" Command="{Binding Path=ChooseDirectoryCommand}">Choose Directory</Button>
-            <Label x:Name="label_ChosenFolder" VerticalAlignment="Center">Chosen folder:</Label>
-            <Label x:Name="chosenFolder" VerticalAlignment="Center" Content="{Binding Path=SelectedPath}"></Label>
+            <Label x:Name="label_ChosenFolder">Chosen folder:</Label>
+            <Label x:Name="chosenFolder" Content="{Binding Path=SelectedPath}"></Label>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal">
             <Button x:Name="button_LoadImages" Command="{Binding Path=LoadImagesIntoMemoryCommand}">Load Images</Button>
-            <Label x:Name="label_loadedImages" VerticalAlignment="Center" Content="Loaded Images:"></Label>
-            <Label x:Name="loadedImages" VerticalAlignment="Center" Content="{Binding Path=LoadedImages}"></Label>
+            <Label x:Name="label_loadedImages" Content="Loaded Images:"></Label>
+            <Label x:Name="loadedImages" Content="{Binding Path=LoadedImages}"></Label>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal">
-            <Button x:Name="button_ProcessImages" Content="Process Images" Command="{Binding Path=FindSimilarImagesCommand, UpdateSourceTrigger=PropertyChanged}"/>
-            <Label x:Name="label_processedImages" VerticalAlignment="Center">Processed images:</Label>
-            <Label x:Name="processesdImages" VerticalAlignment="Center" Content="{Binding Path=SimilarImages}"></Label>
+            <Button x:Name="button_ProcessImages" Content="Process Images" Command="{Binding Path=FindSimilarImagesCommand}"/>
+            <Label x:Name="label_processedImages">Processed images:</Label>
+            <Label x:Name="processesdImages" Content="{Binding Path=SimilarImages}"></Label>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal">
             <Button x:Name="button_MoveImages" Content="Move Images" Command="{Binding Path=MoveImagesCommand}"/>
-            <Label x:Name="label_movedImages" VerticalAlignment="Center">X images moved (not implemented)</Label>
+            <Label x:Name="label_movedImages">X images moved (not implemented)</Label>
         </StackPanel>
 
         <Button Content="Options" Command="{Binding Path=ShowOptionsCommand}"></Button>
