@@ -3,52 +3,51 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:DupFinder"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="400" Width="800">
+    
     <Window.Resources>
         <Style TargetType="Button">
             <Setter Property="Padding" Value="10 10 10 10"/>
-            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Margin" Value="10 10 10 10"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="Grid.Column" Value="0"/>
-            <Setter Property="Grid.ColumnSpan" Value="1"/>
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="MinWidth" Value="150" />
+        </Style>
+        <Style TargetType="Label">
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style TargetType="StackPanel">
+            <Setter Property="Orientation" Value="Horizontal" />
         </Style>
     </Window.Resources>
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition x:Name="TitleColumn" Width="auto"></ColumnDefinition>
-            <ColumnDefinition x:Name="ButtonColumn" Width="auto"></ColumnDefinition>
-            <ColumnDefinition x:Name="LabelColumn"></ColumnDefinition>
-            <ColumnDefinition x:Name="DynamicLabelColumn"></ColumnDefinition>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition x:Name="TitleRow" Height="*"></RowDefinition>
-            <RowDefinition x:Name="ButtonRow1"></RowDefinition>
-            <RowDefinition x:Name="ButtonRow2"></RowDefinition>
-            <RowDefinition x:Name="ButtonRow3"></RowDefinition>
-            <RowDefinition x:Name="ButtonRow4"></RowDefinition>
-            <RowDefinition x:Name="BottomBuffer"></RowDefinition>
-        </Grid.RowDefinitions>
+    <StackPanel Orientation="Vertical">
+        
+        <Label FontSize="40">Duplicate image finder</Label>
 
-        <Label Grid.Row="0" Grid.Column="0" FontSize="40">DupFinder!</Label>
+        <StackPanel>
+            <Button Command="{Binding Path=ChooseDirectory}">Choose Directory</Button>
+            <Label>Chosen folder:</Label>
+            <Label Content="{Binding SelectedPath}"/>
+        </StackPanel>
 
-        <Button x:Name="button_FolderPicker" Grid.Row="1" Command="{Binding Path=ChooseDirectoryCommand}">Choose Directory</Button>
-        <Label x:Name="label_ChosenFolder" Grid.Column="2" Grid.Row="1" VerticalAlignment="Center">Chosen folder:</Label>
-        <Label x:Name="chosenFolder" Grid.Column="3" Grid.Row="1" VerticalAlignment="Center" Content="{Binding Path=SelectedPath}"></Label>
+        <StackPanel>
+            <Button Command="{Binding Path=LoadImages}">Load Images</Button>
+            <Label Content="Loaded Images:"/>
+            <Label Content="{Binding LoadedImages}"/>
+        </StackPanel>
 
-        <Button x:Name="button_LoadImages" Grid.Row="2" Command="{Binding Path=LoadImagesIntoMemoryCommand}">Load Images</Button>
-        <Label x:Name="label_loadedImages" Grid.Column="2" Grid.Row="2" VerticalAlignment="Center" Content="Loaded Images:"></Label>
-        <Label x:Name="loadedImages" Grid.Column="3" Grid.Row="2" VerticalAlignment="Center" Content="{Binding Path=LoadedImages}"></Label>
+        <StackPanel>
+            <Button Content="Process Images" Command="{Binding Path=FindSimilarImages}"/>
+            <Label>Processed images:</Label>
+            <Label Content="{Binding SimilarImages}"/>
+        </StackPanel>
 
-        <Button x:Name="button_ProcessImages" Grid.Row="3" Content="Process Images" Command="{Binding Path=FindSimilarImagesCommand, UpdateSourceTrigger=PropertyChanged}"/>
-        <Label x:Name="label_processedImages" Grid.Column="2" Grid.Row="3" VerticalAlignment="Center">Processed images:</Label>
-        <Label x:Name="processesdImages" Grid.Column="3" Grid.Row="3" VerticalAlignment="Center" Content="{Binding Path=SimilarImages}"></Label>
+        <StackPanel>
+            <Button Content="Move Images" Command="{Binding Path=MoveImages}"/>
+            <Label>X images moved (not implemented)</Label>
+        </StackPanel>
 
-
-        <Button x:Name="button_MoveImages" Grid.Row="4" Content="Move Images" Command="{Binding Path=MoveImagesCommand}"/>
-        <Label x:Name="label_movedImages" Grid.Column="2" Grid.Row="4" VerticalAlignment="Center">X images moved (not implemented)</Label>
-
-        <Button Content="Options" Grid.Row="5" Command="{Binding Path=ShowOptionsCommand}"></Button>
-    </Grid>
+        <Button Content="Options" Command="{Binding Path=ShowOptions}"/>
+    </StackPanel>
 </Window>

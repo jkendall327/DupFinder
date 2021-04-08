@@ -16,6 +16,12 @@ namespace DupFinderApp.Commands
             _canExecute = canExecutePredicate;
         }
 
+        public CommandHandler(Action action)
+        {
+            _action = action;
+            _canExecute = new Func<bool>(() => true);
+        }
+
         /// <summary>
         /// Wires CanExecuteChanged event 
         /// </summary>
