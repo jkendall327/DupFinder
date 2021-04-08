@@ -3,9 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:DupFinder"
         mc:Ignorable="d"
         Title="MainWindow" Height="400" Width="800">
+    
     <Window.Resources>
         <Style TargetType="Button">
             <Setter Property="Padding" Value="10 10 10 10"/>
@@ -17,30 +17,33 @@
         <Style TargetType="Label">
             <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
+        <Style TargetType="StackPanel">
+            <Setter Property="Orientation" Value="Horizontal" />
+        </Style>
     </Window.Resources>
-    <StackPanel>
+    <StackPanel Orientation="Vertical">
         
         <Label FontSize="40">Duplicate image finder</Label>
 
-        <StackPanel Orientation="Horizontal">
+        <StackPanel>
             <Button Command="{Binding Path=ChooseDirectoryCommand}">Choose Directory</Button>
             <Label>Chosen folder:</Label>
             <Label Content="{Binding Path=SelectedPath}"/>
         </StackPanel>
 
-        <StackPanel Orientation="Horizontal">
+        <StackPanel>
             <Button Command="{Binding Path=LoadImagesIntoMemoryCommand}">Load Images</Button>
             <Label Content="Loaded Images:"/>
             <Label Content="{Binding Path=LoadedImages}"/>
         </StackPanel>
 
-        <StackPanel Orientation="Horizontal">
+        <StackPanel>
             <Button Content="Process Images" Command="{Binding Path=FindSimilarImagesCommand}"/>
             <Label>Processed images:</Label>
             <Label Content="{Binding Path=SimilarImages}"/>
         </StackPanel>
 
-        <StackPanel Orientation="Horizontal">
+        <StackPanel>
             <Button Content="Move Images" Command="{Binding Path=MoveImagesCommand}"/>
             <Label>X images moved (not implemented)</Label>
         </StackPanel>
