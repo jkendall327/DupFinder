@@ -30,5 +30,16 @@ namespace DupFinderCore
 
             return array;
         }
+
+        public static List<Color> Flatten(this Color[,] array)
+        {
+            List<Color> list = new();
+
+            foreach (var pixel in array)
+            {
+                list.Add(pixel);
+            }
+            return list;
+        }
     }
 }

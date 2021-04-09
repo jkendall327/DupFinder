@@ -15,6 +15,7 @@ namespace DupFinderCore
         public int Pixels { get; init; }
         public double AspectRatio { get; init; }
         public int FocusLevel { get; set; } = 64;
+        public Color[,] OriginalImage { get; set; }
         public Color[,] ColorMap { get; }
         public Color[,] FocusedColorMap { get; }
         public Digest Hash { get; }
@@ -36,35 +37,26 @@ namespace DupFinderCore
 
             using var img = Image.FromFile(filepath);
 
+            OriginalImage = img.ToColorArray();
+
             Pixels = img.Width * img.Height;
             AspectRatio = img.Width / img.Height;
 
             Hash = ImagePhash.ComputeDigest(img.ToBitmap().ToLuminanceImage());
 
-            ColorMap = GetColorMap(img);
-            FocusedColorMap = GetFocusedMap(img);
+            ColorMap = GetMap(img, FocusLevel, 0);
+
+            int increasedFocus = (int)(FocusLevel * 1.33d);
+            var offset = (int)(increasedFocus * 0.166);
+            FocusedColorMap = GetMap(img, increasedFocus, offset);
+
         }
 
-        private Color[,] GetColorMap(Image baseImage)
+        private Color[,] GetMap(Image baseImage, int focusLevel, int offset = 0)
         {
+            //make a bitmap with dimensions of the focus level - a compressed version
             var shrunken = new Bitmap(FocusLevel, FocusLevel, PixelFormat.Format16bppRgb555);
             using Graphics canvas = GetCanvas(shrunken);
-
-            var offset = 0;
-
-            canvas.DrawImage(baseImage, 0 - offset, 0 - offset, FocusLevel + offset, FocusLevel + offset);
-
-            return shrunken.ToColorArray();
-        }
-
-        private Color[,] GetFocusedMap(Image baseImage)
-        {
-            var focusLevel = (int)(FocusLevel * 1.33d);
-
-            using var shrunken = new Bitmap(focusLevel, focusLevel, PixelFormat.Format16bppRgb555);
-            using Graphics canvas = GetCanvas(shrunken);
-
-            var offset = (int)(focusLevel * 0.166);
 
             canvas.DrawImage(baseImage, 0 - offset, 0 - offset, focusLevel + offset, focusLevel + offset);
 

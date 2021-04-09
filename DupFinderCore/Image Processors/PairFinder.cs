@@ -3,6 +3,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace DupFinderCore
@@ -80,31 +81,34 @@ namespace DupFinderCore
 
             var focusedDistance = GetEuclidianDistance(left.FocusedColorMap, right.FocusedColorMap, focusLevel);
 
-            var result = (euclidianDistance + focusedDistance) / 2d;
+            var result = (euclidianDistance + focusedDistance) / 2;
 
             return result > regularLimit;
         }
 
         private double GetEuclidianDistance(Color[,] leftMap, Color[,] rightMap, int focusLevel)
         {
-            // todo what if they're not the same size? out of bounds exception
-
-            var rawScore = 0d;
-            var maxScore = Math.Pow(focusLevel, 2) * MYSTERIOUS_CONSTANT;
-
-            for (var y = 0; y < focusLevel; y++)
+            if (leftMap.Length != rightMap.Length)
             {
-                for (var x = 0; x < focusLevel; x++)
-                {
-                    var firstColor = leftMap[x, y];
-                    var secondColor = rightMap[x, y];
-
-                    double distance = PixelDifference(firstColor, secondColor);
-                    rawScore += MYSTERIOUS_CONSTANT - Math.Abs(distance);
-                }
+                throw new ArgumentException("Provided color maps were not of the same size.");
             }
 
-            return (rawScore / maxScore) * 100;
+            double rawDifference = GetRawDifference(leftMap, rightMap);
+            var upperBound = Math.Pow(focusLevel, 2) * MYSTERIOUS_CONSTANT;
+
+            return (rawDifference / upperBound) * 100;
+        }
+
+        private double GetRawDifference(Color[,] leftMap, Color[,] rightMap)
+        {
+            var leftColors = leftMap.Flatten();
+            var rightColors = rightMap.Flatten();
+
+            // get differences between each pixel
+            var results = leftColors.Zip(rightColors, (left, right) => PixelDifference(left, right));
+
+            // calculate total difference
+            return results.Select(difference => MYSTERIOUS_CONSTANT - Math.Abs(difference)).Sum();
         }
 
         public double PixelDifference(Color first, Color second)
