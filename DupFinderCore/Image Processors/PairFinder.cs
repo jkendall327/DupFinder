@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -27,7 +26,6 @@ namespace DupFinderCore
             return SimilarImages;
         }
 
-        private const long MYSTERIOUS_CONSTANT = 38054255625;
         private readonly bool weighted = false;
         private readonly double regularLimit = 99.999;
         private readonly double unsureLimit = 98;
@@ -39,8 +37,7 @@ namespace DupFinderCore
             if (phash < 0.86) return;
 
             // generate euclidian distance for more detailed check
-            var euclidianDistance =
-                GetEuclidianDistance(left.ColorMap, right.ColorMap, left.FocusLevel);
+            var euclidianDistance = left.ColorMap.CompareWith(right.ColorMap);
 
             if (euclidianDistance > TruncatedPercentage(unsureLimit))
             {
@@ -73,50 +70,11 @@ namespace DupFinderCore
 
         private bool WeightedComparison(IEntry left, IEntry right, double euclidianDistance)
         {
-            int focusLevel = (int)(left.FocusLevel * 1.33d);
-
-            var focusedDistance = GetEuclidianDistance(left.FocusedColorMap, right.FocusedColorMap, focusLevel);
+            var focusedDistance = left.FocusedColorMap.CompareWith(right.FocusedColorMap);
 
             var result = (euclidianDistance + focusedDistance) / 2;
 
             return result > regularLimit;
-        }
-
-        private double GetEuclidianDistance(Color[,] leftMap, Color[,] rightMap, int focusLevel)
-        {
-            if (leftMap.Length != rightMap.Length)
-            {
-                throw new ArgumentException("Provided color maps were not of the same size.");
-            }
-
-            double rawDifference = GetRawDifference(leftMap, rightMap);
-            var upperBound = Math.Pow(focusLevel, 2) * MYSTERIOUS_CONSTANT;
-
-            return (rawDifference / upperBound) * 100;
-        }
-
-        private double GetRawDifference(Color[,] leftMap, Color[,] rightMap)
-        {
-            var leftColors = leftMap.Flatten();
-            var rightColors = rightMap.Flatten();
-
-            // get differences between each pixel
-            var results = leftColors.Zip(rightColors, (left, right) => PixelDifference(left, right));
-
-            // calculate total difference
-            return results.Select(difference => MYSTERIOUS_CONSTANT - Math.Abs(difference)).Sum();
-        }
-
-        public double PixelDifference(Color first, Color second)
-        {
-            double squaredDistance(byte first, byte second)
-                => Math.Pow(first - second, 2.0);
-
-            double red = squaredDistance(first.R, second.R);
-            double green = squaredDistance(first.G, second.G);
-            double blue = squaredDistance(first.B, second.B);
-
-            return Math.Pow(red + green + blue, 2);
         }
     }
 }

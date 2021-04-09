@@ -1,6 +1,6 @@
-﻿using Shipwreck.Phash;
+﻿using DupFinderCore.Image_Processors;
+using Shipwreck.Phash;
 using System;
-using System.Drawing;
 
 namespace DupFinderCore
 {
@@ -18,11 +18,6 @@ namespace DupFinderCore
         /// The image's aspect ratio.
         /// </summary>
         double AspectRatio { get; init; }
-
-        /// <summary>
-        /// The image's focus level.
-        /// </summary>
-        int FocusLevel { get; set; }
 
         /// <summary>
         /// The image's filesize on disk.
@@ -52,11 +47,8 @@ namespace DupFinderCore
         /// <summary>
         /// The entry's color map. Used for comparing Euclidian distances.
         /// </summary>
-        Color[,] ColorMap { get; }
+        Map ColorMap { get; }
 
-        /// <summary>
-        /// Gets an entry's focused color map. Used for Euclidian distance comparisons.
-        /// </summary>
-        Color[,] FocusedColorMap { get; }
+        Map FocusedColorMap { get; }
     }
 }
