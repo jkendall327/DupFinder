@@ -17,16 +17,12 @@ namespace DupFinderCore
         {
             SimilarImages.Clear();
 
-            // make list of tasks for comparing each unique pair in the given ienumerable of entries
-            //var tasks = images.UniquePairs()
-            //    .Select(pair => Task.Run(() => Compare(pair.Item1, pair.Item2)));
+            //make list of tasks for comparing each unique pair in the given ienumerable of entries
 
-            //await Task.WhenAll(tasks);
+            var tasks = images.UniquePairs()
+                .Select(pair => Task.Run(() => Compare(pair.Item1, pair.Item2)));
 
-            foreach (var pair in images.UniquePairs())
-            {
-                Compare(pair.Item1, pair.Item2);
-            }
+            await Task.WhenAll(tasks);
 
             return SimilarImages;
         }
@@ -40,11 +36,11 @@ namespace DupFinderCore
         {
             // generate phash for initial similarity check
             var phash = ImagePhash.GetCrossCorrelation(left.Hash, right.Hash);
-
             if (phash < 0.86) return;
 
-            // generate euclidian distance for more detail check
-            var euclidianDistance = GetEuclidianDistance(left.ColorMap, right.ColorMap, left.FocusLevel);
+            // generate euclidian distance for more detailed check
+            var euclidianDistance =
+                GetEuclidianDistance(left.ColorMap, right.ColorMap, left.FocusLevel);
 
             if (euclidianDistance > TruncatedPercentage(unsureLimit))
             {

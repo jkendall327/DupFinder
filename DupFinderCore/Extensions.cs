@@ -31,6 +31,24 @@ namespace DupFinderCore
             return array;
         }
 
+        public static Bitmap ToImage(this Color[,] arr)
+        {
+            // new bitmap of correct size
+            int width = arr.GetLength(0);
+            int height = arr.GetLength(1);
+            var bmp = new Bitmap(width, height);
+
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    bmp.SetPixel(x, y, arr[x, y]);
+                }
+            }
+
+            return bmp;
+        }
+
         public static List<Color> Flatten(this Color[,] array)
         {
             List<Color> list = new();

@@ -49,7 +49,6 @@ namespace DupFinderCore
             int increasedFocus = (int)(FocusLevel * 1.33d);
             var offset = (int)(increasedFocus * 0.166);
             FocusedColorMap = GetMap(img, increasedFocus, offset);
-
         }
 
         private Color[,] GetMap(Image baseImage, int focusLevel, int offset = 0)
