@@ -12,12 +12,15 @@ namespace DupFinderCore
     {
         private readonly ConcurrentBag<(IEntry, IEntry)> SimilarImages = new();
 
+        private readonly bool weighted = false;
+        private readonly double regularLimit = 99.999;
+        private readonly double unsureLimit = 98;
+
         public async Task<IEnumerable<(IEntry, IEntry)>> FindPairs(IEnumerable<IEntry> images)
         {
             SimilarImages.Clear();
 
             //make list of tasks for comparing each unique pair in the given ienumerable of entries
-
             var tasks = images.UniquePairs()
                 .Select(pair => Task.Run(() => Compare(pair.Item1, pair.Item2)));
 
@@ -26,39 +29,35 @@ namespace DupFinderCore
             return SimilarImages;
         }
 
-        private readonly bool weighted = false;
-        private readonly double regularLimit = 99.999;
-        private readonly double unsureLimit = 98;
-
         private void Compare(IEntry left, IEntry right)
         {
-            // generate phash for initial similarity check
+            // generate phash for initial check
             var phash = ImagePhash.GetCrossCorrelation(left.Hash, right.Hash);
-            if (phash < 0.86) return;
+
+            if (phash < 0.86)
+                return;
 
             // generate euclidian distance for more detailed check
             var euclidianDistance = left.ColorMap.CompareWith(right.ColorMap);
 
+            // todo: high enough to be sure it's a pair, but high enough to be unsure
+            // do something with this?
             if (euclidianDistance > TruncatedPercentage(unsureLimit))
-            {
-                // todo: eScore not high enough to be sure it's a pair, but high enough to be unsure
-                // do something with this or ignore?
                 return;
-            }
 
             // distance is below arbitrary threshold
             if (euclidianDistance < TruncatedPercentage(regularLimit))
-            {
                 return;
-            }
 
-            // todo weighted comparisons should be in IConfiguration
+            // todo whether to do weighted comparisons should be in IConfiguration
             if (weighted)
             {
-                if (!WeightedComparison(left, right, euclidianDistance))
-                {
+                var focusedDistance = left.FocusedColorMap.CompareWith(right.FocusedColorMap);
+
+                var averageDistance = (euclidianDistance + focusedDistance) / 2;
+
+                if (averageDistance < regularLimit)
                     return;
-                }
             }
 
             // images are similar
@@ -67,14 +66,5 @@ namespace DupFinderCore
 
         private double TruncatedPercentage(double input)
             => Math.Truncate(input * 10 / 10);
-
-        private bool WeightedComparison(IEntry left, IEntry right, double euclidianDistance)
-        {
-            var focusedDistance = left.FocusedColorMap.CompareWith(right.FocusedColorMap);
-
-            var result = (euclidianDistance + focusedDistance) / 2;
-
-            return result > regularLimit;
-        }
     }
 }

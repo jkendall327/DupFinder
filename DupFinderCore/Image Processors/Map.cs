@@ -8,40 +8,55 @@ using System.Linq;
 namespace DupFinderCore.Image_Processors
 {
     /// <summary>
-    /// A shrunken color map of a <see cref="Image"/>. Used for Euclidian distance comparisons.
+    /// A shrunken color map of an <see cref="Image"/>. Used for Euclidian distance comparisons.
     /// </summary>
     public class Map
     {
+        /// <summary>
+        /// The color map itself.
+        /// </summary>
         public Color[] ColorMap { get; }
+
+        /// <summary>
+        /// The focus level of the map, i.e. what level resizing of the original image it is.
+        /// </summary>
         public int FocusLevel { get; } = 64;
+
+        /// <summary>
+        /// The degree to which the map is offset from the base image.
+        /// </summary>
         public int Offset { get; } = 0;
 
         private const long MYSTERIOUS_CONSTANT = 38054255625;
 
-        // ctor where you set the focus level and offset
-
-        public Map(Color[,] baseImage, int focusLevel = 64, int offset = 0)
+        /// <summary>
+        /// Creates a new color map of an image.
+        /// </summary>
+        /// <param name="baseImage">The image to generate a color map of.</param>
+        /// <param name="focusLevel">The focus level of the map, i.e. what level resizing of the original image it is.</param>
+        /// <param name="offset">The degree to which the map is offset from the base image.</param>
+        public Map(Image baseImage, int focusLevel = 64, int offset = 0)
         {
             FocusLevel = focusLevel;
             Offset = offset;
 
-            ColorMap = Generate(baseImage);
+            ColorMap = MakeMap(baseImage.ToColorArray());
         }
 
-        public Map(Image baseImage, int focusLevel = 64, int offset = 0) :
-            this(baseImage.ToColorArray(), focusLevel, offset)
-        { }
+        public override string ToString()
+            => $"Focus: {FocusLevel}. Offset: {Offset}. Map: {ColorMap}";
 
         /// <summary>
-        /// Returns the euclidian distance between two color maps.
+        /// Calculates the euclidian distance between two maps.
         /// </summary>
-        /// <param name="map"></param>
-        /// <returns>A double representing the raw euclidian distance between the two maps</returns>
+        /// <param name="map">The compare to compare this to. Must be the same size.</param>
+        /// <returns>A percentage representing the similarity between the maps.</returns>
         public double CompareWith(Map map)
         {
+            // comparing maps of two different sizes
             if (map.ColorMap.Length != this.ColorMap.Length)
             {
-                throw new ArgumentException();
+                throw new ArgumentException("Maps were not of the same size.");
             }
 
             double rawDifference = CompareColors(ColorMap, map.ColorMap);
@@ -71,16 +86,19 @@ namespace DupFinderCore.Image_Processors
             return Math.Pow(red + green + blue, 2);
         }
 
-        private Color[] Generate(Color[,] baseImage)
+        private Color[] MakeMap(Color[,] baseImage)
         {
-            //make a bitmap with dimensions of the focus level - a compressed version
-            var shrunken = new Bitmap(FocusLevel, FocusLevel, PixelFormat.Format16bppRgb555);
+            //make a bitmap with dimensions of the focus level
+            using var shrunken = new Bitmap(FocusLevel, FocusLevel, PixelFormat.Format16bppRgb555);
             using var canvas = GetCanvas(shrunken);
 
+            // resize the image to the focus level
             var rect = new Rectangle(0 - Offset, 0 - Offset, FocusLevel + Offset, FocusLevel + Offset);
             canvas.DrawImage(baseImage.ToImage(), rect);
 
-            return shrunken.ToFlatColorArray().ToArray();
+            // todo ugly that the extension method doesn't return an array
+            var map = shrunken.ToFlatColorArray().ToArray();
+            return map;
         }
 
         private static Graphics GetCanvas(Bitmap shrunken)

@@ -40,6 +40,7 @@ namespace DupFinderCore
 
             ColorMap = new Map(image);
 
+            // todo bad that this is hardcoded -- focus level should be variable...
             int increasedFocus = (int)(ColorMap.FocusLevel * 1.33d);
             var offset = (int)(increasedFocus * 0.166);
             FocusedColorMap = new Map(image, increasedFocus, offset);
