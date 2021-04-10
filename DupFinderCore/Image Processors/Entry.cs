@@ -31,7 +31,7 @@ namespace DupFinderCore
 
             OriginalFile = new(filepath);
 
-            using var image = Image.FromFile(filepath);
+            var image = Image.FromFile(filepath);
 
             Pixels = image.Width * image.Height;
             AspectRatio = image.Width / image.Height;

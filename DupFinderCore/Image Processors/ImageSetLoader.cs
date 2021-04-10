@@ -19,12 +19,10 @@ namespace DupFinderCore
 
         public async Task<IEnumerable<Entry>> LoadImages(DirectoryInfo directory)
         {
-            var files = GetFiles(directory)
+            var tasks = GetFiles(directory)
                 .Where(x => x.Exists)
-                .Where(x => IsImage(x));
-
-            var tasks = files
-                .Select(file => Task.Run(() => MakeEntryAsync(file)));
+                .Where(x => IsImage(x))
+                .Select(file => Task.Run(() => MakeEntry(file)));
 
             await Task.WhenAll(tasks);
 
@@ -71,7 +69,7 @@ namespace DupFinderCore
             return files;
         }
 
-        private void MakeEntryAsync(FileInfo file)
+        private void MakeEntry(FileInfo file)
         {
             var entry = new Entry(file.FullName);
             _logger.Debug($"Loaded file {file.Name}");

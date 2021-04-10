@@ -15,7 +15,9 @@ namespace DupFinderCore.Image_Processors
         /// <summary>
         /// The color map itself.
         /// </summary>
-        public Color[] ColorMap { get; }
+        public Color[]? ColorMap { get; private set; }
+
+        private Image BaseImage { get; }
 
         /// <summary>
         /// The focus level of the map, i.e. what level resizing of the original image it is.
@@ -37,10 +39,9 @@ namespace DupFinderCore.Image_Processors
         /// <param name="offset">The degree to which the map is offset from the base image.</param>
         public Map(Image baseImage, int focusLevel = 64, int offset = 0)
         {
+            BaseImage = baseImage;
             FocusLevel = focusLevel;
             Offset = offset;
-
-            ColorMap = MakeMap(baseImage.ToColorArray());
         }
 
         public override string ToString()
@@ -53,8 +54,18 @@ namespace DupFinderCore.Image_Processors
         /// <returns>A percentage representing the similarity between the maps.</returns>
         public double CompareWith(Map map)
         {
+            if (ColorMap is null)
+            {
+                MakeMap();
+            }
+
+            if (map.ColorMap is null)
+            {
+                map.MakeMap();
+            }
+
             // comparing maps of two different sizes
-            if (map.ColorMap.Length != this.ColorMap.Length)
+            if (map.ColorMap!.Length != ColorMap!.Length)
             {
                 throw new ArgumentException("Maps were not of the same size.");
             }
@@ -86,7 +97,7 @@ namespace DupFinderCore.Image_Processors
             return Math.Pow(red + green + blue, 2);
         }
 
-        private Color[] MakeMap(Color[,] baseImage)
+        public void MakeMap()
         {
             //make a bitmap with dimensions of the focus level
             using var shrunken = new Bitmap(FocusLevel, FocusLevel, PixelFormat.Format16bppRgb555);
@@ -94,11 +105,10 @@ namespace DupFinderCore.Image_Processors
 
             // resize the image to the focus level
             var rect = new Rectangle(0 - Offset, 0 - Offset, FocusLevel + Offset, FocusLevel + Offset);
-            canvas.DrawImage(baseImage.ToImage(), rect);
+            canvas.DrawImage(BaseImage, rect);
 
             // todo ugly that the extension method doesn't return an array
-            var map = shrunken.ToFlatColorArray().ToArray();
-            return map;
+            ColorMap = shrunken.ToFlatColorArray().ToArray();
         }
 
         private static Graphics GetCanvas(Bitmap shrunken)
