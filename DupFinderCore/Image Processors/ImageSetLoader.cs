@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace DupFinderCore
 {
     /// <inheritdoc cref="IImageSetLoader"/> 
-    public class ImageSetLoader : IImageSetLoader
+    public class ImageSetLoader
     {
         readonly ILogger _logger;
         public ImageSetLoader(ILogger logger) => _logger = logger;

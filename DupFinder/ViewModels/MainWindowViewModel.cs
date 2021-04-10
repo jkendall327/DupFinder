@@ -10,11 +10,11 @@ namespace DupFinderApp.ViewModels
 {
     public class MainWindowViewModel : VMBase
     {
-        private readonly IProcessor _processor;
+        private readonly Processor _processor;
         private OptionsViewModel _optionsViewModel;
         public OptionsViewModel OptionsWindow { get => _optionsViewModel; set => SetProperty(ref _optionsViewModel, value); }
 
-        public MainWindowViewModel(IProcessor processor, OptionsViewModel optionsViewModel)
+        public MainWindowViewModel(Processor processor, OptionsViewModel optionsViewModel)
         {
             _processor = processor ?? throw new ArgumentNullException(nameof(processor));
             _optionsViewModel = optionsViewModel ?? throw new ArgumentNullException(nameof(optionsViewModel));
