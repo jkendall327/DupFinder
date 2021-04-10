@@ -2,6 +2,8 @@
 using DupFinderCore;
 using System;
 using System.IO;
+using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 
 namespace DupFinderApp.ViewModels
@@ -18,6 +20,7 @@ namespace DupFinderApp.ViewModels
             _optionsViewModel = optionsViewModel ?? throw new ArgumentNullException(nameof(optionsViewModel));
 
             ChooseDirectory = new CommandHandler(OpenDirectoryDialogue);
+            ShowOptions = new CommandHandler(ShowOptionsWindow);
 
             LoadImages = new CommandHandler(
                 async () => LoadedImages = await _processor.LoadImages(new DirectoryInfo(SelectedPath)),
@@ -30,8 +33,6 @@ namespace DupFinderApp.ViewModels
             MoveImages = new CommandHandler(
                 () => _processor.FindBetterImages(),
                 () => SimilarImages > 0);
-
-            ShowOptions = new CommandHandler(ShowOptionsWindow);
         }
 
         private string selectedPath = string.Empty;
@@ -54,6 +55,9 @@ namespace DupFinderApp.ViewModels
 
         private void ShowOptionsWindow()
         {
+            if (Application.Current.Windows.OfType<OptionsView>().Any())
+                return;
+
             var window = new OptionsView(_optionsViewModel)
             {
                 DataContext = OptionsWindow
