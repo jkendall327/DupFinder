@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="MainWindow" Height="400" Width="800">
+        Title="MainWindow" Height="500" Width="800">
     
     <Window.Resources>
         <Style TargetType="Button">
@@ -29,7 +29,6 @@
             <Button Command="{Binding Path=ChooseDirectory}">Choose Directory</Button>
             <Label>Chosen folder:</Label>
             <Label Content="{Binding SelectedPath}"/>
-            <ListBox x:Name="listBox" Width="435" Height="123" ItemsSource="{Binding people}"/>
         </StackPanel>
 
         <StackPanel>
@@ -50,5 +49,7 @@
         </StackPanel>
 
         <Button Content="Options" Command="{Binding Path=ShowOptions}"/>
+
+        <ListBox x:Name="listBox" Margin="10" Height="80" ItemsSource="{Binding Logger}" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
     </StackPanel>
 </Window>

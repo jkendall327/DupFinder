@@ -13,7 +13,7 @@ namespace DupFinder
     /// </summary>
     class UISink : ILogEventSink
     {
-        readonly ITextFormatter _textFormatter = new MessageTemplateTextFormatter("{Timestamp} [{Level}] {Message}{Exception}");
+        readonly ITextFormatter _textFormatter = new MessageTemplateTextFormatter("{Message}{Exception}");
         public ObservableCollection<string> UICollection { get; set; } = new();
         public void Emit(LogEvent logEvent)
         {

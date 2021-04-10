@@ -19,18 +19,13 @@ namespace DupFinderApp.ViewModels
         /// </summary>
         public ObservableCollection<string> Logger { get; set; }
 
-        /// <summary>
-        /// The 'pure' logger for reporting events.
-        /// </summary>
-        private readonly ILogger _logger;
-
-        public MainWindowViewModel(IProcessor processor, OptionsViewModel optionsViewModel, ObservableCollection<string> _log, ILogger logger)
+        public MainWindowViewModel(IProcessor processor, OptionsViewModel optionsViewModel, ObservableCollection<string> _log)
         {
             _processor = processor ?? throw new ArgumentNullException(nameof(processor));
             _optionsViewModel = optionsViewModel ?? throw new ArgumentNullException(nameof(optionsViewModel));
+            Logger = _log ?? throw new ArgumentNullException(nameof(_log));
 
-            Logger = _log;
-
+            // wire up commands
             ChooseDirectory = new CommandHandler(OpenDirectoryDialogue);
             ShowOptions = new CommandHandler(ShowOptionsWindow);
 
@@ -45,7 +40,6 @@ namespace DupFinderApp.ViewModels
             MoveImages = new CommandHandler(
                 () => _processor.FindBetterImages(),
                 () => SimilarImages > 0);
-            _logger = logger;
         }
 
         private string selectedPath = string.Empty;
@@ -72,9 +66,11 @@ namespace DupFinderApp.ViewModels
 
         private void ShowOptionsWindow()
         {
+            // don't open multiple windows
             if (Application.Current.Windows.OfType<OptionsView>().Any())
                 return;
 
+            // keeping the same viewmodel means user settings are preserved
             var window = new OptionsView(_optionsViewModel)
             {
                 DataContext = OptionsWindow
@@ -89,7 +85,6 @@ namespace DupFinderApp.ViewModels
             if (folderDialog.ShowDialog() != true) return;
 
             SelectedPath = folderDialog.SelectedPath;
-            _logger.Information("Chose directory...");
         }
     }
 }
