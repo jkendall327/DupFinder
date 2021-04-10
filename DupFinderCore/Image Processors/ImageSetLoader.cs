@@ -1,4 +1,5 @@
 ﻿using Serilog;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,14 +15,18 @@ namespace DupFinderCore
         readonly ILogger _logger;
         public ImageSetLoader(ILogger logger) => _logger = logger;
 
+        readonly ConcurrentBag<Entry> Entries = new();
+
         public async Task<IEnumerable<Entry>> LoadImages(DirectoryInfo directory)
         {
             var tasks = GetFiles(directory)
                 .Where(x => x.Exists)
                 .Where(x => IsImage(x))
-                .Select(x => MakeEntryAsync(x));
+                .Select(file => Task.Run(() => MakeEntry(file)));
 
-            return await Task.WhenAll(tasks);
+            await Task.WhenAll(tasks);
+
+            return Entries;
         }
 
         private IEnumerable<FileInfo> GetFiles(DirectoryInfo directory)
@@ -64,11 +69,11 @@ namespace DupFinderCore
             return files;
         }
 
-        private async Task<Entry> MakeEntryAsync(FileInfo file)
+        private void MakeEntry(FileInfo file)
         {
-            var entry = await Task.Run(() => new Entry(file.FullName));
+            var entry = new Entry(file.FullName);
             _logger.Debug($"Loaded file {file.Name}");
-            return entry;
+            Entries.Add(entry);
         }
 
         // todo improve

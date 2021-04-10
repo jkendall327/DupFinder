@@ -1,4 +1,6 @@
-﻿using Shipwreck.Phash;
+﻿using Microsoft.Extensions.Configuration;
+using Shipwreck.Phash;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,36 +11,60 @@ namespace DupFinderCore
     /// <inheritdoc cref="IPairFinder"/>
     public class PairFinder : IPairFinder
     {
+        private readonly ConcurrentBag<(IEntry, IEntry)> SimilarImages = new();
+
+        private readonly double regularLimit = 99.999;
+
+        private readonly IConfiguration _config;
+
+        public PairFinder(IConfiguration config)
+        {
+            _config = config ?? throw new ArgumentNullException(nameof(config));
+        }
+
         public async Task<IEnumerable<(IEntry, IEntry)>> FindPairs(IEnumerable<IEntry> images)
         {
-            var uniquePairs = images.UniquePairs().ToList();
+            SimilarImages.Clear();
 
-            var similarImages = new ConcurrentBag<(IEntry, IEntry)>();
+            ////make list of tasks for comparing each unique pair in the given ienumerable of entries
+            var tasks = images.UniquePairs()
+                .Select(pair => Task.Run(() => Compare(pair.Item1, pair.Item2)));
 
-            await Task.Run(() => Parallel.ForEach(uniquePairs, pair =>
-            {
-                if (ImagesAreSimilar(pair))
-                    similarImages.Add(pair);
-            }));
+            await Task.WhenAll(tasks);
 
-            return similarImages;
+            return SimilarImages;
         }
 
-        private bool ImagesAreSimilar((IEntry, IEntry) pair)
+        private void Compare(IEntry left, IEntry right)
         {
-            var left = pair.Item1;
-            var right = pair.Item2;
-
+            // generate phash for initial check
             var phash = ImagePhash.GetCrossCorrelation(left.Hash, right.Hash);
 
-            return phash > 0.86 && CompareEuclidianDistance(left, right);
+            if (phash < 0.86)
+                return;
+
+            // generate euclidian distance for more detailed check
+            var euclidianDistance = left.ColorMap.CompareWith(right.ColorMap);
+
+            // distance is below arbitrary threshold
+            if (euclidianDistance < TruncatedPercentage(regularLimit))
+                return;
+
+            if (_config.GetValue<bool>("WeightedImageComparison"))
+            {
+                var focusedDistance = left.FocusedColorMap.CompareWith(right.FocusedColorMap);
+
+                var averageDistance = (euclidianDistance + focusedDistance) / 2;
+
+                if (averageDistance < regularLimit)
+                    return;
+            }
+
+            // images are similar
+            SimilarImages.Add((left, right));
         }
 
-        private bool CompareEuclidianDistance(IEntry left, IEntry right)
-        {
-            // todo add implementation
-            return true;
-        }
-
+        private double TruncatedPercentage(double input)
+            => Math.Truncate(input * 10 / 10);
     }
 }

@@ -1,4 +1,5 @@
-﻿using Shipwreck.Phash;
+﻿using DupFinderCore.Image_Processors;
+using Shipwreck.Phash;
 using System;
 
 namespace DupFinderCore
@@ -17,11 +18,6 @@ namespace DupFinderCore
         /// The image's aspect ratio.
         /// </summary>
         double AspectRatio { get; init; }
-
-        /// <summary>
-        /// The image's focus level.
-        /// </summary>
-        int FocusLevel { get; set; }
 
         /// <summary>
         /// The image's filesize on disk.
@@ -47,5 +43,12 @@ namespace DupFinderCore
         /// The <see cref="ImagePhash"/> digest of the image. Used to calculate similarity to other <see cref="IEntry"/> items.
         /// </summary>
         Digest Hash { get; }
+
+        /// <summary>
+        /// The entry's color map. Used for comparing Euclidian distances.
+        /// </summary>
+        Map ColorMap { get; }
+
+        Map FocusedColorMap { get; }
     }
 }

@@ -1,9 +1,8 @@
-﻿using Shipwreck.Phash;
+﻿using DupFinderCore.Image_Processors;
+using Shipwreck.Phash;
 using Shipwreck.Phash.Bitmaps;
 using System;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using System.IO;
 
 namespace DupFinderCore
@@ -11,63 +10,42 @@ namespace DupFinderCore
     /// <inheritdoc cref="IEntry"/>
     public class Entry : IEntry
     {
-        public Image Image { get; }
+        // image data
         public int Pixels { get; init; }
         public double AspectRatio { get; init; }
-        public int FocusLevel { get; set; } = 64;
-        public long Size { get; }
-
-        public string FullPath { get; }
-        public string Filename => Path.GetFileName(FullPath);
-
-        public DateTime Date { get; }
-
-        public Image? ColorMap { get; set; }
-
-        public override string ToString() => FullPath;
-
-        /// <summary>
-        /// Used for calculating similarity with PHash.
-        /// </summary>
+        public Map ColorMap { get; }
+        public Map FocusedColorMap { get; }
         public Digest Hash { get; }
+
+        // file data
+        public FileInfo OriginalFile { get; set; }
+        public string FullPath => OriginalFile.FullName;
+        public string Filename => Path.GetFileName(FullPath);
+        public long Size => OriginalFile.Length;
+        public DateTime Date => OriginalFile.CreationTimeUtc;
 
         public Entry(string filepath)
         {
             if (!File.Exists(filepath))
                 throw new FileNotFoundException("File not found", Path.GetFileName(filepath));
 
-            FullPath = filepath;
+            OriginalFile = new(filepath);
 
-            Image = Image.FromFile(FullPath);
+            var image = Image.FromFile(filepath);
 
-            Pixels = Image.Width * Image.Height;
-            AspectRatio = (double)Image.Width / Image.Height;
+            Pixels = image.Width * image.Height;
+            AspectRatio = image.Width / image.Height;
 
-            FileInfo file = new(FullPath);
-            Size = file.Length;
-            Date = file.CreationTimeUtc;
+            Hash = ImagePhash.ComputeDigest(image.ToBitmap().ToLuminanceImage());
 
-            Hash = ImagePhash.ComputeDigest((Image as Bitmap).ToLuminanceImage());
+            ColorMap = new Map(image);
 
-            GenerateColorMap();
-
-            Image.Dispose();
+            // todo bad that this is hardcoded -- focus level should be variable...
+            int increasedFocus = (int)(ColorMap.FocusLevel * 1.33d);
+            var offset = (int)(increasedFocus * 0.166);
+            FocusedColorMap = new Map(image, increasedFocus, offset);
         }
 
-        private void GenerateColorMap(bool crop = false)
-        {
-            var Shrunken = new Bitmap(FocusLevel, FocusLevel, PixelFormat.Format16bppRgb555);
-            var Canvas = Graphics.FromImage(Shrunken);
-            Canvas.CompositingQuality = CompositingQuality.HighQuality;
-            Canvas.InterpolationMode = InterpolationMode.HighQualityBilinear;
-            Canvas.SmoothingMode = SmoothingMode.HighQuality;
-
-            var offset = crop ? (int)(FocusLevel * 0.166) : 0;
-            Canvas.DrawImage(Image, 0 - offset, 0 - offset, FocusLevel + offset, FocusLevel + offset);
-
-            ColorMap = Shrunken;
-
-            Canvas.Dispose();
-        }
+        public override string ToString() => Filename;
     }
 }
