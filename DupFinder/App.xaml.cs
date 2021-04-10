@@ -4,7 +4,6 @@ using DupFinderApp.ViewModels;
 using DupFinderCore;
 using Microsoft.Extensions.Configuration;
 using Serilog;
-using Serilog.Events;
 using System.Windows;
 
 namespace DupFinder
@@ -13,17 +12,14 @@ namespace DupFinder
     {
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            ILogger log = new LoggerConfiguration()
-            .Enrich.FromLogContext()
-            .WriteTo.File(
-                path: "log.txt",
-                restrictedToMinimumLevel: LogEventLevel.Debug,
-                rollingInterval: RollingInterval.Day,
-                rollOnFileSizeLimit: true)
-            .CreateLogger();
-
             var builder = new ConfigurationBuilder().AddJsonFile("appsettings.json");
             IConfiguration Configuration = builder.Build();
+
+            ILogger log = new LoggerConfiguration()
+                .ReadFrom.Configuration(Configuration)
+                .CreateLogger();
+
+            log.Information("Program started.");
 
             WindsorContainer ioc = BuildDIContainer(log, Configuration);
             var window = ioc.Resolve<MainWindow>();
