@@ -1,6 +1,6 @@
 ﻿namespace DupFinderCore
 {
-    public class ImagesLoadedProgress
+    public class PercentageProgress
     {
         public int TotalImages { get; set; }
         public int AmountDone { get; set; }

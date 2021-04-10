@@ -21,7 +21,8 @@ namespace DupFinderCore
         /// </summary>
         /// <returns>A task representing the number of potential pairs found within the loaded images.</returns>
         Task<int> FindSimilarImages();
-        Task<int> LoadImages(DirectoryInfo directoryInfo, IProgress<ImagesLoadedProgress> imageLoadProgress);
+        Task<int> FindSimilarImages(IProgress<PercentageProgress> progress);
+        Task<int> LoadImages(DirectoryInfo directoryInfo, IProgress<PercentageProgress> imageLoadProgress);
 
         /// <summary>
         /// Compares potential pairs to automatically sort them based on quality (size, pixels, etc.).

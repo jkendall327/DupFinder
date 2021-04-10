@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DupFinderCore
@@ -14,5 +15,7 @@ namespace DupFinderCore
         /// <param name="images">The list of <see cref="IEntry"/> items to search for similar images in.</param>
         /// <returns>A task representing the list of pairs that is yet to be completed.</returns>
         Task<IEnumerable<(IEntry, IEntry)>> FindPairs(IEnumerable<IEntry> images);
+
+        Task<IEnumerable<(IEntry, IEntry)>> FindPairs(IEnumerable<IEntry> images, IProgress<PercentageProgress> progress);
     }
 }

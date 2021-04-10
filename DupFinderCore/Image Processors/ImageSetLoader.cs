@@ -29,7 +29,7 @@ namespace DupFinderCore
             return Entries;
         }
 
-        public async Task<IEnumerable<IEntry>> LoadImages(DirectoryInfo directory, IProgress<ImagesLoadedProgress> imageLoadProgress)
+        public async Task<IEnumerable<IEntry>> LoadImages(DirectoryInfo directory, IProgress<PercentageProgress> imageLoadProgress)
         {
             Entries.Clear();
 
@@ -41,7 +41,7 @@ namespace DupFinderCore
             foreach (var item in tasks)
             {
                 await Task.Run(() => MakeEntry(item));
-                imageLoadProgress.Report(new ImagesLoadedProgress { TotalImages = tasks.Count(), AmountDone = Entries.Count });
+                imageLoadProgress.Report(new PercentageProgress { TotalImages = tasks.Count(), AmountDone = Entries.Count });
             }
 
             return Entries;

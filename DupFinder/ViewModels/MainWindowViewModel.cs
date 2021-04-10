@@ -22,15 +22,18 @@ namespace DupFinderApp.ViewModels
             ChooseDirectory = new CommandHandler(OpenDirectoryDialogue);
             ShowOptions = new CommandHandler(ShowOptionsWindow);
 
-            ImageLoadProgress = new Progress<ImagesLoadedProgress>();
+            var ImageLoadProgress = new Progress<PercentageProgress>();
             ImageLoadProgress.ProgressChanged += ImageLoadProgress_ProgressChanged;
 
             LoadImages = new CommandHandler(
                 async () => LoadedImages = await _processor.LoadImages(new DirectoryInfo(SelectedPath), ImageLoadProgress),
                 () => Directory.Exists(SelectedPath));
 
+            var SimilarImageProgress = new Progress<PercentageProgress>();
+            SimilarImageProgress.ProgressChanged += SimilarImageProgress_ProgressChanged;
+
             FindSimilarImages = new CommandHandler(
-                async () => SimilarImages = await _processor.FindSimilarImages(),
+                async () => SimilarImages = await _processor.FindSimilarImages(SimilarImageProgress),
                 () => LoadedImages > 0);
 
             MoveImages = new CommandHandler(
@@ -38,15 +41,25 @@ namespace DupFinderApp.ViewModels
                 () => SimilarImages > 0);
         }
 
-        private void ImageLoadProgress_ProgressChanged(object? sender, ImagesLoadedProgress e)
+        private void SimilarImageProgress_ProgressChanged(object? sender, PercentageProgress e)
         {
-            LoadedImagesPercentage = e.PercentageDone;
-            LoadedImages = e.AmountDone;
+            SimilarImages = e.AmountDone;
+            SimilarImagesPercentage = e.PercentageDone;
         }
 
         private string selectedPath = string.Empty;
         public string SelectedPath
         { get => selectedPath; set => SetProperty(ref selectedPath, value); }
+
+        private int similarImages;
+        public int SimilarImages
+        { get => similarImages; set => SetProperty(ref similarImages, value); }
+
+        private int similarImagesPercentage;
+        public int SimilarImagesPercentage
+        { get => similarImagesPercentage; set => SetProperty(ref similarImagesPercentage, value); }
+
+        #region Loading Images
 
         private int loadedImages;
         public int LoadedImages
@@ -56,17 +69,23 @@ namespace DupFinderApp.ViewModels
         public int LoadedImagesPercentage
         { get => loadedImagesPercentage; set => SetProperty(ref loadedImagesPercentage, value); }
 
-        readonly Progress<ImagesLoadedProgress> ImageLoadProgress;
+        private void ImageLoadProgress_ProgressChanged(object? sender, PercentageProgress e)
+        {
+            LoadedImagesPercentage = e.PercentageDone;
+            LoadedImages = e.AmountDone;
+        }
 
-        private int similarImages;
-        public int SimilarImages
-        { get => similarImages; set => SetProperty(ref similarImages, value); }
+        #endregion
+
+        #region Commands
 
         public ICommand ChooseDirectory { get; }
         public ICommand LoadImages { get; }
         public ICommand FindSimilarImages { get; }
         public ICommand MoveImages { get; }
         public ICommand ShowOptions { get; }
+
+        #endregion
 
         private void ShowOptionsWindow()
         {

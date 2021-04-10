@@ -41,7 +41,7 @@ namespace DupFinderCore
         }
 
 
-        public async Task<int> LoadImages(DirectoryInfo baseFolder, IProgress<ImagesLoadedProgress> imageLoadProgress)
+        public async Task<int> LoadImages(DirectoryInfo baseFolder, IProgress<PercentageProgress> imageLoadProgress)
         {
             BaseFolder = baseFolder;
             Targets = await _loader.LoadImages(BaseFolder, imageLoadProgress);
@@ -55,6 +55,13 @@ namespace DupFinderCore
             var result = await _finder.FindPairs(Targets);
             Pairs = result.ToList();
 
+            return Pairs.Count();
+        }
+
+        public async Task<int> FindSimilarImages(IProgress<PercentageProgress> progress)
+        {
+            var result = await _finder.FindPairs(Targets, progress);
+            Pairs = result.ToList();
             return Pairs.Count();
         }
 

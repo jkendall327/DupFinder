@@ -35,6 +35,25 @@ namespace DupFinderCore
             return SimilarImages;
         }
 
+        public async Task<IEnumerable<(IEntry, IEntry)>> FindPairs(IEnumerable<IEntry> images, IProgress<PercentageProgress> progress)
+        {
+            SimilarImages.Clear();
+
+            ////make list of tasks for comparing each unique pair in the given ienumerable of entries
+            var tasks = images.UniquePairs().ToList();
+
+            int counter = 0;
+
+            foreach (var (left, right) in tasks)
+            {
+                await Task.Run(() => Compare(left, right));
+                counter++;
+                progress.Report(new PercentageProgress() { TotalImages = tasks.Count, AmountDone = counter });
+            }
+
+            return SimilarImages;
+        }
+
         private void Compare(IEntry left, IEntry right)
         {
             // generate phash for initial check
