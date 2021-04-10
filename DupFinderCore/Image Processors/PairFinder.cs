@@ -39,7 +39,7 @@ namespace DupFinderCore
         {
             SimilarImages.Clear();
 
-            ////make list of tasks for comparing each unique pair in the given ienumerable of entries
+            // make list of tasks for comparing each unique pair in the given ienumerable of entries
             var tasks = images.UniquePairs().ToList();
 
             int counter = 0;

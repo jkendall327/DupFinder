@@ -41,15 +41,11 @@ namespace DupFinderApp.ViewModels
                 () => SimilarImages > 0);
         }
 
-        private void SimilarImageProgress_ProgressChanged(object? sender, PercentageProgress e)
-        {
-            SimilarImages = e.AmountDone;
-            SimilarImagesPercentage = e.PercentageDone;
-        }
-
         private string selectedPath = string.Empty;
         public string SelectedPath
         { get => selectedPath; set => SetProperty(ref selectedPath, value); }
+
+        #region Finding Similar Images
 
         private int similarImages;
         public int SimilarImages
@@ -58,6 +54,13 @@ namespace DupFinderApp.ViewModels
         private int similarImagesPercentage;
         public int SimilarImagesPercentage
         { get => similarImagesPercentage; set => SetProperty(ref similarImagesPercentage, value); }
+
+        private void SimilarImageProgress_ProgressChanged(object? sender, PercentageProgress e)
+        {
+            SimilarImagesPercentage = e.PercentageDone;
+        }
+
+        #endregion
 
         #region Loading Images
 

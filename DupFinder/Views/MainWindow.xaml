@@ -40,7 +40,7 @@
 
         <StackPanel>
             <Button Content="Process Images" Command="{Binding Path=FindSimilarImages}"/>
-            <Label>Processed images:</Label>
+            <Label>Pairs found:</Label>
             <Label Content="{Binding SimilarImages}"/>
             <ProgressBar Value="{Binding SimilarImagesPercentage}" MinWidth="200" Margin="20 10 10 10"></ProgressBar>
         </StackPanel>
