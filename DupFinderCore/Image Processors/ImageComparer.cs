@@ -25,6 +25,10 @@ namespace DupFinderCore
                 throw new ArgumentNullException(nameof(pairs));
             }
 
+            Keep.Clear();
+            Trash.Clear();
+            Unsure.Clear();
+
             _ruleset.Configure();
 
             foreach (var pair in pairs)
