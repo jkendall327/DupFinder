@@ -65,24 +65,29 @@ namespace DupFinderCore
                 }
             }
 
-            // todo what if two or all values are equal somehow...?
-
             var highest = new List<int>() { leftWins, rightWins, unsure }.Max();
 
+            // if two sides have the same amount of wins, it will default to unsure
+            // and then to left, and then to right
+            // this is arbitrary
+
+            if (highest == unsure)
+            {
+                Unsure.Add(pair.left);
+                Unsure.Add(pair.right);
+                return;
+            }
             if (highest == leftWins)
             {
                 Keep.Add(pair.left);
                 Trash.Add(pair.right);
+                return;
             }
             if (highest == rightWins)
             {
                 Keep.Add(pair.right);
                 Trash.Add(pair.left);
-            }
-            if (highest == unsure)
-            {
-                Unsure.Add(pair.left);
-                Unsure.Add(pair.right);
+                return;
             }
         }
 
