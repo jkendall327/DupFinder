@@ -32,12 +32,12 @@ namespace DupFinder
             ioc.Register(Component.For<ILogger>().Instance(log));
             ioc.Register(Component.For<IConfiguration>().Instance(Configuration));
 
-            ioc.Register(Component.For<IProcessor>().ImplementedBy<Processor>());
+            ioc.Register(Component.For<Processor>().ImplementedBy<Processor>());
 
-            ioc.Register(Component.For<IImageSetLoader>().ImplementedBy<ImageSetLoader>());
+            ioc.Register(Component.For<ImageSetLoader>().ImplementedBy<ImageSetLoader>());
             ioc.Register(Component.For<IImageComparer>().ImplementedBy<ImageComparer>());
             ioc.Register(Component.For<IImageComparisonRuleset>().ImplementedBy<ImageComparisonRuleset>());
-            ioc.Register(Component.For<IPairFinder>().ImplementedBy<PairFinder>());
+            ioc.Register(Component.For<PairFinder>().ImplementedBy<PairFinder>());
 
             ioc.Register(Component.For<UserSettings>().ImplementedBy<UserSettings>());
             ioc.Register(Component.For<OptionsViewModel>().ImplementedBy<OptionsViewModel>());

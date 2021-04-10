@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace DupFinderCore
 {
-    public class Processor : IProcessor
+    public class Processor
     {
-        readonly IImageSetLoader _loader;
+        readonly ImageSetLoader _loader;
         readonly ILogger _logger;
         readonly IImageComparer _comparer;
         readonly IConfiguration _config;
-        readonly IPairFinder _finder;
+        readonly PairFinder _finder;
 
         DirectoryInfo? BaseFolder;
 
@@ -22,7 +22,7 @@ namespace DupFinderCore
 
         public List<(IEntry Left, IEntry Right)> Pairs { get; set; } = new();
 
-        public Processor(IImageSetLoader loader, ILogger logger, IImageComparer comparer, IConfiguration config, IPairFinder finder)
+        public Processor(ImageSetLoader loader, ILogger logger, IImageComparer comparer, IConfiguration config, PairFinder finder)
         {
             _loader = loader ?? throw new ArgumentNullException(nameof(loader));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace DupFinderCore
 {
     /// <inheritdoc cref="IPairFinder"/>
-    public class PairFinder : IPairFinder
+    public class PairFinder
     {
         private readonly ConcurrentBag<(IEntry, IEntry)> SimilarImages = new();
 
