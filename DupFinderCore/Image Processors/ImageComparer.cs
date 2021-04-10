@@ -11,21 +11,21 @@ namespace DupFinderCore
         public List<IEntry> Trash { get; set; } = new List<IEntry>();
         public List<IEntry> Unsure { get; set; } = new List<IEntry>();
 
-        readonly IImageComparisonRuleset _ruleset;
+        private readonly IImageComparisonRuleset _ruleset;
 
         public ImageComparer(IImageComparisonRuleset ruleset)
         {
             _ruleset = ruleset ?? throw new ArgumentNullException(nameof(ruleset));
         }
 
-        public void Compare(IEnumerable<(IEntry left, IEntry right)> pairs, UserSettings settings)
+        public void Compare(IEnumerable<(IEntry left, IEntry right)> pairs)
         {
             if (pairs is null)
             {
                 throw new ArgumentNullException(nameof(pairs));
             }
 
-            _ruleset.Configure(settings);
+            _ruleset.Configure();
 
             foreach (var pair in pairs)
             {

@@ -14,13 +14,22 @@ namespace DupFinderCore
         /// </summary>
         List<Func<IEntry, IEntry, Judgement>> Rules { get; }
 
-        void Configure(UserSettings settings);
+        /// <summary>
+        /// Read a <see cref="UserSettings"/> object to dynamically add rules for image comparison.
+        /// </summary>
+        /// <param name="settings"></param>
+        void Configure();
     }
 
     /// <inheritdoc cref="IImageComparisonRuleset"/>
     public class ImageComparisonRuleset : IImageComparisonRuleset
     {
         public List<Func<IEntry, IEntry, Judgement>> Rules { get; private set; } = new List<Func<IEntry, IEntry, Judgement>>();
+
+        private readonly UserSettings _settings;
+
+        public ImageComparisonRuleset(UserSettings settings)
+            => _settings = settings;
 
         private Judgement ComparePixels(IEntry left, IEntry right)
         {
@@ -79,21 +88,17 @@ namespace DupFinderCore
             return Judgement.Unsure;
         }
 
-        /// <summary>
-        /// Read a <see cref="UserSettings"/> object to dynamically add rules for image comparison.
-        /// </summary>
-        /// <param name="settings"></param>
-        public void Configure(UserSettings settings)
+        public void Configure()
         {
-            if (settings.CompareByDate)
+            if (_settings.CompareByDate)
             {
                 Rules.Add(CompareDate);
             }
-            if (settings.CompareByPixels)
+            if (_settings.CompareByPixels)
             {
                 Rules.Add(ComparePixels);
             }
-            if (settings.CompareBySize)
+            if (_settings.CompareBySize)
             {
                 Rules.Add(CompareSize);
             }

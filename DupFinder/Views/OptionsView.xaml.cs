@@ -8,10 +8,13 @@ namespace DupFinderApp
     /// </summary>
     public partial class OptionsView : Window
     {
-        public OptionsView()
+        private readonly OptionsViewModel _vm;
+        public OptionsView(OptionsViewModel vm)
         {
             InitializeComponent();
-            DataContext = new OptionsViewModel();
+
+            _vm = vm;
+            DataContext = _vm;
         }
     }
 }

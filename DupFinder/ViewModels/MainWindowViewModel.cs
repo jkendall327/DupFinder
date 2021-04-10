@@ -9,10 +9,13 @@ namespace DupFinderApp.ViewModels
     public class MainWindowViewModel : VMBase
     {
         private readonly IProcessor _processor;
+        private OptionsViewModel _optionsViewModel;
+        public OptionsViewModel OptionsWindow { get => _optionsViewModel; set => SetProperty(ref _optionsViewModel, value); }
 
-        public MainWindowViewModel(IProcessor processor)
+        public MainWindowViewModel(IProcessor processor, OptionsViewModel optionsViewModel)
         {
             _processor = processor ?? throw new ArgumentNullException(nameof(processor));
+            _optionsViewModel = optionsViewModel ?? throw new ArgumentNullException(nameof(optionsViewModel));
 
             ChooseDirectory = new CommandHandler(OpenDirectoryDialogue);
 
@@ -25,7 +28,7 @@ namespace DupFinderApp.ViewModels
                 () => LoadedImages > 0);
 
             MoveImages = new CommandHandler(
-                () => _processor.FindBetterImages(OptionsWindow.GetSettings()),
+                () => _processor.FindBetterImages(),
                 () => SimilarImages > 0);
 
             ShowOptions = new CommandHandler(ShowOptionsWindow);
@@ -43,9 +46,6 @@ namespace DupFinderApp.ViewModels
         public int SimilarImages
         { get => similarImages; set => SetProperty(ref similarImages, value); }
 
-        private OptionsViewModel optionsWindow = new OptionsViewModel();
-        public OptionsViewModel OptionsWindow { get => optionsWindow; set => SetProperty(ref optionsWindow, value); }
-
         public ICommand ChooseDirectory { get; }
         public ICommand LoadImages { get; }
         public ICommand FindSimilarImages { get; }
@@ -54,7 +54,7 @@ namespace DupFinderApp.ViewModels
 
         private void ShowOptionsWindow()
         {
-            var window = new OptionsView
+            var window = new OptionsView(_optionsViewModel)
             {
                 DataContext = OptionsWindow
             };

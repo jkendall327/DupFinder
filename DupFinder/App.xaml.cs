@@ -43,6 +43,9 @@ namespace DupFinder
             ioc.Register(Component.For<IImageComparisonRuleset>().ImplementedBy<ImageComparisonRuleset>());
             ioc.Register(Component.For<IPairFinder>().ImplementedBy<PairFinder>());
 
+            ioc.Register(Component.For<UserSettings>().ImplementedBy<UserSettings>());
+            ioc.Register(Component.For<OptionsViewModel>().ImplementedBy<OptionsViewModel>());
+
             ioc.Register(Component.For<MainWindowViewModel>().ImplementedBy<MainWindowViewModel>());
             ioc.Register(Component.For<MainWindow>().ImplementedBy<MainWindow>());
 

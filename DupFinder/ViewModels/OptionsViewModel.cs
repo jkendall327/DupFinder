@@ -4,6 +4,10 @@ namespace DupFinderApp.ViewModels
 {
     public class OptionsViewModel : VMBase
     {
+        private readonly UserSettings _settings;
+
+        public OptionsViewModel(UserSettings settings) => _settings = settings;
+
         private bool checkDates = true;
 
         public bool CheckDates
@@ -30,12 +34,11 @@ namespace DupFinderApp.ViewModels
 
         public UserSettings GetSettings()
         {
-            return new UserSettings()
-            {
-                CompareByDate = CheckDates,
-                CompareBySize = CheckSize,
-                CompareByPixels = CheckPixels
-            };
+            _settings.CompareByDate = CheckDates;
+            _settings.CompareByPixels = CheckPixels;
+            _settings.CompareBySize = CheckSize;
+
+            return _settings;
         }
 
     }

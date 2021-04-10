@@ -27,6 +27,6 @@ namespace DupFinderCore
         /// Original files are affected.
         /// </summary>
         /// <param name="settings">The user's settings indicating what image comparison criteria they want to apply.</param>
-        void FindBetterImages(UserSettings settings);
+        void FindBetterImages();
     }
 }

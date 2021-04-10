@@ -9,7 +9,7 @@ namespace DupFinderCore.Tests
     public class ImageComparerTests
     {
         private readonly ImageComparer _sut;
-        private readonly ImageComparisonRuleset _rules = new();
+        private readonly ImageComparisonRuleset _rules;
         readonly List<(IEntry, IEntry)> list = new();
 
         readonly Mock<IEntry> Left = new();
@@ -22,6 +22,7 @@ namespace DupFinderCore.Tests
 
         public ImageComparerTests()
         {
+            _rules = new(_settings);
             _sut = new ImageComparer(_rules);
 
             Good.SetupGet(x => x.Size).Returns(30000); // smaller
@@ -38,7 +39,7 @@ namespace DupFinderCore.Tests
 
             list.Add((Good.Object, Right.Object));
 
-            _sut.Compare(list, _settings);
+            _sut.Compare(list);
 
             Assert.Contains(Good.Object, _sut.Keep);
             Assert.Contains(Right.Object, _sut.Trash);
@@ -53,7 +54,7 @@ namespace DupFinderCore.Tests
 
             list.Add((Good.Object, Right.Object));
 
-            _sut.Compare(list, _settings);
+            _sut.Compare(list);
 
             Assert.Contains(Good.Object, _sut.Keep);
             Assert.Contains(Right.Object, _sut.Trash);
@@ -74,7 +75,7 @@ namespace DupFinderCore.Tests
 
             list.Add((Left.Object, Right.Object));
 
-            _sut.Compare(list, _settings);
+            _sut.Compare(list);
 
             Assert.Contains(Left.Object, _sut.Unsure);
             Assert.Contains(Right.Object, _sut.Unsure);
@@ -89,7 +90,7 @@ namespace DupFinderCore.Tests
 
             list.Add((Good.Object, Right.Object));
 
-            _sut.Compare(list, _settings);
+            _sut.Compare(list);
 
             Assert.Contains(Good.Object, _sut.Unsure);
             Assert.Contains(Right.Object, _sut.Unsure);
