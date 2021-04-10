@@ -42,7 +42,7 @@ namespace DupFinderCore
             try
             {
                 files = directory
-                    .EnumerateFiles("*.*", SearchOption.AllDirectories)
+                    .EnumerateFiles("*.*", SearchOption.TopDirectoryOnly)
                     .AsParallel();
             }
             catch (DirectoryNotFoundException ex)
