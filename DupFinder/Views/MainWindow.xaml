@@ -45,7 +45,8 @@
 
         <StackPanel>
             <Button Content="Move Images" Command="{Binding Path=MoveImages}"/>
-            <Label>X images moved (not implemented)</Label>
+            <Label>Images moved:</Label>
+            <Label Content="{Binding MovedImages}"/>
         </StackPanel>
 
         <Button Content="Options" Command="{Binding Path=ShowOptions}"/>

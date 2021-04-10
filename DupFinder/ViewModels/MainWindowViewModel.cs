@@ -54,6 +54,10 @@ namespace DupFinderApp.ViewModels
         public int SimilarImages
         { get => similarImages; set => SetProperty(ref similarImages, value); }
 
+        private int movedImages;
+        public int MovedImages
+        { get => movedImages; set => SetProperty(ref movedImages, value); }
+
         private OptionsViewModel _optionsViewModel;
         public OptionsViewModel OptionsWindow
         { get => _optionsViewModel; set => SetProperty(ref _optionsViewModel, value); }

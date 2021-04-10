@@ -35,7 +35,7 @@ namespace DupFinderCore
 
             await Task.WhenAll(tasks);
 
-            _logger.Information("All images processed. X pairs found.");
+            _logger.Information($"All images processed. {SimilarImages.Count} pairs found.");
 
             return SimilarImages;
         }
