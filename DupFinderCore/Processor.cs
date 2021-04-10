@@ -72,12 +72,9 @@ namespace DupFinderCore
                     continue;
                 }
 
-                // check config for whether or not to override files, if no config assume don't override
-                bool overrideFiles = bool.TryParse(_config.GetSection("Override").Value, out bool result);
-                // , overrideFiles ? result : false
-                File.Move(image.FullPath, destination.FullName + Path.DirectorySeparatorChar + image.Filename);
-
-                // todo: should it delete the original as well?
+                bool overrideFiles = _config.GetValue<bool>("OverwriteExistingFiles");
+                string destinationPath = destination.FullName + Path.DirectorySeparatorChar + image.Filename;
+                File.Move(image.FullPath, destinationPath, overrideFiles);
             }
         }
     }

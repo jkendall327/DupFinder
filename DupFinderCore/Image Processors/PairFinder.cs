@@ -1,4 +1,5 @@
-﻿using Shipwreck.Phash;
+﻿using Microsoft.Extensions.Configuration;
+using Shipwreck.Phash;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -13,6 +14,13 @@ namespace DupFinderCore
         private readonly ConcurrentBag<(IEntry, IEntry)> SimilarImages = new();
 
         private readonly double regularLimit = 99.999;
+
+        private readonly IConfiguration _config;
+
+        public PairFinder(IConfiguration config)
+        {
+            _config = config ?? throw new ArgumentNullException(nameof(config));
+        }
 
         public async Task<IEnumerable<(IEntry, IEntry)>> FindPairs(IEnumerable<IEntry> images)
         {
@@ -42,8 +50,7 @@ namespace DupFinderCore
             if (euclidianDistance < TruncatedPercentage(regularLimit))
                 return;
 
-            // todo whether to do weighted comparisons should be in IConfiguration
-            if (false)
+            if (_config.GetValue<bool>("WeightedImageComparison"))
             {
                 var focusedDistance = left.FocusedColorMap.CompareWith(right.FocusedColorMap);
 
