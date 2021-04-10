@@ -31,9 +31,9 @@ namespace DupFinderCore
             return array;
         }
 
-        public static List<Color> ToFlatColorArray(this Bitmap image)
+        public static Color[] ToFlatColorArray(this Bitmap image)
         {
-            List<Color> array = new List<Color>();
+            List<Color> array = new();
 
             for (int i = 0; i < image.Width; i++)
             {
@@ -43,7 +43,7 @@ namespace DupFinderCore
                 }
             }
 
-            return array;
+            return array.ToArray();
         }
 
         public static Bitmap ToImage(this Color[,] arr)

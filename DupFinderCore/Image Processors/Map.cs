@@ -107,8 +107,7 @@ namespace DupFinderCore.Image_Processors
             var rect = new Rectangle(0 - Offset, 0 - Offset, FocusLevel + Offset, FocusLevel + Offset);
             canvas.DrawImage(BaseImage, rect);
 
-            // todo ugly that the extension method doesn't return an array
-            ColorMap = shrunken.ToFlatColorArray().ToArray();
+            ColorMap = shrunken.ToFlatColorArray();
         }
 
         private static Graphics GetCanvas(Bitmap shrunken)
