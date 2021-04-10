@@ -47,5 +47,11 @@ namespace DupFinderCore
         }
 
         public override string ToString() => Filename;
+
+        public void Dispose()
+        {
+            ColorMap.Dispose();
+            FocusedColorMap.Dispose();
+        }
     }
 }

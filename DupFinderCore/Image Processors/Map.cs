@@ -10,7 +10,7 @@ namespace DupFinderCore.Image_Processors
     /// <summary>
     /// A shrunken color map of an <see cref="Image"/>. Used for Euclidian distance comparisons.
     /// </summary>
-    public class Map
+    public class Map : IDisposable
     {
         /// <summary>
         /// The color map itself.
@@ -117,6 +117,11 @@ namespace DupFinderCore.Image_Processors
             canvas.InterpolationMode = InterpolationMode.HighQualityBilinear;
             canvas.SmoothingMode = SmoothingMode.HighQuality;
             return canvas;
+        }
+
+        public void Dispose()
+        {
+            BaseImage.Dispose();
         }
     }
 }

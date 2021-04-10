@@ -60,6 +60,9 @@ namespace DupFinderCore
                     return;
             }
 
+            left.Dispose();
+            right.Dispose();
+
             // images are similar
             SimilarImages.Add((left, right));
         }

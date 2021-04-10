@@ -7,7 +7,7 @@ namespace DupFinderCore
     /// <summary>
     /// Contains relevant information about an image: file info, hash, colourmap, size, etc.
     /// </summary>
-    public interface IEntry
+    public interface IEntry : IDisposable
     {
         /// <summary>
         /// The image's number of pixels.
