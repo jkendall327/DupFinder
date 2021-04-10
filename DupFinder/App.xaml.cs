@@ -4,32 +4,11 @@ using DupFinderApp.ViewModels;
 using DupFinderCore;
 using Microsoft.Extensions.Configuration;
 using Serilog;
-using Serilog.Core;
-using Serilog.Events;
-using Serilog.Formatting;
-using Serilog.Formatting.Display;
-using System;
-using System.Collections.Concurrent;
-using System.IO;
+using System.Collections.ObjectModel;
 using System.Windows;
 
 namespace DupFinder
 {
-    class InMemorySink : ILogEventSink
-    {
-        readonly ITextFormatter _textFormatter = new MessageTemplateTextFormatter("{Timestamp} [{Level}] {Message}{Exception}");
-
-        public ConcurrentQueue<string> Events { get; } = new ConcurrentQueue<string>();
-
-        public void Emit(LogEvent logEvent)
-        {
-            if (logEvent == null) throw new ArgumentNullException(nameof(logEvent));
-            var renderSpace = new StringWriter();
-            _textFormatter.Format(logEvent, renderSpace);
-            Events.Enqueue(renderSpace.ToString());
-        }
-    }
-
     public partial class App : Application
     {
         private void Application_Startup(object sender, StartupEventArgs e)
@@ -37,7 +16,9 @@ namespace DupFinder
             var builder = new ConfigurationBuilder().AddJsonFile("appsettings.json");
             IConfiguration Configuration = builder.Build();
 
-            var sink = new InMemorySink();
+            // for logging to the UI
+            var sink = new UISink();
+
             ILogger log = new LoggerConfiguration()
                 .ReadFrom.Configuration(Configuration)
                 .WriteTo.Sink(sink)
@@ -45,16 +26,16 @@ namespace DupFinder
 
             log.Information("Program started.");
 
-            WindsorContainer ioc = BuildDIContainer(log, sink.Events, Configuration);
+            WindsorContainer ioc = BuildDIContainer(log, sink.UICollection, Configuration);
             var window = ioc.Resolve<MainWindow>();
             window.Show();
         }
 
-        private static WindsorContainer BuildDIContainer(ILogger log, ConcurrentQueue<string> uiLogger, IConfiguration Configuration)
+        private static WindsorContainer BuildDIContainer(ILogger log, ObservableCollection<string> uiLogger, IConfiguration Configuration)
         {
             var ioc = new WindsorContainer();
             ioc.Register(Component.For<ILogger>().Instance(log));
-            ioc.Register(Component.For<ConcurrentQueue<string>>().Instance(uiLogger));
+            ioc.Register(Component.For<ObservableCollection<string>>().Instance(uiLogger));
             ioc.Register(Component.For<IConfiguration>().Instance(Configuration));
 
             ioc.Register(Component.For<IProcessor>().ImplementedBy<Processor>());

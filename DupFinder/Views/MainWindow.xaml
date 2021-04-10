@@ -29,7 +29,7 @@
             <Button Command="{Binding Path=ChooseDirectory}">Choose Directory</Button>
             <Label>Chosen folder:</Label>
             <Label Content="{Binding SelectedPath}"/>
-            <ListBox x:Name="listBox" Width="435" Height="123" ItemsSource="{Binding People}"/>
+            <ListBox x:Name="listBox" Width="435" Height="123" ItemsSource="{Binding people}"/>
         </StackPanel>
 
         <StackPanel>

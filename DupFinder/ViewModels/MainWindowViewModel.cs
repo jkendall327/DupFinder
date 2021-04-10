@@ -2,9 +2,7 @@
 using DupFinderCore;
 using Serilog;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -12,32 +10,26 @@ using System.Windows.Input;
 
 namespace DupFinderApp.ViewModels
 {
-    public class MainWindowViewModel : VMBase, INotifyCollectionChanged
+    public class MainWindowViewModel : VMBase
     {
         private readonly IProcessor _processor;
+
+        /// <summary>
+        /// A sink for the <see cref="ILogger"/> that the UI binds to.
+        /// </summary>
+        public ObservableCollection<string> Logger { get; set; }
+
+        /// <summary>
+        /// The 'pure' logger for reporting events.
+        /// </summary>
         private readonly ILogger _logger;
 
-        private OptionsViewModel _optionsViewModel;
-        public OptionsViewModel OptionsWindow { get => _optionsViewModel; set => SetProperty(ref _optionsViewModel, value); }
-
-        private readonly ConcurrentQueue<string> uiLog = new();
-        public ConcurrentQueue<string> UiLog
-        {
-            get { return uiLog; }
-            set { CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(; }
-        }
-
-        public event NotifyCollectionChangedEventHandler? CollectionChanged;
-
-        public ObservableCollection<string> people = new();
-        public ObservableCollection<string> People { get { return people; } }
-
-        public MainWindowViewModel(IProcessor processor, OptionsViewModel optionsViewModel, ConcurrentQueue<string> uiLog, ILogger logger)
+        public MainWindowViewModel(IProcessor processor, OptionsViewModel optionsViewModel, ObservableCollection<string> _log, ILogger logger)
         {
             _processor = processor ?? throw new ArgumentNullException(nameof(processor));
             _optionsViewModel = optionsViewModel ?? throw new ArgumentNullException(nameof(optionsViewModel));
 
-            UiLog = uiLog;
+            Logger = _log;
 
             ChooseDirectory = new CommandHandler(OpenDirectoryDialogue);
             ShowOptions = new CommandHandler(ShowOptionsWindow);
@@ -65,9 +57,12 @@ namespace DupFinderApp.ViewModels
         { get => loadedImages; set => SetProperty(ref loadedImages, value); }
 
         private int similarImages;
-
         public int SimilarImages
         { get => similarImages; set => SetProperty(ref similarImages, value); }
+
+        private OptionsViewModel _optionsViewModel;
+        public OptionsViewModel OptionsWindow
+        { get => _optionsViewModel; set => SetProperty(ref _optionsViewModel, value); }
 
         public ICommand ChooseDirectory { get; }
         public ICommand LoadImages { get; }
