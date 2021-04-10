@@ -33,8 +33,9 @@ namespace DupFinderCore
         {
             var tasks = GetFiles(directory)
                 .Where(file => file.Exists)
-                .Where(file => file.IsImage())
-                .Select(file => Task.Run(() => MakeEntry(file, imageLoadProgress)));
+                //.Where(file => file.IsImage())
+                .Select(file => Task.Run(() => MakeEntry(file)))
+                .ToList();
 
             var allTasks = Task.WhenAll(tasks);
 
@@ -46,17 +47,9 @@ namespace DupFinderCore
                 imageLoadProgress.Report(progress);
             }
 
+            await allTasks;
+
             return Entries;
-        }
-
-        private void MakeEntry(FileInfo file, IProgress<ImagesLoadedProgress> imageLoadProgress)
-        {
-            var entry = new Entry(file.FullName);
-            _logger.Debug($"Loaded file {file.Name}");
-            Entries.Add(entry);
-
-            var x = new ImagesLoadedProgress() { AmountDone = 20 };
-            imageLoadProgress.Report(x);
         }
 
         private IEnumerable<FileInfo> GetFiles(DirectoryInfo directory)
