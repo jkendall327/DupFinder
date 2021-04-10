@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Serilog;
 using Shipwreck.Phash;
 using System;
 using System.Collections.Concurrent;
@@ -16,21 +17,25 @@ namespace DupFinderCore
         private readonly double regularLimit = 99.999;
 
         private readonly IConfiguration _config;
+        private readonly ILogger _logger;
 
-        public PairFinder(IConfiguration config)
+        public PairFinder(IConfiguration config, ILogger logger)
         {
             _config = config ?? throw new ArgumentNullException(nameof(config));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<IEnumerable<(IEntry, IEntry)>> FindPairs(IEnumerable<IEntry> images)
         {
             SimilarImages.Clear();
 
-            ////make list of tasks for comparing each unique pair in the given ienumerable of entries
+            //make list of tasks for comparing each unique pair in the given ienumerable of entries
             var tasks = images.UniquePairs()
                 .Select(pair => Task.Run(() => Compare(pair.Item1, pair.Item2)));
 
             await Task.WhenAll(tasks);
+
+            _logger.Information($"All images processed. {SimilarImages.Count} pairs found.");
 
             return SimilarImages;
         }
@@ -50,6 +55,8 @@ namespace DupFinderCore
                 counter++;
                 progress.Report(new PercentageProgress() { TotalImages = tasks.Count, AmountDone = counter });
             }
+
+            _logger.Information($"Pairs found: {SimilarImages.Count}");
 
             return SimilarImages;
         }

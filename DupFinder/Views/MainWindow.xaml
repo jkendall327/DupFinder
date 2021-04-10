@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="MainWindow" Height="400" Width="800">
+        Title="MainWindow" Height="500" Width="800">
     
     <Window.Resources>
         <Style TargetType="Button">
@@ -47,9 +47,12 @@
 
         <StackPanel>
             <Button Content="Move Images" Command="{Binding Path=MoveImages}"/>
-            <Label>X images moved (not implemented)</Label>
+            <Label>Images moved:</Label>
+            <Label Content="{Binding MovedImages}"/>
         </StackPanel>
 
         <Button Content="Options" Command="{Binding Path=ShowOptions}"/>
+
+        <ListBox x:Name="listBox" Margin="10" Height="80" ItemsSource="{Binding Logger}" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
     </StackPanel>
 </Window>

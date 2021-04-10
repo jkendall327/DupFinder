@@ -4,6 +4,7 @@ using DupFinderApp.ViewModels;
 using DupFinderCore;
 using Microsoft.Extensions.Configuration;
 using Serilog;
+using System.Collections.ObjectModel;
 using System.Windows;
 
 namespace DupFinder
@@ -15,21 +16,26 @@ namespace DupFinder
             var builder = new ConfigurationBuilder().AddJsonFile("appsettings.json");
             IConfiguration Configuration = builder.Build();
 
+            // for logging to the UI
+            var sink = new UISink();
+
             ILogger log = new LoggerConfiguration()
                 .ReadFrom.Configuration(Configuration)
+                .WriteTo.Sink(sink)
                 .CreateLogger();
 
             log.Information("Program started.");
 
-            WindsorContainer ioc = BuildDIContainer(log, Configuration);
+            WindsorContainer ioc = BuildDIContainer(log, sink.UICollection, Configuration);
             var window = ioc.Resolve<MainWindow>();
             window.Show();
         }
 
-        private static WindsorContainer BuildDIContainer(ILogger log, IConfiguration Configuration)
+        private static WindsorContainer BuildDIContainer(ILogger log, ObservableCollection<string> uiLogger, IConfiguration Configuration)
         {
             var ioc = new WindsorContainer();
             ioc.Register(Component.For<ILogger>().Instance(log));
+            ioc.Register(Component.For<ObservableCollection<string>>().Instance(uiLogger));
             ioc.Register(Component.For<IConfiguration>().Instance(Configuration));
 
             ioc.Register(Component.For<Processor>().ImplementedBy<Processor>());

@@ -1,6 +1,8 @@
 ﻿using DupFinderApp.Commands;
 using DupFinderCore;
+using Serilog;
 using System;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -11,14 +13,24 @@ namespace DupFinderApp.ViewModels
     public class MainWindowViewModel : VMBase
     {
         private readonly Processor _processor;
+
         private OptionsViewModel _optionsViewModel;
         public OptionsViewModel OptionsWindow { get => _optionsViewModel; set => SetProperty(ref _optionsViewModel, value); }
 
-        public MainWindowViewModel(Processor processor, OptionsViewModel optionsViewModel)
+        /// <summary>
+        /// A sink for the <see cref="ILogger"/> that the UI binds to.
+        /// </summary>
+        public ObservableCollection<string> Logger { get; set; }
+
+        public MainWindowViewModel(Processor processor, OptionsViewModel optionsViewModel, ObservableCollection<string> _log)
         {
             _processor = processor ?? throw new ArgumentNullException(nameof(processor));
+
             _optionsViewModel = optionsViewModel ?? throw new ArgumentNullException(nameof(optionsViewModel));
 
+            Logger = _log ?? throw new ArgumentNullException(nameof(_log));
+
+            // wire up commands
             ChooseDirectory = new CommandHandler(OpenDirectoryDialogue);
             ShowOptions = new CommandHandler(ShowOptionsWindow);
 
@@ -80,6 +92,10 @@ namespace DupFinderApp.ViewModels
 
         #endregion
 
+        private int movedImages;
+        public int MovedImages
+        { get => movedImages; set => SetProperty(ref movedImages, value); }
+
         #region Commands
 
         public ICommand ChooseDirectory { get; }
@@ -92,9 +108,11 @@ namespace DupFinderApp.ViewModels
 
         private void ShowOptionsWindow()
         {
+            // don't open multiple windows
             if (Application.Current.Windows.OfType<OptionsView>().Any())
                 return;
 
+            // keeping the same viewmodel means user settings are preserved
             var window = new OptionsView(_optionsViewModel)
             {
                 DataContext = OptionsWindow
