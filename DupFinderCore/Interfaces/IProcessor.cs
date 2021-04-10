@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace DupFinderCore
@@ -20,6 +21,7 @@ namespace DupFinderCore
         /// </summary>
         /// <returns>A task representing the number of potential pairs found within the loaded images.</returns>
         Task<int> FindSimilarImages();
+        Task<int> LoadImages(DirectoryInfo directoryInfo, IProgress<ImagesLoadedProgress> imageLoadProgress);
 
         /// <summary>
         /// Compares potential pairs to automatically sort them based on quality (size, pixels, etc.).

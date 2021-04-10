@@ -1,4 +1,5 @@
 ﻿using Serilog;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -26,6 +27,36 @@ namespace DupFinderCore
             await Task.WhenAll(tasks);
 
             return Entries;
+        }
+
+        public async Task<IEnumerable<IEntry>> LoadImages(DirectoryInfo directory, IProgress<ImagesLoadedProgress> imageLoadProgress)
+        {
+            var tasks = GetFiles(directory)
+                .Where(file => file.Exists)
+                .Where(file => file.IsImage())
+                .Select(file => Task.Run(() => MakeEntry(file, imageLoadProgress)));
+
+            var allTasks = Task.WhenAll(tasks);
+
+            var progress = new ImagesLoadedProgress { TotalImages = tasks.Count(), AmountDone = 0 };
+
+            while (await Task.WhenAny(tasks) != allTasks)
+            {
+                progress.AmountDone++;
+                imageLoadProgress.Report(progress);
+            }
+
+            return Entries;
+        }
+
+        private void MakeEntry(FileInfo file, IProgress<ImagesLoadedProgress> imageLoadProgress)
+        {
+            var entry = new Entry(file.FullName);
+            _logger.Debug($"Loaded file {file.Name}");
+            Entries.Add(entry);
+
+            var x = new ImagesLoadedProgress() { AmountDone = 20 };
+            imageLoadProgress.Report(x);
         }
 
         private IEnumerable<FileInfo> GetFiles(DirectoryInfo directory)

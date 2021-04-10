@@ -35,6 +35,7 @@
             <Button Command="{Binding Path=LoadImages}">Load Images</Button>
             <Label Content="Loaded Images:"/>
             <Label Content="{Binding LoadedImages}"/>
+            <ProgressBar Value="{Binding LoadedImagesPercentage}"></ProgressBar>
         </StackPanel>
 
         <StackPanel>

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -15,5 +16,6 @@ namespace DupFinderCore
         /// <param name="directory">The directory to load images from.</param>
         /// <returns>A task that represents a collection of images to be loaded.</returns>
         Task<IEnumerable<Entry>> LoadImages(DirectoryInfo dir);
+        Task<IEnumerable<IEntry>> LoadImages(DirectoryInfo baseFolder, IProgress<ImagesLoadedProgress> imageLoadProgress);
     }
 }

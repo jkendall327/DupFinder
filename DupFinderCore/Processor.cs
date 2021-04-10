@@ -40,6 +40,16 @@ namespace DupFinderCore
             return Targets.Count();
         }
 
+
+        public async Task<int> LoadImages(DirectoryInfo baseFolder, IProgress<ImagesLoadedProgress> imageLoadProgress)
+        {
+            BaseFolder = baseFolder;
+            Targets = await _loader.LoadImages(BaseFolder, imageLoadProgress);
+            _logger.Information("Images loaded.");
+
+            return Targets.Count();
+        }
+
         public async Task<int> FindSimilarImages()
         {
             var result = await _finder.FindPairs(Targets);
@@ -77,5 +87,6 @@ namespace DupFinderCore
                 File.Move(image.FullPath, destinationPath, overrideFiles);
             }
         }
+
     }
 }
