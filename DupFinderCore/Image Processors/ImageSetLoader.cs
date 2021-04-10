@@ -31,23 +31,18 @@ namespace DupFinderCore
 
         public async Task<IEnumerable<IEntry>> LoadImages(DirectoryInfo directory, IProgress<ImagesLoadedProgress> imageLoadProgress)
         {
+            Entries.Clear();
+
             var tasks = GetFiles(directory)
                 .Where(file => file.Exists)
-                //.Where(file => file.IsImage())
-                .Select(file => Task.Run(() => MakeEntry(file)))
+                .Where(file => file.IsImage())
                 .ToList();
 
-            var allTasks = Task.WhenAll(tasks);
-
-            var progress = new ImagesLoadedProgress { TotalImages = tasks.Count(), AmountDone = 0 };
-
-            while (await Task.WhenAny(tasks) != allTasks)
+            foreach (var item in tasks)
             {
-                progress.AmountDone++;
-                imageLoadProgress.Report(progress);
+                await Task.Run(() => MakeEntry(item));
+                imageLoadProgress.Report(new ImagesLoadedProgress { TotalImages = tasks.Count(), AmountDone = Entries.Count });
             }
-
-            await allTasks;
 
             return Entries;
         }

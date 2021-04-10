@@ -41,6 +41,7 @@ namespace DupFinderApp.ViewModels
         private void ImageLoadProgress_ProgressChanged(object? sender, ImagesLoadedProgress e)
         {
             LoadedImagesPercentage = e.PercentageDone;
+            LoadedImages = e.AmountDone;
         }
 
         private string selectedPath = string.Empty;
