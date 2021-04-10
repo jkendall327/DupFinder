@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace DupFinderCore
@@ -20,8 +19,8 @@ namespace DupFinderCore
         public async Task<IEnumerable<Entry>> LoadImages(DirectoryInfo directory)
         {
             var tasks = GetFiles(directory)
-                .Where(x => x.Exists)
-                .Where(x => IsImage(x))
+                .Where(file => file.Exists)
+                .Where(file => file.IsImage())
                 .Select(file => Task.Run(() => MakeEntry(file)));
 
             await Task.WhenAll(tasks);
@@ -75,9 +74,5 @@ namespace DupFinderCore
             _logger.Debug($"Loaded file {file.Name}");
             Entries.Add(entry);
         }
-
-        // todo improve
-        private bool IsImage(FileInfo file)
-            => Regex.IsMatch(file.FullName, @".jpg|.png|.jpeg$", RegexOptions.IgnoreCase);
     }
 }
