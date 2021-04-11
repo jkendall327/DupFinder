@@ -67,5 +67,7 @@
                 </List>
             </FlowDocument>
         </RichTextBox>
+
+        <Label HorizontalAlignment="Right" Margin="10" FontSize="10" FontStyle="Italic">Jack Kendall, 2021</Label>
     </StackPanel>
 </Window>
