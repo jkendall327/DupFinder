@@ -15,9 +15,9 @@ namespace DupFinderCore
         readonly ILogger _logger;
         public ImageSetLoader(ILogger logger) => _logger = logger;
 
-        readonly ConcurrentBag<Entry> Entries = new();
+        readonly ConcurrentBag<IEntry> Entries = new();
 
-        public async Task<IEnumerable<Entry>> LoadImages(DirectoryInfo directory)
+        public async Task<ConcurrentBag<IEntry>> LoadImages(DirectoryInfo directory)
         {
             Entries.Clear();
 
@@ -31,7 +31,7 @@ namespace DupFinderCore
             return Entries;
         }
 
-        public async Task<IEnumerable<IEntry>> LoadImages(DirectoryInfo directory, IProgress<PercentageProgress> imageLoadProgress)
+        public async Task<ConcurrentBag<IEntry>> LoadImages(DirectoryInfo directory, IProgress<PercentageProgress> imageLoadProgress)
         {
             Entries.Clear();
 

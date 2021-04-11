@@ -3,7 +3,6 @@ using Serilog;
 using Shipwreck.Phash;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -25,7 +24,7 @@ namespace DupFinderCore
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<IEnumerable<(IEntry, IEntry)>> FindPairs(IEnumerable<IEntry> images, IProgress<PercentageProgress>? progress = null)
+        public async Task<ConcurrentBag<(IEntry, IEntry)>> FindPairs(ConcurrentBag<IEntry> images, IProgress<PercentageProgress>? progress = null)
         {
             SimilarImages.Clear();
 

@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Serilog;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace DupFinderCore
@@ -18,9 +18,9 @@ namespace DupFinderCore
 
         DirectoryInfo? BaseFolder;
 
-        public IEnumerable<IEntry> Targets { get; set; } = Enumerable.Empty<Entry>();
+        public ConcurrentBag<IEntry> Targets { get; set; } = new();
 
-        public List<(IEntry Left, IEntry Right)> Pairs { get; set; } = new();
+        public ConcurrentBag<(IEntry Left, IEntry Right)> Pairs { get; set; } = new();
 
         public Processor(ImageSetLoader loader, ILogger logger, IImageComparer comparer, IConfiguration config, PairFinder finder)
         {
@@ -31,38 +31,19 @@ namespace DupFinderCore
             _finder = finder ?? throw new ArgumentNullException(nameof(finder));
         }
 
-        public async Task<int> LoadImages(DirectoryInfo baseFolder)
-        {
-            BaseFolder = baseFolder;
-            Targets = await _loader.LoadImages(BaseFolder);
-            _logger.Information("Images loaded.");
-
-            return Targets.Count();
-        }
-
-
-        public async Task<int> LoadImages(DirectoryInfo baseFolder, IProgress<PercentageProgress> imageLoadProgress)
+        public async Task<int> LoadImages(DirectoryInfo baseFolder, IProgress<PercentageProgress>? imageLoadProgress = null)
         {
             BaseFolder = baseFolder;
             Targets = await _loader.LoadImages(BaseFolder, imageLoadProgress);
             _logger.Information("Images loaded.");
 
-            return Targets.Count();
+            return Targets.Count;
         }
 
-        public async Task<int> FindSimilarImages()
+        public async Task<int> FindSimilarImages(IProgress<PercentageProgress>? progress = null)
         {
-            var result = await _finder.FindPairs(Targets);
-            Pairs = result.ToList();
-
-            return Pairs.Count();
-        }
-
-        public async Task<int> FindSimilarImages(IProgress<PercentageProgress> progress)
-        {
-            var result = await _finder.FindPairs(Targets, progress);
-            Pairs = result.ToList();
-            return Pairs.Count();
+            Pairs = await _finder.FindPairs(Targets, progress);
+            return Pairs.Count;
         }
 
         public void FindBetterImages()
