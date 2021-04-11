@@ -41,16 +41,20 @@ namespace DupFinderApp.ViewModels
                 async () => LoadedImages = await _processor.LoadImages(new DirectoryInfo(SelectedPath), ImageLoadProgress),
                 () => Directory.Exists(SelectedPath));
 
-            var SimilarImageProgress = new Progress<PercentageProgress>();
-            SimilarImageProgress.ProgressChanged += SimilarImageProgress_ProgressChanged;
-
-            FindSimilarImages = new CommandHandler(
-                async () => SimilarImages = await _processor.FindSimilarImages(SimilarImageProgress),
-                () => LoadedImages > 0);
+            FindSimilarImages = new CommandHandler(FindSimilar, () => LoadedImages > 0);
 
             MoveImages = new CommandHandler(
                 () => _processor.FindBetterImages(),
                 () => SimilarImages > 0);
+        }
+
+        private async void FindSimilar()
+        {
+            var SimilarImageProgress = new Progress<PercentageProgress>();
+            SimilarImageProgress.ProgressChanged += SimilarImageProgress_ProgressChanged;
+
+            await _processor.FindSimilarImages(SimilarImageProgress);
+            SimilarImages = _processor.Pairs.Count;
         }
 
         private string selectedPath = string.Empty;

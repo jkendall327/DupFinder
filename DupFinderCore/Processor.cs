@@ -40,10 +40,9 @@ namespace DupFinderCore
             return Targets.Count;
         }
 
-        public async Task<int> FindSimilarImages(IProgress<PercentageProgress>? progress = null)
+        public async Task FindSimilarImages(IProgress<PercentageProgress>? progress = null)
         {
             Pairs = await _finder.FindPairs(Targets, progress);
-            return Pairs.Count;
         }
 
         public void FindBetterImages()
