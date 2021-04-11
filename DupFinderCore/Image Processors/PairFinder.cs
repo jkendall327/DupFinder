@@ -25,35 +25,24 @@ namespace DupFinderCore
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<IEnumerable<(IEntry, IEntry)>> FindPairs(IEnumerable<IEntry> images)
+        public async Task<IEnumerable<(IEntry, IEntry)>> FindPairs(IEnumerable<IEntry> images, IProgress<PercentageProgress>? progress = null)
         {
             SimilarImages.Clear();
 
-            //make list of tasks for comparing each unique pair in the given ienumerable of entries
             var tasks = images.UniquePairs()
-                .Select(pair => Task.Run(() => Compare(pair.Item1, pair.Item2)));
+            .Select(pair => Task.Run(() => Compare(pair.Item1, pair.Item2)))
+            .ToList();
 
-            await Task.WhenAll(tasks);
+            var totalTasks = tasks.Count;
 
-            _logger.Information($"All images processed. {SimilarImages.Count} pairs found.");
-
-            return SimilarImages;
-        }
-
-        public async Task<IEnumerable<(IEntry, IEntry)>> FindPairs(IEnumerable<IEntry> images, IProgress<PercentageProgress> progress)
-        {
-            SimilarImages.Clear();
-
-            // make list of tasks for comparing each unique pair in the given ienumerable of entries
-            var tasks = images.UniquePairs().ToList();
-
-            int counter = 0;
-
-            foreach (var (left, right) in tasks)
+            int total = 0;
+            while (tasks.Any())
             {
-                await Task.Run(() => Compare(left, right));
-                counter++;
-                progress.Report(new PercentageProgress() { TotalImages = tasks.Count, AmountDone = counter });
+                var finishedTask = await Task.WhenAny(tasks);
+                tasks.Remove(finishedTask);
+
+                total++;
+                progress?.Report(new PercentageProgress() { TotalImages = totalTasks, AmountDone = total });
             }
 
             _logger.Information($"Pairs found: {SimilarImages.Count}");
