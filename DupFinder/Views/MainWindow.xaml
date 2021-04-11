@@ -21,6 +21,22 @@
             <Setter Property="Orientation" Value="Horizontal" />
         </Style>
     </Window.Resources>
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding Path=ChooseDirectory}" 
+                Key="O" 
+                Modifiers="Control"/>
+        <KeyBinding Command="{Binding Path=LoadImages}" 
+                Key="L" 
+                Modifiers="Control"/>
+        <KeyBinding Command="{Binding Path=FindSimilarImages}" 
+                Key="P" 
+                Modifiers="Control"/>
+        <KeyBinding Command="{Binding Path=MoveImages}" 
+                Key="M" 
+                Modifiers="Control"/>
+        <KeyBinding Command="{Binding Path=ShowOptions}" 
+                Key="Esc" />
+    </Window.InputBindings>
     <StackPanel Orientation="Vertical">
         
         <Label FontSize="40">Duplicate image finder</Label>
