@@ -57,7 +57,7 @@
         <StackPanel>
             <Button Content="Process Images" Command="{Binding Path=FindSimilarImages}"/>
             <Label>Pairs found:</Label>
-            <Label Content="{Binding SimilarImages}"/>
+            <Label Margin="0 0 20 0" Content="{Binding SimilarImages}"/>
             <ProgressBar Value="{Binding SimilarImagesPercentage}" MinWidth="200" Margin="20 10 10 10"></ProgressBar>
         </StackPanel>
 
@@ -67,7 +67,10 @@
             <Label Content="{Binding MovedImages}"/>
         </StackPanel>
 
-        <Button Content="Options" Command="{Binding Path=ShowOptions}"/>
+        <StackPanel>
+            <Button Content="Options" Command="{Binding Path=ShowOptions}"/>
+            <Button Content="Help" HorizontalAlignment="Right" Command="{Binding Path=ShowHelp}"></Button>
+        </StackPanel>
 
         <ListBox x:Name="listBox" Margin="10" Height="80" ItemsSource="{Binding Logger}" ScrollViewer.VerticalScrollBarVisibility="Visible"/>
     </StackPanel>

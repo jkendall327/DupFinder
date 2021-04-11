@@ -1,4 +1,5 @@
 ﻿using DupFinderApp.Commands;
+using DupFinderApp.Views;
 using DupFinderCore;
 using Serilog;
 using System;
@@ -33,6 +34,7 @@ namespace DupFinderApp.ViewModels
             // wire up commands
             ChooseDirectory = new CommandHandler(OpenDirectoryDialogue);
             ShowOptions = new CommandHandler(ShowOptionsWindow);
+            ShowHelp = new CommandHandler(ShowHelpWindow);
 
             var ImageLoadProgress = new Progress<PercentageProgress>();
             ImageLoadProgress.ProgressChanged += ImageLoadProgress_ProgressChanged;
@@ -46,6 +48,21 @@ namespace DupFinderApp.ViewModels
             MoveImages = new CommandHandler(
                 () => _processor.FindBetterImages(),
                 () => SimilarImages > 0);
+        }
+
+        private void ShowHelpWindow()
+        {
+            // don't open multiple windows
+            if (Application.Current.Windows.OfType<HelpView>().Any())
+                return;
+
+            // keeping the same viewmodel means user settings are preserved
+            var window = new HelpView()
+            {
+                DataContext = new HelpViewModel()
+            };
+
+            window.Show();
         }
 
         private async void FindSimilar()
@@ -107,6 +124,7 @@ namespace DupFinderApp.ViewModels
         public ICommand FindSimilarImages { get; }
         public ICommand MoveImages { get; }
         public ICommand ShowOptions { get; }
+        public ICommand ShowHelp { get; }
 
         #endregion
 
