@@ -32,16 +32,12 @@ namespace DupFinderCore
             .Select(pair => Task.Run(() => Compare(pair.Item1, pair.Item2)))
             .ToList();
 
-            var totalTasks = tasks.Count;
-
-            int total = 0;
-            while (tasks.Any())
+            foreach (var task in tasks)
             {
-                var finishedTask = await Task.WhenAny(tasks);
-                tasks.Remove(finishedTask);
+                await task;
 
-                total++;
-                progress?.Report(new PercentageProgress() { TotalImages = totalTasks, AmountDone = total });
+                // todo why doesn't this report progress accurately?
+                progress?.Report(new PercentageProgress() { TotalImages = tasks.Count, AmountDone = SimilarImages.Count });
             }
 
             _logger.Information($"Pairs found: {SimilarImages.Count}");
@@ -75,6 +71,7 @@ namespace DupFinderCore
             }
 
             // images are similar
+            _logger.Information($"Pair found: {left.Filename} and {right.Filename}");
             SimilarImages.Add((left, right));
         }
 
