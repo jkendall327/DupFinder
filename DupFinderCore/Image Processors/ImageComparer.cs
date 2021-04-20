@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,11 +12,13 @@ namespace DupFinderCore
         public List<IEntry> Trash { get; set; } = new List<IEntry>();
         public List<IEntry> Unsure { get; set; } = new List<IEntry>();
 
-        private readonly IImageComparisonRuleset _ruleset;
+        private IImageComparisonRuleset _ruleset { get; }
+        private ILogger _logger { get; }
 
-        public ImageComparer(IImageComparisonRuleset ruleset)
+        public ImageComparer(IImageComparisonRuleset ruleset, ILogger logger)
         {
             _ruleset = ruleset ?? throw new ArgumentNullException(nameof(ruleset));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public void Compare(IEnumerable<(IEntry left, IEntry right)> pairs)
@@ -43,6 +46,8 @@ namespace DupFinderCore
             {
                 Unsure.Add(pair.left);
                 Unsure.Add(pair.right);
+                _logger.Information($"Images {pair.left.Filename} and {pair.right.Filename} could not be judged conclusively. Both moved to 'Unsure' folder.");
+
                 return;
             }
 
@@ -79,18 +84,24 @@ namespace DupFinderCore
             {
                 Unsure.Add(pair.left);
                 Unsure.Add(pair.right);
+                _logger.Information($"Images {pair.left.Filename} and {pair.right.Filename} could not be judged conclusively. Both moved to 'Unsure' folder.");
+
                 return;
             }
             if (highest == leftWins)
             {
                 Keep.Add(pair.left);
                 Trash.Add(pair.right);
+                _logger.Information($"Image {pair.left.Filename} deemed superior over {pair.right.Filename}.");
+
                 return;
             }
             if (highest == rightWins)
             {
                 Keep.Add(pair.right);
                 Trash.Add(pair.left);
+                _logger.Information($"Image {pair.right.Filename} deemed superior over {pair.left.Filename}.");
+
                 return;
             }
         }
