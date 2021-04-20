@@ -46,7 +46,7 @@ namespace DupFinderCore
             {
                 Unsure.Add(pair.left);
                 Unsure.Add(pair.right);
-                _logger.Information($"Images {pair.left.Filename} and {pair.right.Filename} could not be judged conclusively. Both moved to 'Unsure' folder.");
+                _logger.Information($"Images {pair.left.TruncatedFilename} and {pair.right.TruncatedFilename} could not be judged conclusively. Both moved to 'Unsure' folder.");
 
                 return;
             }
@@ -84,7 +84,7 @@ namespace DupFinderCore
             {
                 Unsure.Add(pair.left);
                 Unsure.Add(pair.right);
-                _logger.Information($"Images {pair.left.Filename} and {pair.right.Filename} could not be judged conclusively. Both moved to 'Unsure' folder.");
+                _logger.Information($"Images {pair.left.TruncatedFilename} and {pair.right.TruncatedFilename} could not be judged conclusively. Both moved to 'Unsure' folder.");
 
                 return;
             }
@@ -92,7 +92,7 @@ namespace DupFinderCore
             {
                 Keep.Add(pair.left);
                 Trash.Add(pair.right);
-                _logger.Information($"Image {pair.left.Filename} deemed superior over {pair.right.Filename}.");
+                _logger.Information($"Image {pair.left.TruncatedFilename} deemed superior over {pair.right.TruncatedFilename}.");
 
                 return;
             }
@@ -100,7 +100,7 @@ namespace DupFinderCore
             {
                 Keep.Add(pair.right);
                 Trash.Add(pair.left);
-                _logger.Information($"Image {pair.right.Filename} deemed superior over {pair.left.Filename}.");
+                _logger.Information($"Image {pair.right.TruncatedFilename} deemed superior over {pair.left.TruncatedFilename}.");
 
                 return;
             }

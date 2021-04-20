@@ -21,6 +21,7 @@ namespace DupFinderCore
         public FileInfo OriginalFile { get; set; }
         public string FullPath => OriginalFile.FullName;
         public string Filename => Path.GetFileName(FullPath);
+        public string TruncatedFilename => Filename.Substring(0, 40) + "...";
         public long Size => OriginalFile.Length;
         public DateTime Date => OriginalFile.CreationTimeUtc;
 

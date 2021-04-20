@@ -71,7 +71,7 @@ namespace DupFinderCore
             }
 
             // images are similar
-            _logger.Information($"Pair found: {left.Filename} and {right.Filename}");
+            _logger.Information($"Pair found: {left.TruncatedFilename} and {right.TruncatedFilename}");
             SimilarImages.Add((left, right));
         }
 

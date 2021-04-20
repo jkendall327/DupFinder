@@ -35,6 +35,11 @@ namespace DupFinderCore
         string Filename { get; }
 
         /// <summary>
+        /// The image's filename, truncated for legibility.
+        /// </summary>
+        string TruncatedFilename { get; }
+
+        /// <summary>
         /// The date of the image's creation.
         /// </summary>
         DateTime Date { get; }
