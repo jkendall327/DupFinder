@@ -9,7 +9,8 @@ Planned features:
 
 Known bugs/points to improve:
 * Lack of unit tests.
-* The logbox is hard to read because filenames aren't truncated.
+* Possible concurrency errors and race conditions (joy!)
+* The 'Process Images' button becomes active as soon as any images are loaded and not when the entire set is loaded.
 * The logbox doesn't automatically scroll when new entires are added.
 * The program has no icon.
 * All pairs are marked as 'Unsure'.
