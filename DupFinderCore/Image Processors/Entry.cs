@@ -31,7 +31,7 @@ namespace DupFinderCore
 
             OriginalFile = new(filepath);
 
-            var image = Image.FromFile(filepath);
+            using var image = Image.FromFile(filepath);
 
             Pixels = image.Width * image.Height;
             AspectRatio = image.Width / image.Height;
@@ -47,11 +47,5 @@ namespace DupFinderCore
         }
 
         public override string ToString() => Filename;
-
-        public void Dispose()
-        {
-            ColorMap.Dispose();
-            FocusedColorMap.Dispose();
-        }
     }
 }

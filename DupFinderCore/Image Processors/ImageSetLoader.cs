@@ -17,19 +17,19 @@ namespace DupFinderCore
 
         readonly ConcurrentBag<IEntry> Entries = new();
 
-        public async Task<ConcurrentBag<IEntry>> LoadImages(DirectoryInfo directory)
-        {
-            Entries.Clear();
+        //public async Task<ConcurrentBag<IEntry>> LoadImages(DirectoryInfo directory)
+        //{
+        //    Entries.Clear();
 
-            var tasks = GetFiles(directory)
-                .Where(file => file.Exists)
-                .Where(file => file.IsImage())
-                .Select(file => Task.Run(() => Entries.Add(new Entry(file.FullName))));
+        //    var tasks = GetFiles(directory)
+        //        .Where(file => file.Exists)
+        //        .Where(file => file.IsImage())
+        //        .Select(file => Task.Run(() => Entries.Add(new Entry(file.FullName))));
 
-            await Task.WhenAll(tasks);
+        //    await Task.WhenAll(tasks);
 
-            return Entries;
-        }
+        //    return Entries;
+        //}
 
         public async Task<ConcurrentBag<IEntry>> LoadImages(DirectoryInfo directory, IProgress<PercentageProgress> imageLoadProgress)
         {
