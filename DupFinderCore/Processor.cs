@@ -45,7 +45,7 @@ namespace DupFinderCore
             Pairs = await _finder.FindPairs(Targets, progress);
         }
 
-        public void FindBetterImages()
+        public int FindBetterImages()
         {
             _comparer.Compare(Pairs);
             string path = BaseFolder?.FullName + Path.DirectorySeparatorChar;
@@ -57,6 +57,8 @@ namespace DupFinderCore
             Move(_comparer.Keep, new DirectoryInfo(path + "Keep"));
             Move(_comparer.Trash, new DirectoryInfo(path + "Trash"));
             Move(_comparer.Unsure, new DirectoryInfo(path + "Unsure"));
+
+            return _comparer.Keep.Count + _comparer.Trash.Count + _comparer.Unsure.Count;
         }
 
         private void Move(IEnumerable<IEntry> images, DirectoryInfo destination)

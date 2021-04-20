@@ -46,7 +46,7 @@ namespace DupFinderApp.ViewModels
             FindSimilarImages = new CommandHandler(FindSimilar, () => LoadedImages > 0);
 
             MoveImages = new CommandHandler(
-                () => _processor.FindBetterImages(),
+                () => MovedImages = _processor.FindBetterImages(),
                 () => SimilarImages > 0);
         }
 
