@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:viewmodels="clr-namespace:DupFinderApp.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:MainWindowViewModel}"
         mc:Ignorable="d"
         Title="MainWindow" Height="500" Width="800">
     
@@ -22,19 +22,19 @@
         </Style>
     </Window.Resources>
     <Window.InputBindings>
-        <KeyBinding Command="{Binding Path=ChooseDirectory}" 
+        <KeyBinding Command="{Binding Path=ChooseDirectoryCommand}" 
                 Key="O" 
                 Modifiers="Control"/>
-        <KeyBinding Command="{Binding Path=LoadImages}" 
+        <KeyBinding Command="{Binding Path=LoadImagesCommand}" 
                 Key="L" 
                 Modifiers="Control"/>
-        <KeyBinding Command="{Binding Path=FindSimilarImages}" 
+        <KeyBinding Command="{Binding Path=FindSimilarImagesCommand}" 
                 Key="P" 
                 Modifiers="Control"/>
-        <KeyBinding Command="{Binding Path=MoveImages}" 
+        <KeyBinding Command="{Binding Path=MoveImagesCommand}" 
                 Key="M" 
                 Modifiers="Control"/>
-        <KeyBinding Command="{Binding Path=ShowOptions}" 
+        <KeyBinding Command="{Binding Path=ShowOptionsCommand}" 
                 Key="Esc" />
     </Window.InputBindings>
     <StackPanel Orientation="Vertical">
@@ -42,34 +42,32 @@
         <Label FontSize="40">Duplicate image finder</Label>
 
         <StackPanel>
-            <Button Command="{Binding Path=ChooseDirectory}">Choose Directory</Button>
+            <Button Command="{Binding Path=ChooseDirectoryCommand}">Choose Directory</Button>
             <Label>Chosen folder:</Label>
             <Label Content="{Binding SelectedPath}"/>
         </StackPanel>
 
         <StackPanel>
-            <Button Command="{Binding Path=LoadImages}">Load Images</Button>
+            <Button Command="{Binding Path=LoadImagesCommand}">Load Images</Button>
             <Label Content="Loaded Images:"/>
             <Label Content="{Binding LoadedImages}"/>
-            <ProgressBar Value="{Binding LoadedImagesPercentage}" MinWidth="200" Margin="20 10 10 10"></ProgressBar>
         </StackPanel>
 
         <StackPanel>
-            <Button Content="Process Images" Command="{Binding Path=FindSimilarImages}"/>
+            <Button Content="Process Images" Command="{Binding Path=FindSimilarImagesCommand}"/>
             <Label>Pairs found:</Label>
             <Label Margin="0 0 20 0" Content="{Binding SimilarImages}"/>
-            <ProgressBar Value="{Binding SimilarImagesPercentage}" MinWidth="200" Margin="20 10 10 10"></ProgressBar>
         </StackPanel>
 
         <StackPanel>
-            <Button Content="Move Images" Command="{Binding Path=MoveImages}"/>
+            <Button Content="Move Images" Command="{Binding Path=MoveImagesCommand}"/>
             <Label>Images moved:</Label>
             <Label Content="{Binding MovedImages}"/>
         </StackPanel>
 
         <StackPanel>
-            <Button Content="Options" Command="{Binding Path=ShowOptions}"/>
-            <Button Content="Help" HorizontalAlignment="Right" Command="{Binding Path=ShowHelp}"></Button>
+            <Button Content="Options" Command="{Binding Path=ShowOptionsCommand}"/>
+            <Button Content="Help" HorizontalAlignment="Right" Command="{Binding Path=ShowHelpCommand}"></Button>
         </StackPanel>
 
         <ListBox x:Name="listBox" Margin="10" Height="80" ItemsSource="{Binding Logger}" ScrollViewer.VerticalScrollBarVisibility="Visible"/>

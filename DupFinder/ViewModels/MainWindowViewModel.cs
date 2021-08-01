@@ -1,12 +1,11 @@
-﻿using DupFinderApp.Commands;
-using DupFinderApp.Views;
-using DupFinderCore;
+﻿using DupFinderCore;
+using Microsoft.Toolkit.Mvvm.Input;
 using Serilog;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System.Linq;
-using System.Windows;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace DupFinderApp.ViewModels
@@ -15,140 +14,113 @@ namespace DupFinderApp.ViewModels
     {
         private readonly Processor _processor;
 
-        private OptionsViewModel _optionsViewModel;
-        public OptionsViewModel OptionsWindow { get => _optionsViewModel; set => SetProperty(ref _optionsViewModel, value); }
+        public event EventHandler? ShowHelpWindowRequested;
+        public event EventHandler? ShowOptionsWindowRequested;
+        public event EventHandler? ShowDirectoryDialogueRequested;
 
         /// <summary>
         /// A sink for the <see cref="ILogger"/> that the UI binds to.
         /// </summary>
         public ObservableCollection<string> Logger { get; set; }
 
-        public MainWindowViewModel(Processor processor, OptionsViewModel optionsViewModel, ObservableCollection<string> _log)
+        public ICommand ChooseDirectoryCommand { get; }
+        public ICommand LoadImagesCommand { get; }
+        public ICommand FindSimilarImagesCommand { get; }
+        public ICommand MoveImagesCommand { get; }
+        public ICommand ShowOptionsCommand { get; }
+        public ICommand ShowHelpCommand { get; }
+
+        public MainWindowViewModel(Processor processor, ObservableCollection<string> _log)
         {
-            _processor = processor ?? throw new ArgumentNullException(nameof(processor));
+            _processor = processor;
+            Logger = _log;
 
-            _optionsViewModel = optionsViewModel ?? throw new ArgumentNullException(nameof(optionsViewModel));
+            ChooseDirectoryCommand = new RelayCommand(() => InvokeAndUpdate(ShowDirectoryDialogueRequested!));
+            ShowOptionsCommand = new RelayCommand(() => InvokeAndUpdate(ShowOptionsWindowRequested!));
+            ShowHelpCommand = new RelayCommand(() => InvokeAndUpdate(ShowHelpWindowRequested!));
 
-            Logger = _log ?? throw new ArgumentNullException(nameof(_log));
+            LoadImagesCommand = new AsyncRelayCommand(LoadImages, () => Directory.Exists(SelectedPath));
+            FindSimilarImagesCommand = new AsyncRelayCommand(FindSimilarImages, () => LoadedImages > 0);
+            MoveImagesCommand = new RelayCommand(MoveImages, () => SimilarImages > 0);
 
-            // wire up commands
-            ChooseDirectory = new CommandHandler(OpenDirectoryDialogue);
-            ShowOptions = new CommandHandler(ShowOptionsWindow);
-            ShowHelp = new CommandHandler(ShowHelpWindow);
-
-            var ImageLoadProgress = new Progress<PercentageProgress>();
-            ImageLoadProgress.ProgressChanged += ImageLoadProgress_ProgressChanged;
-
-            LoadImages = new CommandHandler(
-                async () => LoadedImages = await _processor.LoadImages(new DirectoryInfo(SelectedPath), ImageLoadProgress),
-                () => Directory.Exists(SelectedPath));
-
-            FindSimilarImages = new CommandHandler(FindSimilar, () => LoadedImages > 0);
-
-            MoveImages = new CommandHandler(
-                () => MovedImages = _processor.FindBetterImages(),
-                () => SimilarImages > 0);
-        }
-
-        private void ShowHelpWindow()
-        {
-            // don't open multiple windows
-            if (Application.Current.Windows.OfType<HelpView>().Any())
-                return;
-
-            // keeping the same viewmodel means user settings are preserved
-            var window = new HelpView()
+            Commands = new(6)
             {
-                DataContext = new HelpViewModel()
+                ChooseDirectoryCommand,
+                ShowOptionsCommand,
+                ShowHelpCommand,
+                LoadImagesCommand,
+                FindSimilarImagesCommand,
+                MoveImagesCommand
             };
-
-            window.Show();
         }
 
-        private async void FindSimilar()
-        {
-            var SimilarImageProgress = new Progress<PercentageProgress>();
-            SimilarImageProgress.ProgressChanged += SimilarImageProgress_ProgressChanged;
+        private readonly List<ICommand> Commands = new();
 
-            await _processor.FindSimilarImages(SimilarImageProgress);
+        private void UpdateAllCommands()
+        {
+            foreach (ICommand? command in Commands)
+            {
+                if (command is not RelayCommand r)
+                {
+                    continue;
+                }
+
+                r.NotifyCanExecuteChanged();
+            }
+        }
+
+        private async Task LoadImages()
+        {
+            var baseFolder = new DirectoryInfo(SelectedPath);
+            LoadedImages = await _processor.LoadImages(baseFolder);
+            UpdateAllCommands();
+        }
+
+        private async Task FindSimilarImages()
+        {
+            await _processor.FindSimilarImages();
             SimilarImages = _processor.Pairs.Count;
+            UpdateAllCommands();
+        }
+
+        private void MoveImages()
+        {
+            MovedImages = _processor.FindBetterImages();
+            UpdateAllCommands();
+        }
+
+        private void InvokeAndUpdate(EventHandler e)
+        {
+            e?.Invoke(this, EventArgs.Empty);
+            UpdateAllCommands();
         }
 
         private string selectedPath = string.Empty;
         public string SelectedPath
-        { get => selectedPath; set => SetProperty(ref selectedPath, value); }
-
-        #region Finding Similar Images
+        {
+            get => selectedPath;
+            set => SetProperty(ref selectedPath, value);
+        }
 
         private int similarImages;
         public int SimilarImages
-        { get => similarImages; set => SetProperty(ref similarImages, value); }
-
-        private int similarImagesPercentage;
-        public int SimilarImagesPercentage
-        { get => similarImagesPercentage; set => SetProperty(ref similarImagesPercentage, value); }
-
-        private void SimilarImageProgress_ProgressChanged(object? sender, PercentageProgress e)
         {
-            SimilarImagesPercentage = e.PercentageDone;
+            get => similarImages;
+            set => SetProperty(ref similarImages, value);
         }
-
-        #endregion
-
-        #region Loading Images
 
         private int loadedImages;
         public int LoadedImages
-        { get => loadedImages; set => SetProperty(ref loadedImages, value); }
-
-        private int loadedImagesPercentage;
-        public int LoadedImagesPercentage
-        { get => loadedImagesPercentage; set => SetProperty(ref loadedImagesPercentage, value); }
-
-        private void ImageLoadProgress_ProgressChanged(object? sender, PercentageProgress e)
         {
-            LoadedImagesPercentage = e.PercentageDone;
-            LoadedImages = e.AmountDone;
+            get => loadedImages;
+            set => SetProperty(ref loadedImages, value);
         }
-
-        #endregion
 
         private int movedImages;
         public int MovedImages
-        { get => movedImages; set => SetProperty(ref movedImages, value); }
-
-        #region Commands
-
-        public ICommand ChooseDirectory { get; }
-        public ICommand LoadImages { get; }
-        public ICommand FindSimilarImages { get; }
-        public ICommand MoveImages { get; }
-        public ICommand ShowOptions { get; }
-        public ICommand ShowHelp { get; }
-
-        #endregion
-
-        private void ShowOptionsWindow()
         {
-            // don't open multiple windows
-            if (Application.Current.Windows.OfType<OptionsView>().Any())
-                return;
-
-            // keeping the same viewmodel means user settings are preserved
-            var window = new OptionsView(_optionsViewModel)
-            {
-                DataContext = OptionsWindow
-            };
-
-            window.Show();
-        }
-
-        private void OpenDirectoryDialogue()
-        {
-            var folderDialog = new Ookii.Dialogs.Wpf.VistaFolderBrowserDialog();
-            if (folderDialog.ShowDialog() != true) return;
-
-            SelectedPath = folderDialog.SelectedPath;
+            get => movedImages;
+            set => SetProperty(ref movedImages, value);
         }
     }
 }
