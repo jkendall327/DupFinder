@@ -69,29 +69,38 @@ namespace DupFinderApp.ViewModels
             }
         }
 
+        private DirectoryInfo BaseFolder => new DirectoryInfo(SelectedPath);
+
         private async Task LoadImages()
         {
-            var baseFolder = new DirectoryInfo(SelectedPath);
-            LoadedImages = await _processor.LoadImages(baseFolder);
+            await _processor.LoadImages(BaseFolder);
+            LoadedImages = _processor.Targets.Count;
+
             UpdateAllCommands();
         }
 
         private async Task FindSimilarImages()
         {
-            await _processor.FindSimilarImages();
+            await _processor.FindSimilarImages(_processor.Targets);
             SimilarImages = _processor.Pairs.Count;
+
             UpdateAllCommands();
         }
 
         private void MoveImages()
         {
-            MovedImages = _processor.FindBetterImages();
+            _processor.CompareImages(_processor.Pairs);
+            _processor.MoveImages(BaseFolder);
+
+            MovedImages = _processor.MovedImageCount;
+
             UpdateAllCommands();
         }
 
         private void InvokeAndUpdate(EventHandler e)
         {
             e?.Invoke(this, EventArgs.Empty);
+
             UpdateAllCommands();
         }
 

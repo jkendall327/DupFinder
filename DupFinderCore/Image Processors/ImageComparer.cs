@@ -17,17 +17,12 @@ namespace DupFinderCore
 
         public ImageComparer(IImageComparisonRuleset ruleset, ILogger logger)
         {
-            _ruleset = ruleset ?? throw new ArgumentNullException(nameof(ruleset));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _ruleset = ruleset;
+            _logger = logger;
         }
 
         public void Compare(IEnumerable<(IEntry left, IEntry right)> pairs)
         {
-            if (pairs is null)
-            {
-                throw new ArgumentNullException(nameof(pairs));
-            }
-
             Keep.Clear();
             Trash.Clear();
             Unsure.Clear();
@@ -36,16 +31,26 @@ namespace DupFinderCore
 
             foreach (var pair in pairs)
             {
-                DetermineJudgement(pair);
+                Judge(pair);
             }
         }
 
-        private void DetermineJudgement((IEntry left, IEntry right) pair)
+        private bool DetermineUnsure(IEntry left, IEntry right)
+        {
+            var aspectRatioDifference = Math.Abs(left.AspectRatio - right.AspectRatio);
+            var pixelDifference = Math.Abs(((double)left.Pixels / right.Pixels) - 1d);
+            var sizeDifference = Math.Abs(((double)left.Size / right.Size) - 1d);
+
+            return Math.Abs(pixelDifference - sizeDifference) >= 1 || aspectRatioDifference > 0.05;
+        }
+
+        private void Judge((IEntry left, IEntry right) pair)
         {
             if (DetermineUnsure(pair.left, pair.right))
             {
                 Unsure.Add(pair.left);
                 Unsure.Add(pair.right);
+
                 _logger.Information($"Images {pair.left.TruncatedFilename} and {pair.right.TruncatedFilename} could not be judged conclusively. Both moved to 'Unsure' folder.");
 
                 return;
@@ -55,9 +60,10 @@ namespace DupFinderCore
             int rightWins = 0;
             int unsure = 0;
 
-            foreach (var Rule in _ruleset.Rules)
+            foreach (var Test in _ruleset.Rules)
             {
-                var judgement = Rule(pair.left, pair.right);
+                var judgement = Test(pair.left, pair.right);
+
                 switch (judgement)
                 {
                     case Judgement.Left:
@@ -76,15 +82,11 @@ namespace DupFinderCore
 
             var highest = new List<int>() { leftWins, rightWins, unsure }.Max();
 
-            // if two sides have the same amount of wins, it will default to unsure
-            // and then to left, and then to right
-            // this is arbitrary
-
             if (highest == unsure)
             {
                 Unsure.Add(pair.left);
                 Unsure.Add(pair.right);
-                _logger.Information($"Images {pair.left.TruncatedFilename} and {pair.right.TruncatedFilename} could not be judged conclusively. Both moved to 'Unsure' folder.");
+                _logger.Information($"{pair.left.TruncatedFilename} and {pair.right.TruncatedFilename} comparison inconclusive.");
 
                 return;
             }
@@ -92,7 +94,7 @@ namespace DupFinderCore
             {
                 Keep.Add(pair.left);
                 Trash.Add(pair.right);
-                _logger.Information($"Image {pair.left.TruncatedFilename} deemed superior over {pair.right.TruncatedFilename}.");
+                _logger.Information($"{pair.left.TruncatedFilename} better than {pair.right.TruncatedFilename}.");
 
                 return;
             }
@@ -100,19 +102,10 @@ namespace DupFinderCore
             {
                 Keep.Add(pair.right);
                 Trash.Add(pair.left);
-                _logger.Information($"Image {pair.right.TruncatedFilename} deemed superior over {pair.left.TruncatedFilename}.");
+                _logger.Information($"{pair.right.TruncatedFilename} better than {pair.left.TruncatedFilename}.");
 
                 return;
             }
-        }
-
-        private bool DetermineUnsure(IEntry left, IEntry right)
-        {
-            var aspectRatioDifference = Math.Abs(left.AspectRatio - right.AspectRatio);
-            var pixelDifference = Math.Abs(((double)left.Pixels / right.Pixels) - 1d);
-            var sizeDifference = Math.Abs(((double)left.Size / right.Size) - 1d);
-
-            return Math.Abs(pixelDifference - sizeDifference) >= 1 || aspectRatioDifference > 0.05;
         }
     }
 }

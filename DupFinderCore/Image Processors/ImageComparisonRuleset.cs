@@ -24,12 +24,14 @@ namespace DupFinderCore
     /// <inheritdoc cref="IImageComparisonRuleset"/>
     public class ImageComparisonRuleset : IImageComparisonRuleset
     {
-        public List<Func<IEntry, IEntry, Judgement>> Rules { get; private set; } = new List<Func<IEntry, IEntry, Judgement>>();
+        public List<Func<IEntry, IEntry, Judgement>> Rules { get; private set; } = new();
 
         private readonly UserSettings _settings;
 
         public ImageComparisonRuleset(UserSettings settings)
-            => _settings = settings;
+        {
+            _settings = settings;
+        }
 
         private Judgement ComparePixels(IEntry left, IEntry right)
         {
@@ -51,57 +53,40 @@ namespace DupFinderCore
 
         private enum Order { Biggest, Smallest }
 
-        private Judgement CompareByProperty<T>(IEntry left, IEntry right, Func<IEntry, T> propertyToCompare, Order order)
+        private static Judgement CompareByProperty<T>(IEntry left, IEntry right, Func<IEntry, T> property, Order order)
         {
-            // evaluate the properties so we can compare for equality
-            T leftProperty = propertyToCompare(left);
-            T rightProperty = propertyToCompare(right);
+            // evaluate properties
+            T leftProperty = property(left);
+            T rightProperty = property(right);
 
-            // check if the two entries have the same value for the given property
             if (EqualityComparer<T>.Default.Equals(leftProperty, rightProperty))
             {
+                // both have same value for given property
                 return Judgement.Unsure;
             }
 
             IEnumerable<IEntry> list = new List<IEntry>() { left, right };
 
-            // inject the property to compare
-            // decide whether to find the smallest or biggest value by switching on order
             list = order switch
             {
-                Order.Smallest => list.OrderBy(propertyToCompare),
-                Order.Biggest => list.OrderByDescending(propertyToCompare),
-                _ => list.OrderByDescending(propertyToCompare),
+                Order.Smallest => list.OrderBy(property),
+                _ => list.OrderByDescending(property),
             };
 
             var winner = list.First();
 
-            if (winner == left)
-            {
-                return Judgement.Left;
-            }
-            if (winner == right)
-            {
-                return Judgement.Right;
-            }
-
+            if (winner == left) return Judgement.Left;
+            if (winner == right) return Judgement.Right;
             return Judgement.Unsure;
         }
 
         public void Configure()
         {
-            if (_settings.CompareByDate)
-            {
-                Rules.Add(CompareDate);
-            }
-            if (_settings.CompareByPixels)
-            {
-                Rules.Add(ComparePixels);
-            }
-            if (_settings.CompareBySize)
-            {
-                Rules.Add(CompareSize);
-            }
+            if (_settings.CompareByDate) Rules.Add(CompareDate);
+            
+            if (_settings.CompareByPixels) Rules.Add(ComparePixels);
+            
+            if (_settings.CompareBySize) Rules.Add(CompareSize);
         }
     }
 }

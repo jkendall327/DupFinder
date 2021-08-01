@@ -3,6 +3,7 @@ using Serilog;
 using Shipwreck.Phash;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -11,54 +12,58 @@ namespace DupFinderCore
     /// <inheritdoc cref="IPairFinder"/>
     public class PairFinder
     {
-        private readonly ConcurrentBag<(IEntry, IEntry)> SimilarImages = new();
-
-        private readonly double regularLimit = 99.999;
-
         private readonly IConfiguration _config;
         private readonly ILogger _logger;
 
         public PairFinder(IConfiguration config, ILogger logger)
         {
-            _config = config ?? throw new ArgumentNullException(nameof(config));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _config = config;
+            _logger = logger;
         }
+        private static double TruncatedPercentage(double input) => Math.Truncate(input * 10 / 10);
 
-        public async Task<ConcurrentBag<(IEntry, IEntry)>> FindPairs(ConcurrentBag<IEntry> images, IProgress<PercentageProgress>? progress = null)
+        public async Task<ConcurrentBag<(IEntry, IEntry)>> FindPairs(IEnumerable<IEntry> images)
         {
-            SimilarImages.Clear();
+            ConcurrentBag<(IEntry, IEntry)> similarImages = new();
 
-            var tasks = images.UniquePairs()
-            .Select(pair => Task.Run(() => Compare(pair.Item1, pair.Item2)))
-            .ToList();
-
-            foreach (var task in tasks)
+            IEnumerable<Task> tasks = images.UniquePairs()
+            .Select(pair =>
             {
-                await task;
+                void compare()
+                {
+                    if (!AreSimilar(pair.Item1, pair.Item2)) return;
+                    
+                    similarImages.Add((pair.Item1, pair.Item2));
+                    _logger.Information($"Pair found: {pair}");
+                }
 
-                // todo why doesn't this report progress accurately?
-                progress?.Report(new PercentageProgress() { TotalImages = tasks.Count, AmountDone = SimilarImages.Count });
-            }
+                return Task.Run(compare);
+            });
 
-            _logger.Information($"Pairs found: {SimilarImages.Count}");
+            await Task.WhenAll(tasks);
 
-            return SimilarImages;
+            _logger.Information($"Pairs found: {similarImages.Count}");
+
+            return similarImages;
         }
 
-        private void Compare(IEntry left, IEntry right)
+        private readonly double regularLimit = 99.999;
+        private readonly double phashLimit = 0.86;
+
+        private bool AreSimilar(IEntry left, IEntry right)
         {
             // generate phash for initial check
             var phash = ImagePhash.GetCrossCorrelation(left.Hash, right.Hash);
 
-            if (phash < 0.86)
-                return;
+            if (phash < phashLimit)
+                return false;
 
             // generate euclidian distance for more detailed check
             var euclidianDistance = left.ColorMap.CompareWith(right.ColorMap);
 
             // distance is below arbitrary threshold
             if (euclidianDistance < TruncatedPercentage(regularLimit))
-                return;
+                return false;
 
             if (_config.GetValue<bool>("WeightedImageComparison"))
             {
@@ -67,15 +72,11 @@ namespace DupFinderCore
                 var averageDistance = (euclidianDistance + focusedDistance) / 2;
 
                 if (averageDistance < regularLimit)
-                    return;
+                    return false;
             }
 
-            // images are similar
             _logger.Information($"Pair found: {left.TruncatedFilename} and {right.TruncatedFilename}");
-            SimilarImages.Add((left, right));
+            return true;
         }
-
-        private double TruncatedPercentage(double input)
-            => Math.Truncate(input * 10 / 10);
     }
 }

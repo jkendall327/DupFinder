@@ -12,81 +12,53 @@ namespace DupFinderCore
     /// <inheritdoc cref="IImageSetLoader"/> 
     public class ImageSetLoader
     {
-        readonly ILogger _logger;
-        public ImageSetLoader(ILogger logger) => _logger = logger;
+        private readonly ILogger _logger;
 
-        readonly ConcurrentBag<IEntry> Entries = new();
-
-        //public async Task<ConcurrentBag<IEntry>> LoadImages(DirectoryInfo directory)
-        //{
-        //    Entries.Clear();
-
-        //    var tasks = GetFiles(directory)
-        //        .Where(file => file.Exists)
-        //        .Where(file => file.IsImage())
-        //        .Select(file => Task.Run(() => Entries.Add(new Entry(file.FullName))));
-
-        //    await Task.WhenAll(tasks);
-
-        //    return Entries;
-        //}
-
-        public async Task<ConcurrentBag<IEntry>> LoadImages(DirectoryInfo directory, IProgress<PercentageProgress> imageLoadProgress)
+        public ImageSetLoader(ILogger logger)
         {
-            Entries.Clear();
+            _logger = logger;
+        }
 
-            var tasks = GetFiles(directory)
-                .Where(file => file.Exists)
-                .Where(file => file.IsImage())
-                .ToList();
+        public async Task<ConcurrentBag<IEntry>> LoadImages(DirectoryInfo directory)
+        {
+            ConcurrentBag<IEntry> entries = new();
 
-            foreach (var item in tasks)
-            {
-                await Task.Run(() => Entries.Add(new Entry(item.FullName)));
-                imageLoadProgress.Report(new PercentageProgress { TotalImages = tasks.Count(), AmountDone = Entries.Count });
-            }
+            IEnumerable<Task> tasks = 
+                GetFiles(directory)
+                .Select(x =>
+                {
+                    void create()
+                    {
+                        entries.Add(new Entry(x.FullName));
+                        _logger.Debug($"Created new entry from {x.Name}");
+                    }
 
-            return Entries;
+                    return Task.Run(create);
+                });
+
+            await Task.WhenAll(tasks);
+
+            return entries;
         }
 
         private IEnumerable<FileInfo> GetFiles(DirectoryInfo directory)
         {
-            if (directory is null)
-            {
-                _logger.Warning($"{nameof(directory)} was null.");
-                return Enumerable.Empty<FileInfo>();
-            }
-
-            ParallelQuery<FileInfo> files;
-
             try
             {
-                files = directory
+                ParallelQuery<FileInfo>? files = directory
                     .EnumerateFiles("*.*", SearchOption.TopDirectoryOnly)
+                    .Where(file => file.IsImage())
                     .AsParallel();
+
+                _logger.Debug($"Loaded {files.Count()} files from {directory.FullName}.");
+
+                return files;
             }
-            catch (DirectoryNotFoundException ex)
+            catch (Exception ex)
             {
-                _logger.Error($"Directory not found: {directory.Name}");
-                _logger.Error(ex.StackTrace);
+                _logger.Error(ex, $"Exception when processing {directory.Name}.");
                 return Enumerable.Empty<FileInfo>();
             }
-            catch (SecurityException ex)
-            {
-                _logger.Error($"Security exception when processing {directory.Name}.");
-                _logger.Error(ex.StackTrace);
-                return Enumerable.Empty<FileInfo>();
-            }
-
-            if (!files.Any())
-            {
-                _logger.Debug($"{directory.Name} was empty.");
-                return Enumerable.Empty<FileInfo>();
-            }
-
-            _logger.Debug($"Loading files from {directory.FullName}...");
-
-            return files;
         }
     }
 }

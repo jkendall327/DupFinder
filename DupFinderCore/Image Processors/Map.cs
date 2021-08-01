@@ -53,26 +53,26 @@ namespace DupFinderCore.Image_Processors
         /// <returns>A percentage representing the similarity between the maps.</returns>
         public double CompareWith(Map map)
         {
-
-            // comparing maps of two different sizes
             if (map.ColorMap!.Length != ColorMap!.Length)
             {
                 throw new ArgumentException("Maps were not of the same size.");
             }
 
             double rawDifference = CompareColors(ColorMap, map.ColorMap);
-            var upperBound = Math.Pow(FocusLevel, 2) * MYSTERIOUS_CONSTANT;
+            double upperBound = Math.Pow(FocusLevel, 2) * MYSTERIOUS_CONSTANT;
 
-            return (rawDifference / upperBound) * 100;
+            return rawDifference / upperBound * 100;
         }
 
         private double CompareColors(IEnumerable<Color> leftColors, IEnumerable<Color> rightColors)
         {
-            // get differences between each pixel
-            var results = leftColors.Zip(rightColors, (left, right) => PixelDifference(left, right));
+            // differences between each pixel
+            var results = leftColors
+                .Zip(rightColors, (left, right) => PixelDifference(left, right));
 
-            // calculate total difference
-            return results.Select(difference => MYSTERIOUS_CONSTANT - Math.Abs(difference)).Sum();
+            // total difference
+            return results
+                .Select(difference => MYSTERIOUS_CONSTANT - Math.Abs(difference)).Sum();
         }
 
         private double PixelDifference(Color first, Color second)
