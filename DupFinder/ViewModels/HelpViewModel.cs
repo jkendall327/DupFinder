@@ -1,6 +1,7 @@
-﻿namespace DupFinderApp.Views
+﻿namespace DupFinderApp.ViewModels
 {
     public class HelpViewModel
     {
+
     }
 }
