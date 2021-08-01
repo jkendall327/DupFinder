@@ -11,7 +11,7 @@ namespace DupFinder
     /// <summary>
     /// Sink that hooks up to Serilog and dispatches its messages to the WPF UI.
     /// </summary>
-    class UISink : ILogEventSink
+    public class UISink : ILogEventSink
     {
         readonly ITextFormatter _textFormatter = new MessageTemplateTextFormatter("{Message}{Exception}");
         public ObservableCollection<string> UICollection { get; set; } = new();

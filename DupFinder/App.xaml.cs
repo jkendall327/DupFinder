@@ -1,10 +1,10 @@
-﻿using Castle.MicroKernel.Registration;
-using Castle.Windsor;
+﻿using DupFinderApp;
 using DupFinderApp.ViewModels;
 using DupFinderCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
-using System.Collections.ObjectModel;
+using System;
 using System.Windows;
 
 namespace DupFinder
@@ -13,45 +13,51 @@ namespace DupFinder
     {
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            var builder = new ConfigurationBuilder().AddJsonFile("appsettings.json");
-            IConfiguration Configuration = builder.Build();
+            BuildDIContainer().GetRequiredService<MainWindow>().Show();
+        }
+
+        private static IServiceProvider BuildDIContainer()
+        {
+            var ioc = new ServiceCollection();
+
+            IConfiguration config = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
 
             // for logging to the UI
             var sink = new UISink();
 
             ILogger log = new LoggerConfiguration()
-                .ReadFrom.Configuration(Configuration)
+                .ReadFrom.Configuration(config)
                 .WriteTo.Sink(sink)
                 .CreateLogger();
 
             log.Information("Program started.");
 
-            WindsorContainer ioc = BuildDIContainer(log, sink.UICollection, Configuration);
-            var window = ioc.Resolve<MainWindow>();
-            window.Show();
-        }
+            return ioc.AddSingleton(log)
+            .AddSingleton(sink)
 
-        private static WindsorContainer BuildDIContainer(ILogger log, ObservableCollection<string> uiLogger, IConfiguration Configuration)
-        {
-            var ioc = new WindsorContainer();
-            ioc.Register(Component.For<ILogger>().Instance(log));
-            ioc.Register(Component.For<ObservableCollection<string>>().Instance(uiLogger));
-            ioc.Register(Component.For<IConfiguration>().Instance(Configuration));
+            .AddSingleton(config)
 
-            ioc.Register(Component.For<Processor>().ImplementedBy<Processor>());
+            .AddTransient<Processor>()
+            .AddTransient<ImageSetLoader>()
+            .AddTransient<PairFinder>()
+            .AddTransient<IImageComparisonRuleset, ImageComparisonRuleset>()
+            .AddTransient<IImageComparer, ImageComparer>()
 
-            ioc.Register(Component.For<ImageSetLoader>().ImplementedBy<ImageSetLoader>());
-            ioc.Register(Component.For<IImageComparer>().ImplementedBy<ImageComparer>());
-            ioc.Register(Component.For<IImageComparisonRuleset>().ImplementedBy<ImageComparisonRuleset>());
-            ioc.Register(Component.For<PairFinder>().ImplementedBy<PairFinder>());
+            .AddSingleton<UserSettings>()
+            .AddSingleton<OptionsViewModel>()
+            .AddTransient<MainWindow>()
+            .AddTransient<MainWindowViewModel>()
 
-            ioc.Register(Component.For<UserSettings>().ImplementedBy<UserSettings>());
-            ioc.Register(Component.For<OptionsViewModel>().ImplementedBy<OptionsViewModel>());
+            .AddTransient(s =>
+            {
+                return new Func<OptionsView>(() =>
+                {
+                    OptionsViewModel vm = s.GetRequiredService<OptionsViewModel>();
+                    return new OptionsView(vm) { DataContext = vm };
+                });
+            })
 
-            ioc.Register(Component.For<MainWindowViewModel>().ImplementedBy<MainWindowViewModel>());
-            ioc.Register(Component.For<MainWindow>().ImplementedBy<MainWindow>());
-
-            return ioc;
+            .BuildServiceProvider();
         }
     }
 }

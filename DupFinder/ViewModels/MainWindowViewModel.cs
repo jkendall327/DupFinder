@@ -1,4 +1,5 @@
-﻿using DupFinderCore;
+﻿using DupFinder;
+using DupFinderCore;
 using Microsoft.Toolkit.Mvvm.Input;
 using Serilog;
 using System;
@@ -30,10 +31,10 @@ namespace DupFinderApp.ViewModels
         public ICommand ShowOptionsCommand { get; }
         public ICommand ShowHelpCommand { get; }
 
-        public MainWindowViewModel(Processor processor, ObservableCollection<string> _log)
+        public MainWindowViewModel(Processor processor, UISink _log)
         {
             _processor = processor;
-            Logger = _log;
+            Logger = _log.UICollection;
 
             ChooseDirectoryCommand = new RelayCommand(() => InvokeAndUpdate(ShowDirectoryDialogueRequested!));
             ShowOptionsCommand = new RelayCommand(() => InvokeAndUpdate(ShowOptionsWindowRequested!));
