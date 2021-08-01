@@ -5,13 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DupFinderApp.Views"
         mc:Ignorable="d"
+        Background="{StaticResource BackgroundColor}"
         Title="Help" Height="470" Width="700">
     <StackPanel>
         <TextBlock Padding="10 10" HorizontalAlignment="Center">Thanks for using my app. Here is some advice on how to use it.</TextBlock>
 
         <TextBlock FontSize="16" FontWeight="Normal" Padding="10" TextDecorations="Underline">How to use</TextBlock>
 
-        <RichTextBox BorderThickness="0">
+        <RichTextBox BorderThickness="0" Background="{StaticResource BackgroundColor}">
             <FlowDocument>
                 <List>
                     <ListItem>
@@ -40,7 +41,8 @@
         </RichTextBox>
 
         <TextBlock FontSize="16" FontWeight="Normal" Padding="10" TextDecorations="Underline">Keyboard shortcuts:</TextBlock>
-        <RichTextBox BorderThickness="0">
+
+        <RichTextBox Background="{StaticResource BackgroundColor}" BorderThickness="0">
             <FlowDocument>
                 <List>
                     <ListItem>
@@ -57,9 +59,6 @@
                     </ListItem>
                     <ListItem>
                         <Paragraph>Esc: open the options window.</Paragraph>
-                    </ListItem>
-                    <ListItem>
-                        <Paragraph>Ctrl+M: open this window (implement this!).</Paragraph>
                     </ListItem>
                     <ListItem>
                         <Paragraph>Select a directory with images you want to process for duplicates.</Paragraph>

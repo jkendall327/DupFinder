@@ -95,7 +95,7 @@ namespace DupFinderApp.ViewModels
             UpdateAllCommands();
         }
 
-        private string selectedPath = string.Empty;
+        private string selectedPath;
         public string SelectedPath
         {
             get => selectedPath;
