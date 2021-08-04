@@ -1,11 +1,11 @@
-﻿using DupFinderCore.Image_Processors;
+﻿using DupFinderCore.Models;
 using Shipwreck.Phash;
 using Shipwreck.Phash.Bitmaps;
 using System;
 using System.Drawing;
 using System.IO;
 
-namespace DupFinderCore
+namespace DupFinderCore.Models
 {
     /// <inheritdoc cref="IEntry"/>
     public class Entry : IEntry

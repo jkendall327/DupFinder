@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using DupFinderCore.Models;
+using Moq;
 using System;
 using System.Collections.Generic;
 using Xunit;
@@ -10,7 +11,7 @@ namespace DupFinderCore.Tests
     {
         private readonly ImageComparer _sut;
         private readonly ImageComparisonRuleset _rules;
-        readonly List<(IEntry, IEntry)> list = new();
+        readonly List<Pair> list = new();
 
         readonly Mock<IEntry> Left = new();
         readonly Mock<IEntry> Right = new();
@@ -23,7 +24,7 @@ namespace DupFinderCore.Tests
         public ImageComparerTests()
         {
             _rules = new(_settings);
-            _sut = new ImageComparer(_rules);
+            _sut = new ImageComparer(_rules, null);
 
             Good.SetupGet(x => x.Size).Returns(30000); // smaller
             Good.SetupGet(x => x.Date).Returns(DaysAgo(1)); // newer
@@ -37,7 +38,7 @@ namespace DupFinderCore.Tests
             Right.SetupGet(x => x.Date).Returns(DaysAgo(2));
             Right.SetupGet(x => x.Pixels).Returns(900);
 
-            list.Add((Good.Object, Right.Object));
+            list.Add(new Pair(Good.Object, Right.Object));
 
             _sut.Compare(list);
 
@@ -52,7 +53,7 @@ namespace DupFinderCore.Tests
             Right.SetupGet(x => x.Date).Returns(DaysAgo(1));
             Right.SetupGet(x => x.Pixels).Returns(900);
 
-            list.Add((Good.Object, Right.Object));
+            list.Add(new Pair(Good.Object, Right.Object));
 
             _sut.Compare(list);
 
@@ -73,7 +74,7 @@ namespace DupFinderCore.Tests
             Right.SetupGet(x => x.Date).Returns(DaysAgo(1));
             Right.SetupGet(x => x.Pixels).Returns(1000);
 
-            list.Add((Left.Object, Right.Object));
+            list.Add(new Pair(Left.Object, Right.Object));
 
             _sut.Compare(list);
 
@@ -88,7 +89,7 @@ namespace DupFinderCore.Tests
             Right.SetupGet(x => x.Date).Returns(DaysAgo(1));
             Right.SetupGet(x => x.Pixels).Returns(1000);
 
-            list.Add((Good.Object, Right.Object));
+            list.Add(new Pair(Good.Object, Right.Object));
 
             _sut.Compare(list);
 

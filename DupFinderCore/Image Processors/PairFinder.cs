@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using DupFinderCore.Models;
+using Microsoft.Extensions.Configuration;
 using Serilog;
 using Shipwreck.Phash;
 using System;
@@ -22,9 +23,9 @@ namespace DupFinderCore
         }
         private static double TruncatedPercentage(double input) => Math.Truncate(input * 10 / 10);
 
-        public async Task<ConcurrentBag<(IEntry, IEntry)>> FindPairs(IEnumerable<IEntry> images)
+        public async Task<ConcurrentBag<Pair>> FindPairs(IEnumerable<IEntry> images)
         {
-            ConcurrentBag<(IEntry, IEntry)> similarImages = new();
+            ConcurrentBag<Pair> similarImages = new();
 
             IEnumerable<Task> tasks = images.UniquePairs()
             .Select(pair =>
@@ -33,7 +34,7 @@ namespace DupFinderCore
                 {
                     if (!AreSimilar(pair.Item1, pair.Item2)) return;
                     
-                    similarImages.Add((pair.Item1, pair.Item2));
+                    similarImages.Add(new(pair.Item1, pair.Item2));
                     _logger.Information($"Pair found: {pair}");
                 }
 

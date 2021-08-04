@@ -1,10 +1,10 @@
-﻿using Serilog;
+﻿using DupFinderCore.Models;
+using Serilog;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security;
 using System.Threading.Tasks;
 
 namespace DupFinderCore

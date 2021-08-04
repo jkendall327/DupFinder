@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using DupFinderCore.Models;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,7 +22,7 @@ namespace DupFinderCore
             _logger = logger;
         }
 
-        public void Compare(IEnumerable<(IEntry left, IEntry right)> pairs)
+        public void Compare(IEnumerable<Pair> pairs)
         {
             Keep.Clear();
             Trash.Clear();
@@ -44,14 +45,14 @@ namespace DupFinderCore
             return Math.Abs(pixelDifference - sizeDifference) >= 1 || aspectRatioDifference > 0.05;
         }
 
-        private void Judge((IEntry left, IEntry right) pair)
+        private void Judge(Pair pair)
         {
-            if (DetermineUnsure(pair.left, pair.right))
+            if (DetermineUnsure(pair.Left, pair.Right))
             {
-                Unsure.Add(pair.left);
-                Unsure.Add(pair.right);
+                Unsure.Add(pair.Left);
+                Unsure.Add(pair.Right);
 
-                _logger.Information($"Images {pair.left.TruncatedFilename} and {pair.right.TruncatedFilename} could not be judged conclusively. Both moved to 'Unsure' folder.");
+                _logger.Information($"Images {pair.Left.TruncatedFilename} and {pair.Right.TruncatedFilename} could not be judged conclusively. Both moved to 'Unsure' folder.");
 
                 return;
             }
@@ -62,7 +63,7 @@ namespace DupFinderCore
 
             foreach (var Test in _ruleset.Rules)
             {
-                var judgement = Test(pair.left, pair.right);
+                var judgement = Test(pair.Left, pair.Right);
 
                 switch (judgement)
                 {
@@ -84,25 +85,25 @@ namespace DupFinderCore
 
             if (highest == unsure)
             {
-                Unsure.Add(pair.left);
-                Unsure.Add(pair.right);
-                _logger.Information($"{pair.left.TruncatedFilename} and {pair.right.TruncatedFilename} comparison inconclusive.");
+                Unsure.Add(pair.Left);
+                Unsure.Add(pair.Right);
+                _logger.Information($"{pair.Left.TruncatedFilename} and {pair.Right.TruncatedFilename} comparison inconclusive.");
 
                 return;
             }
             if (highest == leftWins)
             {
-                Keep.Add(pair.left);
-                Trash.Add(pair.right);
-                _logger.Information($"{pair.left.TruncatedFilename} better than {pair.right.TruncatedFilename}.");
+                Keep.Add(pair.Left);
+                Trash.Add(pair.Right);
+                _logger.Information($"{pair.Left.TruncatedFilename} better than {pair.Right.TruncatedFilename}.");
 
                 return;
             }
             if (highest == rightWins)
             {
-                Keep.Add(pair.right);
-                Trash.Add(pair.left);
-                _logger.Information($"{pair.right.TruncatedFilename} better than {pair.left.TruncatedFilename}.");
+                Keep.Add(pair.Right);
+                Trash.Add(pair.Left);
+                _logger.Information($"{pair.Right.TruncatedFilename} better than {pair.Left.TruncatedFilename}.");
 
                 return;
             }

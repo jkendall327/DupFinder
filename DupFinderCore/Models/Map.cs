@@ -5,7 +5,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Linq;
 
-namespace DupFinderCore.Image_Processors
+namespace DupFinderCore.Models
 {
     /// <summary>
     /// A shrunken color map of an <see cref="Image"/>. Used for Euclidian distance comparisons.

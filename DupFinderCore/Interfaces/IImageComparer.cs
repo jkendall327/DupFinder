@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using DupFinderCore.Models;
 
 namespace DupFinderCore
 {
@@ -27,6 +28,6 @@ namespace DupFinderCore
         /// </summary>
         /// <param name="pairs">A list of <see cref="IEntry"/> pairs to be compared.</param>
         /// <param name="settings">The user's desired criteria for comparing images: pixel count, file size, etc.</param>
-        void Compare(IEnumerable<(IEntry left, IEntry right)> pairs);
+        void Compare(IEnumerable<Pair> pairs);
     }
 }

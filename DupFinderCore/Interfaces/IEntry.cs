@@ -1,4 +1,4 @@
-﻿using DupFinderCore.Image_Processors;
+﻿using DupFinderCore.Models;
 using Shipwreck.Phash;
 using System;
 

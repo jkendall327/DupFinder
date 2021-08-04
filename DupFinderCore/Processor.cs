@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using DupFinderCore.Models;
+using Microsoft.Extensions.Configuration;
 using Serilog;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ namespace DupFinderCore
         private readonly PairFinder _finder;
 
         public ConcurrentBag<IEntry> Targets { get; private set; } = new();
-        public ConcurrentBag<(IEntry Left, IEntry Right)> Pairs { get; private set; } = new();
+        public ConcurrentBag<Pair> Pairs { get; private set; } = new();
 
         public Processor(ImageSetLoader loader, ILogger logger, IImageComparer comparer, IConfiguration config, PairFinder finder)
         {
@@ -38,7 +39,7 @@ namespace DupFinderCore
             Pairs = await _finder.FindPairs(targets);
         }
 
-        public void CompareImages(IEnumerable<(IEntry, IEntry)> pairs)
+        public void CompareImages(IEnumerable<Pair> pairs)
         {
             _comparer.Compare(pairs);
         }
