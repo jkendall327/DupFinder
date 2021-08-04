@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using DupFinderCore.Interfaces;
 using DupFinderCore.Models;
-using Microsoft.Extensions.Configuration;
 using Serilog;
 using Shipwreck.Phash;
 
@@ -14,17 +13,18 @@ namespace DupFinderCore.Services
     /// <inheritdoc cref="IPairFinder"/>
     public class PairFinder
     {
-        private readonly IConfiguration _config;
         private readonly ILogger _logger;
+        private readonly double regularLimit = 99.999;
+        private readonly double phashLimit = 0.86;
 
-        public PairFinder(IConfiguration config, ILogger logger)
+        public PairFinder(ILogger logger)
         {
-            _config = config;
             _logger = logger;
         }
+
         private static double TruncatedPercentage(double input) => Math.Truncate(input * 10 / 10);
 
-        public async Task<ConcurrentBag<Pair>> FindPairs(IEnumerable<IEntry> images)
+        public async Task<ConcurrentBag<Pair>> FindPairs(IEnumerable<IEntry> images, bool doWeightedComparison = true)
         {
             ConcurrentBag<Pair> similarImages = new();
 
@@ -33,7 +33,7 @@ namespace DupFinderCore.Services
             {
                 void compare()
                 {
-                    if (!AreSimilar(pair.Item1, pair.Item2)) return;
+                    if (!AreSimilar(pair.Item1, pair.Item2, doWeightedComparison)) return;
 
                     similarImages.Add(new(pair.Item1, pair.Item2));
                     _logger.Information($"Pair found: {pair}");
@@ -49,10 +49,7 @@ namespace DupFinderCore.Services
             return similarImages;
         }
 
-        private readonly double regularLimit = 99.999;
-        private readonly double phashLimit = 0.86;
-
-        private bool AreSimilar(IEntry left, IEntry right)
+        private bool AreSimilar(IEntry left, IEntry right, bool doWeightedComparison)
         {
             // generate phash for initial check
             var phash = ImagePhash.GetCrossCorrelation(left.Hash, right.Hash);
@@ -67,7 +64,7 @@ namespace DupFinderCore.Services
             if (euclidianDistance < TruncatedPercentage(regularLimit))
                 return false;
 
-            if (_config.GetValue<bool>("WeightedImageComparison"))
+            if (doWeightedComparison)
             {
                 var focusedDistance = left.FocusedColorMap.CompareWith(right.FocusedColorMap);
 

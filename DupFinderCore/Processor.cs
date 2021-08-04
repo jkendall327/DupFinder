@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using DupFinderCore.Interfaces;
 using DupFinderCore.Models;
 using DupFinderCore.Services;
-using Microsoft.Extensions.Configuration;
 using Serilog;
 
 namespace DupFinderCore
@@ -15,19 +14,17 @@ namespace DupFinderCore
         private readonly ImageSetLoader _loader;
         private readonly ILogger _logger;
         private readonly IImageComparer _comparer;
-        private readonly IConfiguration _config;
         private readonly PairFinder _finder;
 
         public ConcurrentBag<IEntry> Targets { get; private set; } = new();
         public ConcurrentBag<Pair> Pairs { get; private set; } = new();
 
-        public Processor(ImageSetLoader loader, ILogger logger, IImageComparer comparer, IConfiguration config, PairFinder finder)
+        public Processor(ImageSetLoader loader, ILogger logger, IImageComparer comparer, PairFinder finder)
         {
             _logger = logger;
 
             _loader = loader;
             _comparer = comparer;
-            _config = config;
             _finder = finder;
         }
 
@@ -46,7 +43,7 @@ namespace DupFinderCore
             _comparer.Compare(pairs);
         }
 
-        public void MoveImages(DirectoryInfo baseFolder)
+        public void MoveImages(DirectoryInfo baseFolder, bool overwriteExistingFiles = true)
         {
             string basePath = baseFolder?.FullName + Path.DirectorySeparatorChar;
 
@@ -60,13 +57,13 @@ namespace DupFinderCore
             foreach ((List<IEntry> collection, string path) pair in collectionsAndPaths)
             {
                 DirectoryInfo destination = Directory.CreateDirectory(basePath + pair.path);
-                Move(pair.collection, destination);
+                Move(pair.collection, destination, overwriteExistingFiles);
             }
         }
 
         public int MovedImageCount => _comparer.Keep.Count + _comparer.Trash.Count + _comparer.Unsure.Count;
 
-        private void Move(IEnumerable<IEntry> images, DirectoryInfo destination)
+        private void Move(IEnumerable<IEntry> images, DirectoryInfo destination, bool overwriteExistingFiles)
         {
             foreach (var image in images)
             {
@@ -76,10 +73,9 @@ namespace DupFinderCore
                     continue;
                 }
 
-                bool overrideFiles = _config.GetValue<bool>("OverwriteExistingFiles");
                 string destinationPath = destination.FullName + Path.DirectorySeparatorChar + image.Filename;
 
-                File.Move(image.FullPath, destinationPath, overrideFiles);
+                File.Move(image.FullPath, destinationPath, overwriteExistingFiles);
             }
         }
     }
