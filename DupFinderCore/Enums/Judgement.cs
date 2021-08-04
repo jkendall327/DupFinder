@@ -1,4 +1,4 @@
-﻿namespace DupFinderCore
+﻿namespace DupFinderCore.Enums
 {
     /// <summary>
     /// Indicates which of two <see cref="IEntry"/> items is superior to the other.

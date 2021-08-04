@@ -1,8 +1,8 @@
-﻿using DupFinderCore.Models;
+﻿using System;
+using DupFinderCore.Models;
 using Shipwreck.Phash;
-using System;
 
-namespace DupFinderCore
+namespace DupFinderCore.Interfaces
 {
     /// <summary>
     /// Contains relevant information about an image: file info, hash, colourmap, size, etc.

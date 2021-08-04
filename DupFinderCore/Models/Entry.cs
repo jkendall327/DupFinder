@@ -1,9 +1,9 @@
-﻿using DupFinderCore.Models;
-using Shipwreck.Phash;
-using Shipwreck.Phash.Bitmaps;
-using System;
+﻿using System;
 using System.Drawing;
 using System.IO;
+using DupFinderCore.Interfaces;
+using Shipwreck.Phash;
+using Shipwreck.Phash.Bitmaps;
 
 namespace DupFinderCore.Models
 {

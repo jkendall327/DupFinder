@@ -1,4 +1,4 @@
-﻿namespace DupFinderCore
+﻿namespace DupFinderCore.Models
 {
     /// <summary>
     /// A simple data object that represents the user's desired criteria when comparing <see cref="IEntry"/> items.

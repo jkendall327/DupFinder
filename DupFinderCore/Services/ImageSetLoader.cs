@@ -1,13 +1,14 @@
-﻿using DupFinderCore.Models;
-using Serilog;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using DupFinderCore.Interfaces;
+using DupFinderCore.Models;
+using Serilog;
 
-namespace DupFinderCore
+namespace DupFinderCore.Services
 {
     /// <inheritdoc cref="IImageSetLoader"/> 
     public class ImageSetLoader
@@ -23,7 +24,7 @@ namespace DupFinderCore
         {
             ConcurrentBag<IEntry> entries = new();
 
-            IEnumerable<Task> tasks = 
+            IEnumerable<Task> tasks =
                 GetFiles(directory)
                 .Select(x =>
                 {

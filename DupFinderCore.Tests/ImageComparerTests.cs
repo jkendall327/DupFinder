@@ -1,7 +1,9 @@
-﻿using DupFinderCore.Models;
-using Moq;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using DupFinderCore.Interfaces;
+using DupFinderCore.Models;
+using DupFinderCore.Services;
+using Moq;
 using Xunit;
 
 namespace DupFinderCore.Tests

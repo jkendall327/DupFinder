@@ -1,26 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DupFinderCore.Enums;
+using DupFinderCore.Interfaces;
+using DupFinderCore.Models;
 
-namespace DupFinderCore
+namespace DupFinderCore.Services
 {
-    /// <summary>
-    /// Compares two <see cref="Entry"/> items to determine which is superior.
-    /// </summary>
-    public interface IImageComparisonRuleset
-    {
-        /// <summary>
-        /// List of methods that will compare two <see cref="Entry"/> items and return a <see cref="Judgement"/> indicating which is superior.
-        /// </summary>
-        List<Func<IEntry, IEntry, Judgement>> Rules { get; }
-
-        /// <summary>
-        /// Read a <see cref="UserSettings"/> object to dynamically add rules for image comparison.
-        /// </summary>
-        /// <param name="settings"></param>
-        void Configure();
-    }
-
     /// <inheritdoc cref="IImageComparisonRuleset"/>
     public class ImageComparisonRuleset : IImageComparisonRuleset
     {
@@ -83,9 +69,9 @@ namespace DupFinderCore
         public void Configure()
         {
             if (_settings.CompareByDate) Rules.Add(CompareDate);
-            
+
             if (_settings.CompareByPixels) Rules.Add(ComparePixels);
-            
+
             if (_settings.CompareBySize) Rules.Add(CompareSize);
         }
     }

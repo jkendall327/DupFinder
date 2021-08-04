@@ -1,10 +1,10 @@
-﻿using DupFinderApp;
+﻿using System;
+using System.Linq;
+using System.Windows;
+using DupFinderApp;
 using DupFinderApp.ViewModels;
 using DupFinderApp.Views;
 using Ookii.Dialogs.Wpf;
-using System;
-using System.Linq;
-using System.Windows;
 
 namespace DupFinder
 {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using DupFinderCore.Models;
 
-namespace DupFinderCore
+namespace DupFinderCore.Interfaces
 {
     /// <summary>
     /// Compares pairs of <see cref="IEntry"/> items and sorts them into lists based on criteria found in a <see cref="IImageComparisonRuleset"/>.

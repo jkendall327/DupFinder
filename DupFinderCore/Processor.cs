@@ -1,10 +1,12 @@
-﻿using DupFinderCore.Models;
-using Microsoft.Extensions.Configuration;
-using Serilog;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using DupFinderCore.Interfaces;
+using DupFinderCore.Models;
+using DupFinderCore.Services;
+using Microsoft.Extensions.Configuration;
+using Serilog;
 
 namespace DupFinderCore
 {

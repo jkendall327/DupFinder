@@ -1,5 +1,5 @@
-﻿using DupFinderApp.ViewModels;
-using System.Windows;
+﻿using System.Windows;
+using DupFinderApp.ViewModels;
 
 namespace DupFinderApp
 {

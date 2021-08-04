@@ -1,13 +1,13 @@
-﻿using DupFinder;
-using DupFinderCore;
-using Microsoft.Toolkit.Mvvm.Input;
-using Serilog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using DupFinder;
+using DupFinderCore;
+using Microsoft.Toolkit.Mvvm.Input;
+using Serilog;
 
 namespace DupFinderApp.ViewModels
 {

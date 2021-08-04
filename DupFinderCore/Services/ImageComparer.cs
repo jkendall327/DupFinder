@@ -1,10 +1,12 @@
-﻿using DupFinderCore.Models;
-using Serilog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using DupFinderCore.Enums;
+using DupFinderCore.Interfaces;
+using DupFinderCore.Models;
+using Serilog;
 
-namespace DupFinderCore
+namespace DupFinderCore.Services
 {
     /// <inheritdoc cref="IImageComparer"/>
     public class ImageComparer : IImageComparer

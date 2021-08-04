@@ -1,4 +1,4 @@
-﻿using DupFinderCore;
+﻿using DupFinderCore.Models;
 
 namespace DupFinderApp.ViewModels
 {

@@ -1,14 +1,15 @@
-﻿using DupFinderCore.Models;
-using Microsoft.Extensions.Configuration;
-using Serilog;
-using Shipwreck.Phash;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DupFinderCore.Interfaces;
+using DupFinderCore.Models;
+using Microsoft.Extensions.Configuration;
+using Serilog;
+using Shipwreck.Phash;
 
-namespace DupFinderCore
+namespace DupFinderCore.Services
 {
     /// <inheritdoc cref="IPairFinder"/>
     public class PairFinder
@@ -33,7 +34,7 @@ namespace DupFinderCore
                 void compare()
                 {
                     if (!AreSimilar(pair.Item1, pair.Item2)) return;
-                    
+
                     similarImages.Add(new(pair.Item1, pair.Item2));
                     _logger.Information($"Pair found: {pair}");
                 }

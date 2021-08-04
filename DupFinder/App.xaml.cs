@@ -1,11 +1,14 @@
-﻿using DupFinderApp;
+﻿using System;
+using System.Windows;
+using DupFinderApp;
 using DupFinderApp.ViewModels;
 using DupFinderCore;
+using DupFinderCore.Interfaces;
+using DupFinderCore.Models;
+using DupFinderCore.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
-using System;
-using System.Windows;
 
 namespace DupFinder
 {
