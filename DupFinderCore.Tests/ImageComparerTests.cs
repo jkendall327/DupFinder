@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using DupFinderCore.Interfaces;
 using DupFinderCore.Models;
 using DupFinderCore.Services;
+using FluentAssertions;
 using Moq;
 using Xunit;
 
@@ -17,7 +18,6 @@ namespace DupFinderCore.Tests
 
         readonly Mock<IEntry> Left = new();
         readonly Mock<IEntry> Right = new();
-
         readonly Mock<IEntry> Good = new();
 
         private readonly UserSettings _settings = new()
@@ -44,8 +44,8 @@ namespace DupFinderCore.Tests
 
             _sut.Compare(list);
 
-            Assert.Contains(Good.Object, _sut.Keep);
-            Assert.Contains(Right.Object, _sut.Trash);
+            _sut.Keep.Should().Contain(Good.Object);
+            _sut.Trash.Should().Contain(Right.Object);
         }
 
         [Fact]
@@ -59,8 +59,8 @@ namespace DupFinderCore.Tests
 
             _sut.Compare(list);
 
-            Assert.Contains(Good.Object, _sut.Keep);
-            Assert.Contains(Right.Object, _sut.Trash);
+            _sut.Keep.Should().Contain(Good.Object);
+            _sut.Trash.Should().Contain(Right.Object);
         }
 
         [Fact]
@@ -80,8 +80,8 @@ namespace DupFinderCore.Tests
 
             _sut.Compare(list);
 
-            Assert.Contains(Left.Object, _sut.Unsure);
-            Assert.Contains(Right.Object, _sut.Unsure);
+            _sut.Unsure.Should().Contain(Left.Object);
+            _sut.Unsure.Should().Contain(Right.Object);
         }
 
         [Fact]
@@ -95,8 +95,8 @@ namespace DupFinderCore.Tests
 
             _sut.Compare(list);
 
-            Assert.Contains(Good.Object, _sut.Unsure);
-            Assert.Contains(Right.Object, _sut.Unsure);
+            _sut.Unsure.Should().Contain(Good.Object);
+            _sut.Unsure.Should().Contain(Right.Object);
         }
 
         private static DateTime DaysAgo(int days)
