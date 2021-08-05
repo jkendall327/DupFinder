@@ -40,11 +40,12 @@ namespace DupFinder
 
             .AddSingleton(config)
 
-            .AddTransient<Processor>()
-            .AddTransient<ImageSetLoader>()
-            .AddTransient<PairFinder>()
-            .AddTransient<IImageComparisonRuleset, ImageComparisonRuleset>()
-            .AddTransient<IImageComparer, ImageComparer>()
+            .AddSingleton<Processor>()
+            .AddSingleton<ImageSetLoader>()
+            .AddSingleton<PairFinder>()
+            .AddSingleton<IImageComparisonRuleset, ImageComparisonRuleset>()
+            .AddSingleton<IImageComparer, ImageComparer>()
+            .AddSingleton<Mover>()
 
             .AddSingleton<UserSettings>()
             .AddSingleton<OptionsViewModel>()

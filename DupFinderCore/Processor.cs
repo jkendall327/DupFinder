@@ -12,20 +12,19 @@ namespace DupFinderCore
     public class Processor
     {
         private readonly ImageSetLoader _loader;
-        private readonly ILogger _logger;
         private readonly IImageComparer _comparer;
         private readonly PairFinder _finder;
+        private readonly Mover _mover;
 
         public ConcurrentBag<IEntry> Targets { get; private set; } = new();
         public ConcurrentBag<Pair> Pairs { get; private set; } = new();
 
-        public Processor(ImageSetLoader loader, ILogger logger, IImageComparer comparer, PairFinder finder)
+        public Processor(ImageSetLoader loader, IImageComparer comparer, PairFinder finder, Mover mover)
         {
-            _logger = logger;
-
             _loader = loader;
             _comparer = comparer;
             _finder = finder;
+            _mover = mover;
         }
 
         public async Task LoadImages(DirectoryInfo baseFolder)
@@ -45,38 +44,9 @@ namespace DupFinderCore
 
         public void MoveImages(DirectoryInfo baseFolder, bool overwriteExistingFiles = true)
         {
-            string basePath = baseFolder?.FullName + Path.DirectorySeparatorChar;
-
-            var collectionsAndPaths = new List<(List<IEntry>, string)>()
-            {
-                (_comparer.Keep, "Keep"),
-                (_comparer.Trash, "Trash"),
-                (_comparer.Unsure, "Unsure")
-            };
-
-            foreach ((List<IEntry> collection, string path) pair in collectionsAndPaths)
-            {
-                DirectoryInfo destination = Directory.CreateDirectory(basePath + pair.path);
-                Move(pair.collection, destination, overwriteExistingFiles);
-            }
+            _mover.MoveImages(baseFolder, overwriteExistingFiles);
         }
 
         public int MovedImageCount => _comparer.Keep.Count + _comparer.Trash.Count + _comparer.Unsure.Count;
-
-        private void Move(IEnumerable<IEntry> images, DirectoryInfo destination, bool overwriteExistingFiles)
-        {
-            foreach (var image in images)
-            {
-                if (!File.Exists(image.FullPath))
-                {
-                    _logger.Warning($"Image {image.FullPath} not found.");
-                    continue;
-                }
-
-                string destinationPath = destination.FullName + Path.DirectorySeparatorChar + image.Filename;
-
-                File.Move(image.FullPath, destinationPath, overwriteExistingFiles);
-            }
-        }
     }
 }
