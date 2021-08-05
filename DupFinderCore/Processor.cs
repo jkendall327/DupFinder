@@ -44,9 +44,9 @@ namespace DupFinderCore
             _comparer.Compare(pairs);
         }
 
-        public void MoveImages(DirectoryInfo baseFolder, bool overwriteExistingFiles = true)
+        public void MoveImages(DirectoryInfo baseFolder)
         {
-            _mover.MoveImages(baseFolder, overwriteExistingFiles);
+            _mover.MoveImages(baseFolder);
         }
 
         public int MovedImageCount => _comparer.Keep.Count + _comparer.Trash.Count + _comparer.Unsure.Count;

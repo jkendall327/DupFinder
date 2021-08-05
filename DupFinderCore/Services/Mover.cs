@@ -14,13 +14,16 @@ namespace DupFinderCore.Services
         private readonly IImageComparer _comparer;
         private readonly ILogger<Mover> _logger;
 
+        public bool OverwriteExistingFiles { get; set; }
+        public int MovedImageCount => _comparer.Keep.Count + _comparer.Trash.Count + _comparer.Unsure.Count;
+
         public Mover(IImageComparer comparer, ILogger<Mover> logger)
         {
             _comparer = comparer;
             _logger = logger;
         }
 
-        public void MoveImages(DirectoryInfo baseFolder, bool overwriteExistingFiles = true)
+        public void MoveImages(DirectoryInfo baseFolder)
         {
             string basePath = baseFolder?.FullName + Path.DirectorySeparatorChar;
 
@@ -34,13 +37,11 @@ namespace DupFinderCore.Services
             foreach ((List<IEntry> collection, string path) pair in collectionsAndPaths)
             {
                 DirectoryInfo destination = Directory.CreateDirectory(basePath + pair.path);
-                Move(pair.collection, destination, overwriteExistingFiles);
+                Move(pair.collection, destination);
             }
         }
 
-        public int MovedImageCount => _comparer.Keep.Count + _comparer.Trash.Count + _comparer.Unsure.Count;
-
-        private void Move(IEnumerable<IEntry> images, DirectoryInfo destination, bool overwriteExistingFiles)
+        private void Move(IEnumerable<IEntry> images, DirectoryInfo destination)
         {
             foreach (var image in images)
             {
@@ -52,7 +53,7 @@ namespace DupFinderCore.Services
 
                 string destinationPath = destination.FullName + Path.DirectorySeparatorChar + image.Filename;
 
-                File.Move(image.FullPath, destinationPath, overwriteExistingFiles);
+                File.Move(image.FullPath, destinationPath, OverwriteExistingFiles);
             }
         }
     }
