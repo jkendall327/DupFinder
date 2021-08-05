@@ -38,7 +38,9 @@ namespace DupFinder
 
         private static void OpenWindow<T>(T newInstance) where T : Window
         {
-            if (Application.Current.Windows.OfType<T>().Any()) return;
+            var open = Application.Current.Windows.OfType<T>().Where(x => x.IsActive);
+
+            if (open.Any()) return;
 
             newInstance.Show();
         }
