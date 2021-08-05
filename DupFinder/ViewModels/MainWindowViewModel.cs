@@ -68,7 +68,7 @@ namespace DupFinderApp.ViewModels
             }
         }
 
-        private DirectoryInfo BaseFolder => new DirectoryInfo(SelectedPath);
+        private DirectoryInfo BaseFolder => new DirectoryInfo(SelectedPath!);
 
         private async Task LoadImages()
         {
@@ -103,29 +103,29 @@ namespace DupFinderApp.ViewModels
             UpdateAllCommands();
         }
 
-        private string selectedPath;
-        public string SelectedPath
+        private string? selectedPath = string.Empty;
+        public string? SelectedPath
         {
             get => selectedPath;
             set => SetProperty(ref selectedPath, value);
         }
 
-        private int similarImages;
-        public int SimilarImages
+        private int? similarImages = null;
+        public int? SimilarImages
         {
             get => similarImages;
             set => SetProperty(ref similarImages, value);
         }
 
-        private int loadedImages;
-        public int LoadedImages
+        private int? loadedImages = null;
+        public int? LoadedImages
         {
             get => loadedImages;
             set => SetProperty(ref loadedImages, value);
         }
 
-        private int movedImages;
-        public int MovedImages
+        private int? movedImages = null;
+        public int? MovedImages
         {
             get => movedImages;
             set => SetProperty(ref movedImages, value);
