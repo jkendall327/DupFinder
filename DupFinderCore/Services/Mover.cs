@@ -46,7 +46,7 @@ namespace DupFinderCore.Services
             {
                 if (!File.Exists(image.FullPath))
                 {
-                    _logger.LogWarning($"Image {image.FullPath} not found.");
+                    _logger.LogWarning("Image {ImagePath} not found.", image.FullPath);
                     continue;
                 }
 

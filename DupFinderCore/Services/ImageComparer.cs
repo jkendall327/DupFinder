@@ -54,7 +54,7 @@ namespace DupFinderCore.Services
                 Unsure.Add(pair.Left);
                 Unsure.Add(pair.Right);
 
-                _logger.LogInformation($"Images {pair.Left.TruncatedFilename} and {pair.Right.TruncatedFilename} could not be judged conclusively. Both moved to 'Unsure' folder.");
+                _logger.LogInformation("{LeftFilename} and {RightFilename} comparison inconclusive.", pair.Left.TruncatedFilename, pair.Right.TruncatedFilename);
 
                 return;
             }
@@ -89,7 +89,7 @@ namespace DupFinderCore.Services
             {
                 Unsure.Add(pair.Left);
                 Unsure.Add(pair.Right);
-                _logger.LogInformation($"{pair.Left.TruncatedFilename} and {pair.Right.TruncatedFilename} comparison inconclusive.");
+                _logger.LogInformation("{LeftFilename} and {RightFilename} comparison inconclusive.", pair.Left.TruncatedFilename, pair.Right.TruncatedFilename);
 
                 return;
             }
@@ -97,7 +97,7 @@ namespace DupFinderCore.Services
             {
                 Keep.Add(pair.Left);
                 Trash.Add(pair.Right);
-                _logger.LogInformation($"{pair.Left.TruncatedFilename} better than {pair.Right.TruncatedFilename}.");
+                _logger.LogInformation("{LeftFilename} better than {RightFilename}.", pair.Left.TruncatedFilename, pair.Right.TruncatedFilename);
 
                 return;
             }
@@ -105,7 +105,7 @@ namespace DupFinderCore.Services
             {
                 Keep.Add(pair.Right);
                 Trash.Add(pair.Left);
-                _logger.LogInformation($"{pair.Right.TruncatedFilename} better than {pair.Left.TruncatedFilename}.");
+                _logger.LogInformation("{RightFilename} better than {LeftFilename}.", pair.Right.TruncatedFilename, pair.Left.TruncatedFilename);
 
                 return;
             }

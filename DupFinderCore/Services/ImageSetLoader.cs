@@ -31,7 +31,7 @@ namespace DupFinderCore.Services
                     void create()
                     {
                         entries.Add(new Entry(x.FullName));
-                        _logger.LogDebug($"Created new entry from {x.Name}");
+                        _logger.LogDebug("Created new entry from {EntryName}", x.Name);
                     }
 
                     return Task.Run(create);
@@ -51,13 +51,13 @@ namespace DupFinderCore.Services
                     .Where(file => file.IsImage())
                     .AsParallel();
 
-                _logger.LogDebug($"Loaded {files.Count()} files from {directory.FullName}.");
+                _logger.LogDebug("Loaded {FileCount} files from {DirectoryName}.", files.Count(), directory.FullName);
 
                 return files;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Exception when processing {directory.Name}.");
+                _logger.LogError(ex, "Exception when processing {DirectoryName}.", directory.Name);
                 return Enumerable.Empty<FileInfo>();
             }
         }
