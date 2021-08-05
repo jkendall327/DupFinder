@@ -20,26 +20,20 @@ namespace DupFinderCore.Services
             _logger = logger;
         }
 
-        public async Task<ConcurrentBag<IEntry>> LoadImages(DirectoryInfo directory)
+        public async IAsyncEnumerable<IEntry> LoadImagesAsync(DirectoryInfo directory)
         {
-            ConcurrentBag<IEntry> entries = new();
+            foreach (FileInfo file in GetFiles(directory))
+            {
+                yield return await MakeEntryAsync(file);
+            }
+        }
 
-            IEnumerable<Task> tasks =
-                GetFiles(directory)
-                .Select(x =>
-                {
-                    void create()
-                    {
-                        entries.Add(new Entry(x.FullName));
-                        _logger.LogDebug("Created new entry from {EntryName}", x.Name);
-                    }
+        private async Task<IEntry> MakeEntryAsync(FileInfo fi)
+        {
+            Entry entry = await Task.Run(() => new Entry(fi.FullName));
+            _logger.LogDebug("Created new entry from {EntryName}", fi.Name);
 
-                    return Task.Run(create);
-                });
-
-            await Task.WhenAll(tasks);
-
-            return entries;
+            return entry;
         }
 
         private IEnumerable<FileInfo> GetFiles(DirectoryInfo directory)

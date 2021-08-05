@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using DupFinderCore.Interfaces;
 using DupFinderCore.Models;
@@ -24,29 +22,23 @@ namespace DupFinderCore.Services
 
         private static double TruncatedPercentage(double input) => Math.Truncate(input * 10 / 10);
 
-        public async Task<ConcurrentBag<Pair>> FindPairs(IEnumerable<IEntry> images, bool doWeightedComparison = true)
+        public async IAsyncEnumerable<Pair> FindPairs(IEnumerable<IEntry> images, bool doWeightedComparison = true)
         {
-            ConcurrentBag<Pair> similarImages = new();
-
-            IEnumerable<Task> tasks = images.UniquePairs()
-            .Select(pair =>
+            foreach (Pair pair in images.UniquePairs())
             {
-                void compare()
+                Func<bool> similar = () =>
+                AreSimilar(
+                    pair.Left, 
+                    pair.Right,
+                    doWeightedComparison);
+
+                if (await Task.Run(similar))
                 {
-                    if (!AreSimilar(pair.Item1, pair.Item2, doWeightedComparison)) return;
+                    _logger.LogInformation("Pair found: {Pair}", pair);
 
-                    similarImages.Add(new(pair.Item1, pair.Item2));
-                    _logger.LogInformation($"Pair found: {pair}");
+                    yield return new Pair(pair.Left, pair.Right);
                 }
-
-                return Task.Run(compare);
-            });
-
-            await Task.WhenAll(tasks);
-
-            _logger.LogInformation($"Pairs found: {similarImages.Count}");
-
-            return similarImages;
+            }
         }
 
         private bool AreSimilar(IEntry left, IEntry right, bool doWeightedComparison)
@@ -74,7 +66,6 @@ namespace DupFinderCore.Services
                     return false;
             }
 
-            _logger.LogInformation($"Pair found: {left.TruncatedFilename} and {right.TruncatedFilename}");
             return true;
         }
     }

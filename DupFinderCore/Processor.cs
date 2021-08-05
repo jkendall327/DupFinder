@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using DupFinderCore.Interfaces;
 using DupFinderCore.Models;
@@ -15,8 +16,8 @@ namespace DupFinderCore
         private readonly PairFinder _finder;
         private readonly Mover _mover;
 
-        public ConcurrentBag<IEntry> Targets { get; private set; } = new();
-        public ConcurrentBag<Pair> Pairs { get; private set; } = new();
+        public IEnumerable<IEntry> Targets { get; private set; } = new List<IEntry>();
+        public IEnumerable<Pair> Pairs { get; private set; } = new List<Pair>();
 
         public Processor(ImageSetLoader loader, IImageComparer comparer, PairFinder finder, Mover mover)
         {
@@ -28,12 +29,14 @@ namespace DupFinderCore
 
         public async Task LoadImages(DirectoryInfo baseFolder)
         {
-            Targets = await _loader.LoadImages(baseFolder);
+            var result = _loader.LoadImagesAsync(baseFolder);
+
+            Targets = await result.ToListAsync();
         }
 
         public async Task FindSimilarImages(IEnumerable<IEntry> targets)
         {
-            Pairs = await _finder.FindPairs(targets);
+            Pairs = await _finder.FindPairs(targets).ToListAsync();
         }
 
         public void CompareImages(IEnumerable<Pair> pairs)

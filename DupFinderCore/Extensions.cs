@@ -2,6 +2,8 @@
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using DupFinderCore.Interfaces;
+using DupFinderCore.Models;
 
 namespace DupFinderCore
 {
@@ -14,6 +16,13 @@ namespace DupFinderCore
         /// </summary>
         public static IEnumerable<(T, T)> UniquePairs<T>(this IEnumerable<T> source)
             => source.SelectMany((_, i) => source.Where((_, j) => i < j), (x, y) => (x, y));
+
+        public static IEnumerable<Pair> UniquePairs(this IEnumerable<IEntry> source)
+        {
+            var pairs = source.UniquePairs();
+
+            return pairs.Select(x => new Pair(x.Left, x.Right));
+        }
 
         public static Color[] ToFlatColorArray(this Bitmap image)
         {

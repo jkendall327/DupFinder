@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using DupFinder;
@@ -73,7 +74,7 @@ namespace DupFinderApp.ViewModels
         private async Task LoadImages()
         {
             await _processor.LoadImages(BaseFolder);
-            LoadedImages = _processor.Targets.Count;
+            LoadedImages = _processor.Targets.Count();
 
             UpdateAllCommands();
         }
@@ -81,7 +82,7 @@ namespace DupFinderApp.ViewModels
         private async Task FindSimilarImages()
         {
             await _processor.FindSimilarImages(_processor.Targets);
-            SimilarImages = _processor.Pairs.Count;
+            SimilarImages = _processor.Pairs.Count();
 
             UpdateAllCommands();
         }
