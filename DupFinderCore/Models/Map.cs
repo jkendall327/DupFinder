@@ -15,7 +15,7 @@ namespace DupFinderCore.Models
         /// <summary>
         /// The color map itself.
         /// </summary>
-        public Color[]? ColorMap { get; private set; }
+        public Color[] ColorMap { get; private set; }
 
         /// <summary>
         /// The focus level of the map, i.e. what level resizing of the original image it is.
@@ -40,11 +40,35 @@ namespace DupFinderCore.Models
             FocusLevel = focusLevel;
             Offset = offset;
 
-            MakeMap(baseImage);
+            ColorMap = MakeMap(baseImage);
         }
 
         public override string ToString()
             => $"Focus: {FocusLevel}. Offset: {Offset}. Map: {ColorMap}";
+
+        private Color[] MakeMap(Image baseImage)
+        {
+            //make a bitmap with dimensions of the focus level
+            using var shrunken = new Bitmap(FocusLevel, FocusLevel, PixelFormat.Format16bppRgb555);
+            using var canvas = GetCanvas(shrunken);
+
+            // resize the image to the focus level
+            var rect = new Rectangle(0 - Offset, 0 - Offset, FocusLevel + Offset, FocusLevel + Offset);
+            canvas.DrawImage(baseImage, rect);
+
+            return shrunken.ToFlatColorArray();
+        }
+
+        private static Graphics GetCanvas(Bitmap shrunken)
+        {
+            var canvas = Graphics.FromImage(shrunken);
+
+            canvas.CompositingQuality = CompositingQuality.HighQuality;
+            canvas.InterpolationMode = InterpolationMode.HighQualityBilinear;
+            canvas.SmoothingMode = SmoothingMode.HighQuality;
+
+            return canvas;
+        }
 
         /// <summary>
         /// Calculates the euclidian distance between two maps.
@@ -53,7 +77,7 @@ namespace DupFinderCore.Models
         /// <returns>A percentage representing the similarity between the maps.</returns>
         public double CompareWith(Map map)
         {
-            if (map.ColorMap!.Length != ColorMap!.Length)
+            if (map.ColorMap.Length != ColorMap.Length)
             {
                 throw new ArgumentException("Maps were not of the same size.");
             }
@@ -85,28 +109,6 @@ namespace DupFinderCore.Models
             double blue = squaredDistance(first.B, second.B);
 
             return Math.Pow(red + green + blue, 2);
-        }
-
-        private void MakeMap(Image baseImage)
-        {
-            //make a bitmap with dimensions of the focus level
-            using var shrunken = new Bitmap(FocusLevel, FocusLevel, PixelFormat.Format16bppRgb555);
-            using var canvas = GetCanvas(shrunken);
-
-            // resize the image to the focus level
-            var rect = new Rectangle(0 - Offset, 0 - Offset, FocusLevel + Offset, FocusLevel + Offset);
-            canvas.DrawImage(baseImage, rect);
-
-            ColorMap = shrunken.ToFlatColorArray();
-        }
-
-        private static Graphics GetCanvas(Bitmap shrunken)
-        {
-            var canvas = Graphics.FromImage(shrunken);
-            canvas.CompositingQuality = CompositingQuality.HighQuality;
-            canvas.InterpolationMode = InterpolationMode.HighQualityBilinear;
-            canvas.SmoothingMode = SmoothingMode.HighQuality;
-            return canvas;
         }
     }
 }
