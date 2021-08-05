@@ -61,12 +61,10 @@ namespace DupFinderApp.ViewModels
         {
             foreach (ICommand? command in Commands)
             {
-                if (command is not RelayCommand r)
+                if (command is IRelayCommand r)
                 {
-                    continue;
+                    r.NotifyCanExecuteChanged();
                 }
-
-                r.NotifyCanExecuteChanged();
             }
         }
 
