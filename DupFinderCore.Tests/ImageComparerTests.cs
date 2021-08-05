@@ -6,6 +6,7 @@ using DupFinderCore.Services;
 using FluentAssertions;
 using Moq;
 using Xunit;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace DupFinderCore.Tests
 {
@@ -30,7 +31,7 @@ namespace DupFinderCore.Tests
         public ImageComparerTests()
         {
             _rules = new(_settings);
-            _sut = new ImageComparer(_rules, new NullLogger());
+            _sut = new ImageComparer(_rules, NullLogger<ImageComparer>.Instance);
 
             SetupMock(mock: Good, size: 30000, date: DaysAgo(1), pixels: 1000);
         }

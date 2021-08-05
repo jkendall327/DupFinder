@@ -35,9 +35,9 @@ namespace DupFinder
 
             log.Information("Program started.");
 
-            return ioc.AddSingleton(log)
+            return ioc
             .AddSingleton(sink)
-
+            .AddLogging(c => c.AddSerilog(log))
             .AddSingleton(config)
 
             .AddSingleton<Processor>()

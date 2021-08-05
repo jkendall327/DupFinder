@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using DupFinderCore.Interfaces;
 using DupFinderCore.Models;
 using DupFinderCore.Services;
-using Serilog;
 
 namespace DupFinderCore
 {

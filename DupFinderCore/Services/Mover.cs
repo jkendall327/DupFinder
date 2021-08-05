@@ -5,16 +5,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using DupFinderCore.Interfaces;
-using Serilog;
+using Microsoft.Extensions.Logging;
 
 namespace DupFinderCore.Services
 {
     public class Mover
     {
         private readonly IImageComparer _comparer;
-        private readonly ILogger _logger;
+        private readonly ILogger<Mover> _logger;
 
-        public Mover(IImageComparer comparer, ILogger logger)
+        public Mover(IImageComparer comparer, ILogger<Mover> logger)
         {
             _comparer = comparer;
             _logger = logger;
@@ -46,7 +46,7 @@ namespace DupFinderCore.Services
             {
                 if (!File.Exists(image.FullPath))
                 {
-                    _logger.Warning($"Image {image.FullPath} not found.");
+                    _logger.LogWarning($"Image {image.FullPath} not found.");
                     continue;
                 }
 

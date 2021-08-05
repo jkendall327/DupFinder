@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DupFinderCore.Interfaces;
 using DupFinderCore.Models;
-using Serilog;
+using Microsoft.Extensions.Logging;
 using Shipwreck.Phash;
 
 namespace DupFinderCore.Services
@@ -13,11 +13,11 @@ namespace DupFinderCore.Services
     /// <inheritdoc cref="IPairFinder"/>
     public class PairFinder
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<PairFinder> _logger;
         private readonly double regularLimit = 99.999;
         private readonly double phashLimit = 0.86;
 
-        public PairFinder(ILogger logger)
+        public PairFinder(ILogger<PairFinder> logger)
         {
             _logger = logger;
         }
@@ -36,7 +36,7 @@ namespace DupFinderCore.Services
                     if (!AreSimilar(pair.Item1, pair.Item2, doWeightedComparison)) return;
 
                     similarImages.Add(new(pair.Item1, pair.Item2));
-                    _logger.Information($"Pair found: {pair}");
+                    _logger.LogInformation($"Pair found: {pair}");
                 }
 
                 return Task.Run(compare);
@@ -44,7 +44,7 @@ namespace DupFinderCore.Services
 
             await Task.WhenAll(tasks);
 
-            _logger.Information($"Pairs found: {similarImages.Count}");
+            _logger.LogInformation($"Pairs found: {similarImages.Count}");
 
             return similarImages;
         }
@@ -74,7 +74,7 @@ namespace DupFinderCore.Services
                     return false;
             }
 
-            _logger.Information($"Pair found: {left.TruncatedFilename} and {right.TruncatedFilename}");
+            _logger.LogInformation($"Pair found: {left.TruncatedFilename} and {right.TruncatedFilename}");
             return true;
         }
     }

@@ -6,16 +6,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using DupFinderCore.Interfaces;
 using DupFinderCore.Models;
-using Serilog;
+using Microsoft.Extensions.Logging;
 
 namespace DupFinderCore.Services
 {
     /// <inheritdoc cref="IImageSetLoader"/> 
     public class ImageSetLoader
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<ImageSetLoader> _logger;
 
-        public ImageSetLoader(ILogger logger)
+        public ImageSetLoader(ILogger<ImageSetLoader> logger)
         {
             _logger = logger;
         }
@@ -31,7 +31,7 @@ namespace DupFinderCore.Services
                     void create()
                     {
                         entries.Add(new Entry(x.FullName));
-                        _logger.Debug($"Created new entry from {x.Name}");
+                        _logger.LogDebug($"Created new entry from {x.Name}");
                     }
 
                     return Task.Run(create);
@@ -51,13 +51,13 @@ namespace DupFinderCore.Services
                     .Where(file => file.IsImage())
                     .AsParallel();
 
-                _logger.Debug($"Loaded {files.Count()} files from {directory.FullName}.");
+                _logger.LogDebug($"Loaded {files.Count()} files from {directory.FullName}.");
 
                 return files;
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, $"Exception when processing {directory.Name}.");
+                _logger.LogError(ex, $"Exception when processing {directory.Name}.");
                 return Enumerable.Empty<FileInfo>();
             }
         }

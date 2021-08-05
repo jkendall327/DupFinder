@@ -4,7 +4,7 @@ using System.Linq;
 using DupFinderCore.Enums;
 using DupFinderCore.Interfaces;
 using DupFinderCore.Models;
-using Serilog;
+using Microsoft.Extensions.Logging;
 
 namespace DupFinderCore.Services
 {
@@ -16,9 +16,9 @@ namespace DupFinderCore.Services
         public List<IEntry> Unsure { get; set; } = new List<IEntry>();
 
         private IImageComparisonRuleset _ruleset { get; }
-        private ILogger _logger { get; }
+        private ILogger<ImageComparer> _logger { get; }
 
-        public ImageComparer(IImageComparisonRuleset ruleset, ILogger logger)
+        public ImageComparer(IImageComparisonRuleset ruleset, ILogger<ImageComparer> logger)
         {
             _ruleset = ruleset;
             _logger = logger;
@@ -54,7 +54,7 @@ namespace DupFinderCore.Services
                 Unsure.Add(pair.Left);
                 Unsure.Add(pair.Right);
 
-                _logger.Information($"Images {pair.Left.TruncatedFilename} and {pair.Right.TruncatedFilename} could not be judged conclusively. Both moved to 'Unsure' folder.");
+                _logger.LogInformation($"Images {pair.Left.TruncatedFilename} and {pair.Right.TruncatedFilename} could not be judged conclusively. Both moved to 'Unsure' folder.");
 
                 return;
             }
@@ -89,7 +89,7 @@ namespace DupFinderCore.Services
             {
                 Unsure.Add(pair.Left);
                 Unsure.Add(pair.Right);
-                _logger.Information($"{pair.Left.TruncatedFilename} and {pair.Right.TruncatedFilename} comparison inconclusive.");
+                _logger.LogInformation($"{pair.Left.TruncatedFilename} and {pair.Right.TruncatedFilename} comparison inconclusive.");
 
                 return;
             }
@@ -97,7 +97,7 @@ namespace DupFinderCore.Services
             {
                 Keep.Add(pair.Left);
                 Trash.Add(pair.Right);
-                _logger.Information($"{pair.Left.TruncatedFilename} better than {pair.Right.TruncatedFilename}.");
+                _logger.LogInformation($"{pair.Left.TruncatedFilename} better than {pair.Right.TruncatedFilename}.");
 
                 return;
             }
@@ -105,7 +105,7 @@ namespace DupFinderCore.Services
             {
                 Keep.Add(pair.Right);
                 Trash.Add(pair.Left);
-                _logger.Information($"{pair.Right.TruncatedFilename} better than {pair.Left.TruncatedFilename}.");
+                _logger.LogInformation($"{pair.Right.TruncatedFilename} better than {pair.Left.TruncatedFilename}.");
 
                 return;
             }
